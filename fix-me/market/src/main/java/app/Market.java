@@ -29,14 +29,16 @@ class Market {
             String echoString;
             String response;
 
-            BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String savedServerResponse = dIn.readLine();
-            System.out.println("--Market Connected--\n" + savedServerResponse);
+            // BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            // String savedServerResponse = dIn.readLine();
+            // System.out.println("--Market Connected--\n" + savedServerResponse);
+            System.out.println("--Market Connected--");
             do {
                 // Continual loop looking for input
                 // Runs purchase with its check function
                 // Sends Back if transaction was successful
-                echoString = echoes.readLine();
+                echoString = scanner.nextLine().toLowerCase();
+                // echoString = echoes.readLine();
                 /*
                 GET MESSAGE FROM SERVER
 

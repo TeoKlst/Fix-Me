@@ -31,21 +31,21 @@ class Broker {
 
             //-Reading output from server and saving it
             //-Error of fatal close, string left null which faults echoer on server side
-            BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String savedServerResponse = dIn.readLine();
-            System.out.println("--Broker Connected--\n" + savedServerResponse);
+            // BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            // String savedServerResponse = dIn.readLine();
+            // System.out.println("--Broker Connected--\n" + savedServerResponse);
 
             do {
                 StringBuilder sbMessage = new StringBuilder();
-                int brokerMessageType = 0;
+                String brokerMessageType = "0";
 
                 System.out.println("Buy, Sell, List Markets or Display your goods:");
                 echoString = scanner.nextLine().toLowerCase();
 
                 if (echoString.equals("buy")) {
                     //-Type of message ID
-                    brokerMessageType = 1;
-                    sbMessage.append(echoString + brokerMessageType);
+                    brokerMessageType = "1";
+                    sbMessage.append(brokerMessageType + "-");
                     System.out.println("Choose Market ID:");
                     echoString = scanner.nextLine().toLowerCase();
                     sbMessage.append(echoString + "-");
@@ -65,8 +65,8 @@ class Broker {
                     stringToEcho.println(sbMessage.toString());
                 }
                 else if (echoString.equals("sell")) {
-                    brokerMessageType = 2;
-                    sbMessage.append(echoString + brokerMessageType);
+                    brokerMessageType = "2";
+                    sbMessage.append(brokerMessageType + "-");
                     System.out.println("Choose Market ID:");
                     echoString = scanner.nextLine().toLowerCase();
                     sbMessage.append(echoString + "-");
@@ -85,11 +85,11 @@ class Broker {
                     //-Sends message to echoer
                     stringToEcho.println(sbMessage.toString());
                 }
-                else if (echoString.equals("list markets")) {
-                    brokerMessageType = 3;
-                    stringToEcho.println(Integer.toString(brokerMessageType));
+                else if (echoString.equals("listm")) {
+                    brokerMessageType = "3";
+                    stringToEcho.println(brokerMessageType);
                 }
-                else if (echoString.equals("display goods")) {
+                else if (echoString.equals("listg")) {
                     System.out.println("__/Your Account/__" + "\nSilver: " + BrokerAccount.accountSilver + 
                     "\nGold: " + BrokerAccount.accountGold+ "\nPlatinum: " + BrokerAccount.accountPlatinum + 
                     "\nFuel: " + BrokerAccount.accountFuel + "\nBitcoin: " + BrokerAccount.accountBitcoin + 

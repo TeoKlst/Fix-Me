@@ -41,27 +41,24 @@ public class Echoer extends Thread {
                 }
                 //-Buy from market
                 if (echoStringParts[0].equals("1")) {
-                    Socket marketPort = MainServer.marketSockets.get(echoStringParts[1]);
-                    output = new PrintWriter(marketPort.getOutputStream(), true);
+                    // Socket marketPort = MainServer.marketSockets.get(echoStringParts[1]);
+                    // output = new PrintWriter(marketPort.getOutputStream(), true);
                     output.println("Message from Broker -> Buy Market => Data: " + echoString);
                 }
                 //-Sell from market
                 if (echoStringParts[0].equals("2")) {
-                    Socket marketPort = MainServer.marketSockets.get(echoStringParts[1]);
-                    output = new PrintWriter(marketPort.getOutputStream(), true);
+                    // Socket marketPort = MainServer.marketSockets.get(echoStringParts[1]);
+                    // output = new PrintWriter(marketPort.getOutputStream(), true);
                     output.println("Message from Broker -> Sale Market => Data: " + echoString);
                 }
                 //-List Markets
                 if (echoString.equals("3")) {
-                    Socket brokerPort = MainServer.brokerSockets.get("1");
-                    output = new PrintWriter(brokerPort.getOutputStream(), true);
-                    int key = 1;
-                    while (key <= MainServer.marketSockets.size()) {
-                        output.println("Market => " + MainServer.marketSockets.get(Integer.toString(key)));
-                        key++;
-                    }
+                    // Socket brokerPort = MainServer.brokerSockets.get("1");
+                    // output = new PrintWriter(brokerPort.getOutputStream(), true);
+                    output.println("Market => " + MainServer.brokerSockets);
                 }
-                output.println("Echo from server :" + echoString);
+                else
+                    output.println("Echo from server :" + echoString);
                 // Test TKelest Branch Merge
             }
         } catch(IOException e) {

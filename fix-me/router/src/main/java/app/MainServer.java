@@ -52,7 +52,7 @@ import app.BrokerCount;
 // • You concieve a fail-over mechanismso that ongoing transactions are restored in case one component goes down.
 
 public class MainServer {
-    /*
+    // /*
     public static void main(String[] args)throws Exception{
         Selector selector = Selector.open();
         int[] ports = {5000, 5001};
@@ -82,7 +82,7 @@ public class MainServer {
             }
         }        
     }
-    */
+    // */
 
     /*
     public static void main(String[] args)throws Exception{
@@ -143,7 +143,7 @@ public class MainServer {
     //-Market Hash Map
     public static Map<String, Socket> marketSockets = new HashMap<String,Socket>();
 
-    // /*
+    /*
     public static void main(String[] args) throws Exception {        
         try (ServerSocket serverSocketBroker = new ServerSocket(5000)) {
             System.out.println("--Broker Router Running--");
@@ -177,5 +177,5 @@ public class MainServer {
             System.out.println("Server exception " + e.getMessage());
         }
     }
-    // */
+    */
 }
