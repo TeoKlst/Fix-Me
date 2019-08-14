@@ -45,7 +45,7 @@ class Broker {
                 if (echoString.equals("buy")) {
                     //-Type of message ID
                     brokerMessageType = 1;
-                    sbMessage.append(echoString + brokerMessageType);
+                    sbMessage.append(echoString + brokerMessageType + "-");
                     System.out.println("Choose Market ID:");
                     echoString = scanner.nextLine().toLowerCase();
                     sbMessage.append(echoString + "-");
@@ -66,7 +66,7 @@ class Broker {
                 }
                 else if (echoString.equals("sell")) {
                     brokerMessageType = 2;
-                    sbMessage.append(echoString + brokerMessageType);
+                    sbMessage.append(echoString + brokerMessageType + "-");
                     System.out.println("Choose Market ID:");
                     echoString = scanner.nextLine().toLowerCase();
                     sbMessage.append(echoString + "-");
