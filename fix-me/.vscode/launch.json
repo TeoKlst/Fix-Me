@@ -1,0 +1,39 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - MainServer2",
+            "request": "launch",
+            "mainClass": "app.MainServer2",
+            "projectName": "router"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - TwoPortServer",
+            "request": "launch",
+            "mainClass": "app.TwoPortServer",
+            "projectName": "router"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Market",
+            "request": "launch",
+            "mainClass": "app.Market",
+            "projectName": "market"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Broker",
+            "request": "launch",
+            "mainClass": "app.Broker",
+            "projectName": "broker"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - MainServer",
+            "request": "launch",
+            "mainClass": "app.MainServer",
+            "projectName": "router"
+        }
+    ]
+}
