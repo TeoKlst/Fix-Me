@@ -115,7 +115,7 @@ public class FixProtocol {
          */
         body.append("554=" + this.password + "|");
 
-        String header = ConstructHeader();
+        String header = ConstructHeader(object, body.toString());
 
         String message = header + body.toString() + checksumGenerator(header + body.toString()) + "|";
 
@@ -137,11 +137,28 @@ public class FixProtocol {
      * Sending Time -> the time of message transmission
      */
 
-    public String ConstructHeader() {
+    public String ConstructHeader(HashMap<String, String> object, String bodyMessage) {
         StringBuilder header = new StringBuilder();
 
         //Protocol version. Always unencrypted, must be first field in message.
         header.append("8=FIX4.4|");
+
+        StringBuilder message = new StringBuilder();
+
+        //Message type. Always unencrypted, must be the third field in message.
+        if (object.containsKey("type")) {
+            message.append("35=" + object.get("type") + "|");
+        } else {
+            //Values: https://www.onixs.biz/fix-dictionary/4.2/tagnum_35.html
+            message.append("35=" + "1" + "|");
+        }
+
+        //ID of the trading party in the following format: <BrokerUID>.<Trader Login>
+        //Where BrokerUID is prvided by cTrader and Trader Login is numeric identifier of the trader account
+
+        // https://help.ctrader.com/fix/fixsample
+
+
         return null;
     }
 }
