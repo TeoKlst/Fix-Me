@@ -99,3 +99,4 @@ fabric.properties
 
 target
 .DS_Store
+*.prefs
