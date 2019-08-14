@@ -40,19 +40,19 @@ public class Echoer extends Thread {
                     break;
                 }
                 //-Buy from market
-                if (echoStringParts[0].equals("1")) {
-                    Socket marketPort = MainServer.marketSockets.get(echoStringParts[1]);
-                    output = new PrintWriter(marketPort.getOutputStream(), true);
+                else if (echoStringParts[0].equals("1")) {
+                    // Socket brokerPort = MainServer.marketSockets.get("1");
+                    // output = new PrintWriter(brokerPort.getOutputStream(), true);
                     output.println("Message from Broker -> Buy Market => Data: " + echoString);
                 }
                 //-Sell from market
-                if (echoStringParts[0].equals("2")) {
-                    Socket marketPort = MainServer.marketSockets.get(echoStringParts[1]);
-                    output = new PrintWriter(marketPort.getOutputStream(), true);
+                else if (echoStringParts[0].equals("2")) {
+                    // Socket brokerPort = MainServer.marketSockets.get("1");
+                    // output = new PrintWriter(brokerPort.getOutputStream(), true);
                     output.println("Message from Broker -> Sale Market => Data: " + echoString);
                 }
                 //-List Markets
-                if (echoString.equals("3")) {
+                else if (echoString.equals("3")) {
                     Socket brokerPort = MainServer.brokerSockets.get("1");
                     output = new PrintWriter(brokerPort.getOutputStream(), true);
                     int key = 1;
@@ -61,7 +61,9 @@ public class Echoer extends Thread {
                         key++;
                     }
                 }
-                output.println("Echo from server :" + echoString);
+                else {
+                    output.println("Echo from server :" + echoString);
+                }
             }
         } catch(IOException e) {
             System.out.println("Oops: " + e.getMessage());

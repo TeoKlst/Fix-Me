@@ -37,15 +37,15 @@ class Broker {
 
             do {
                 StringBuilder sbMessage = new StringBuilder();
-                int brokerMessageType = 0;
+                String brokerMessageType = "0";
 
                 System.out.println("Buy, Sell, List Markets or Display your goods:");
                 echoString = scanner.nextLine().toLowerCase();
 
                 if (echoString.equals("buy")) {
                     //-Type of message ID
-                    brokerMessageType = 1;
-                    sbMessage.append(echoString + brokerMessageType + "-");
+                    brokerMessageType = "1";
+                    sbMessage.append(brokerMessageType + "-");
                     System.out.println("Choose Market ID:");
                     echoString = scanner.nextLine().toLowerCase();
                     sbMessage.append(echoString + "-");
@@ -65,8 +65,8 @@ class Broker {
                     stringToEcho.println(sbMessage.toString());
                 }
                 else if (echoString.equals("sell")) {
-                    brokerMessageType = 2;
-                    sbMessage.append(echoString + brokerMessageType + "-");
+                    brokerMessageType = "2";
+                    sbMessage.append(brokerMessageType + "-");
                     System.out.println("Choose Market ID:");
                     echoString = scanner.nextLine().toLowerCase();
                     sbMessage.append(echoString + "-");
@@ -86,8 +86,8 @@ class Broker {
                     stringToEcho.println(sbMessage.toString());
                 }
                 else if (echoString.equals("list markets")) {
-                    brokerMessageType = 3;
-                    stringToEcho.println(Integer.toString(brokerMessageType));
+                    brokerMessageType = "3";
+                    stringToEcho.println(brokerMessageType);
                 }
                 else if (echoString.equals("display goods")) {
                     System.out.println("__/Your Account/__" + "\nSilver: " + BrokerAccount.accountSilver + 
