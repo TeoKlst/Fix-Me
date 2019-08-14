@@ -61,9 +61,8 @@ public class Echoer extends Thread {
                         key++;
                     }
                 }
-                else {
-                    output.println("Echo from server :" + echoString);
-                }
+                output.println("Echo from server :" + echoString);
+                // Test TKelest Branch Merge
             }
         } catch(IOException e) {
             System.out.println("Oops: " + e.getMessage());
