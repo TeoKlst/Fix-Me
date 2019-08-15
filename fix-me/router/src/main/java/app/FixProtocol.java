@@ -141,6 +141,7 @@ public class FixProtocol {
      * Sending Time -> the time of message transmission
      */
 
+     //Protocol Version|        |Message Type|      |Message Sequence Number|Date|
     public String ConstructHeader(HashMap<String, String> object, String bodyMessage) {
         StringBuilder header = new StringBuilder();
 
