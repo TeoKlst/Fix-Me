@@ -34,10 +34,11 @@ class Market {
             // System.out.println("--Market Connected--\n" + savedServerResponse);
             System.out.println("--Market Connected--");
             do {
+                response = echoes.readLine();
                 // Continual loop looking for input
                 // Runs purchase with its check function
                 // Sends Back if transaction was successful
-                echoString = scanner.nextLine().toLowerCase();
+                echoString = response;
                 // echoString = echoes.readLine();
                 /*
                 GET MESSAGE FROM SERVER
@@ -47,6 +48,7 @@ class Market {
                 else if (Message == Sale -> Sale Func Called)
                     MarketFunctions.brokerSaleCheck(echoString);
                 */
+                
                 stringToEcho.println(echoString);
                 if (!echoString.equals("exit")) {
                     response = echoes.readLine();
