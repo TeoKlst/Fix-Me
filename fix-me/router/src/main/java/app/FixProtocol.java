@@ -1,7 +1,11 @@
 package app;
 
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.TimeZone;
 
 public class FixProtocol {
     private String     username;
@@ -155,10 +159,40 @@ public class FixProtocol {
 
         //ID of the trading party in the following format: <BrokerUID>.<Trader Login>
         //Where BrokerUID is prvided by cTrader and Trader Login is numeric identifier of the trader account
+        message.append("49=" + "_senderCompID" + "|");
+
+        //Message target. Valid value is "CSERVER"
+        message.append("56=" + "_targetCompID" + "|");
+
+        //Additional session qualifier. Possible Values are: "QUOTE", "TRADE"
+        message.append("57=" + "qualifier.toString()" + "|");
+
+        //Assigned value used to identify specific message originator
+        message.append("50=" + "_senderSubID" + "|");
+
+        //Message Sequence Number
+        message.append("34=" + "messageSequenceNumber" + "|");
+
+        //Time of message transmission (always expressed in UTC (Universal Time Coordinated), also known as 'GMT'))
+        SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
+        dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+        //Local time zone   
+        SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
+
+        try{
+            message.append("52=" + dateFormatLocal.parse( dateFormatGmt.format(new Date()) ).toString() + "|");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        //Message body length. Always unencrypted, must be second field in message.
+        int length = message.length() + bodyMessage.length();
+        header.append("9=" + length + "|");
+        header.append(message);
+
+        return header.toString();
 
         // https://help.ctrader.com/fix/fixsample
-
-
-        return null;
     }
 }
