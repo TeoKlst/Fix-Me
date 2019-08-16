@@ -74,6 +74,8 @@ public class FixProtocol {
         return true;
     }
 
+
+    //Encryption|Heartbeat|resetSeqNum|UserID|
     public String       logonMessage(HashMap<String, String> object) {
         StringBuilder body = new StringBuilder();
 
@@ -106,6 +108,8 @@ public class FixProtocol {
          */
         if (object.containsKey("resetSeqNum") && object.get("resetSeqNum").equals("true")) {
             body.append("141=Y|");
+        } else {
+            body.append("141=N|");
         }
 
         /*
@@ -141,7 +145,7 @@ public class FixProtocol {
      * Sending Time -> the time of message transmission
      */
 
-     //Protocol Version|        |Message Type|      |Message Sequence Number|Date|
+     //Protocol Version|length|Message Type|Message Sequence Number|Date|
     public String ConstructHeader(HashMap<String, String> object, String bodyMessage) {
         StringBuilder header = new StringBuilder();
 
@@ -158,6 +162,10 @@ public class FixProtocol {
             message.append("35=" + "1" + "|");
         }
 
+
+
+
+        /*
         //ID of the trading party in the following format: <BrokerUID>.<Trader Login>
         //Where BrokerUID is prvided by cTrader and Trader Login is numeric identifier of the trader account
         message.append("49=" + "_senderCompID" + "|");
@@ -170,6 +178,10 @@ public class FixProtocol {
 
         //Assigned value used to identify specific message originator
         message.append("50=" + "_senderSubID" + "|");
+        */
+
+
+
 
         //Message Sequence Number
         message.append("34=" + "messageSequenceNumber" + "|");
