@@ -8,13 +8,12 @@ import java.util.HashMap;
 import java.util.TimeZone;
 
 public class FixProtocol {
-    private String     username;
-    private String     password;
-    private String     test;
+    private String     userID;
+    private int         msgSeqNum;
 
-    public FixProtocol(String username, String password) {
-        this.username = username;
-        this.password = password;
+    public FixProtocol(String userID) {
+        this.userID = userID;
+        this.msgSeqNum = 0;
     }
     
     public String       checksumGenerator(String messageInput) {
@@ -79,9 +78,9 @@ public class FixProtocol {
     public String       logonMessage(HashMap<String, String> object) {
         StringBuilder body = new StringBuilder();
 
-        /* Define a message encryption scheme
-         * Valid value is "0" = NONE+OTHER (encryption is not used)
-        */
+        /* 
+         * Define a message encryption scheme. Valid value is "0" = NONE+OTHER (encryption is not used)
+         */
         body.append("98=0|");
 
         /*
@@ -96,7 +95,7 @@ public class FixProtocol {
         if (object.containsKey("heartbeat")) {
             body.append("108=" + object.get("heartbeat") + "|");
         } else {
-            body.append("108=" + "60" + "|");
+            body.append("108=" + "120" + "|");
         }
 
         /*
@@ -107,24 +106,21 @@ public class FixProtocol {
          * Valid value is "Y" = Yes (reset)
          * 
          */
-        if (object.containsKey("resetSeqNum") && object.get("resetSeqNum").equals("true")) {
-            body.append("141=Y|");
-        } else {
-            body.append("141=N|");
-        }
+        body.append("141=Y|");
+        this.msgSeqNum = 0;
+
+        //For other messages
+        // if (object.containsKey("resetSeqNum") && object.get("resetSeqNum").equals("true")) {
+        //     body.append("141=Y|");
+        //     this.msgSeqNum = 0;
+        // } else {
+        //     body.append("141=N|");
+        // }
 
         /*
-         * The numeric User ID.
-         * User is linked to SenderCompID (#49) value (the user's organisation)
+         * The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
          */
-        body.append("553=" + this.username + "|");
-
-
-        
-        /*
-         * User password.
-         */
-        /*body.append("554=" + this.password + "|");*/
+        body.append("553=" + this.userID + "|");
 
         String header = ConstructHeader(object, body.toString());
 
@@ -162,32 +158,12 @@ public class FixProtocol {
             message.append("35=" + object.get("type") + "|");
         } else {
             //Values: https://www.onixs.biz/fix-dictionary/4.2/tagnum_35.html
-            message.append("35=" + "1" + "|");
+            message.append("35=" + "1" + "|");          //Test request = 1
         }
 
-
-
-
-        /*
-        //ID of the trading party in the following format: <BrokerUID>.<Trader Login>
-        //Where BrokerUID is prvided by cTrader and Trader Login is numeric identifier of the trader account
-        message.append("49=" + "_senderCompID" + "|");
-
-        //Message target. Valid value is "CSERVER"
-        message.append("56=" + "_targetCompID" + "|");
-
-        //Additional session qualifier. Possible Values are: "QUOTE", "TRADE"
-        message.append("57=" + "qualifier.toString()" + "|");
-
-        //Assigned value used to identify specific message originator
-        message.append("50=" + "_senderSubID" + "|");
-        */
-
-
-
-
         //Message Sequence Number
-        message.append("34=" + "messageSequenceNumber" + "|");
+        this.msgSeqNum++;       //Message sequence number starts at 1
+        message.append("34=" + this.msgSeqNum + "|");
 
         //Time of message transmission (always expressed in UTC (Universal Time Coordinated), also known as 'GMT'))
         SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
