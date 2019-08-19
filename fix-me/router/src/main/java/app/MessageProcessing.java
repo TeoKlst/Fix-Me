@@ -7,17 +7,17 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 // All messages will respect the FIX notation.
-// All messages will start with the ID asigned by the router and will be ended by the checksum.
+// All messages will start with the ID assigned by the router and will be ended by the checksum.
 // Buy and Sell messages will have the following mandatory fields:
 // • Instrument
 // • Quantity
 // • Market
 // • Price
 
-public class Echoer extends Thread {
+public class MessageProcessing extends Thread {
     private Socket socket;
 
-    public Echoer(Socket socket) {
+    public MessageProcessing(Socket socket) {
         this.socket = socket;
     }
 
@@ -30,7 +30,7 @@ public class Echoer extends Thread {
             while (true) {
                 String echoString = input.readLine();
                 String[] echoStringParts = echoString.split("-");
-                //- java.lang.NullPointerException on this-line ⬆ when I close terminal withouting writing exit on broker
+                // TODO java.lang.NullPointerException on this-line ⬆ when I close terminal without writing exit on broker
                 if (echoStringParts[0].equals("exit")) {
                     break;
                 }
@@ -54,9 +54,7 @@ public class Echoer extends Thread {
         } finally {
             try {
                 socket.close();
-            } catch(IOException e) {
-                //-Well fuck it
-            }
+            } catch(IOException e) { }
         }
     }
 }

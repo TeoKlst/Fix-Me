@@ -85,11 +85,11 @@ class Broker {
                     //-Sends message to echoer
                     stringToEcho.println(sbMessage.toString());
                 }
-                else if (echoString.equals("listm")) {
+                else if (echoString.equals("listm") || echoString.equals("list markets")) {
                     brokerMessageType = "3";
                     stringToEcho.println(brokerMessageType);
                 }
-                else if (echoString.equals("listg")) {
+                else if (echoString.equals("listg")|| echoString.equals("list goods")) {
                     System.out.println("__/Your Account/__" + "\nSilver: " + BrokerAccount.accountSilver + 
                     "\nGold: " + BrokerAccount.accountGold+ "\nPlatinum: " + BrokerAccount.accountPlatinum + 
                     "\nFuel: " + BrokerAccount.accountFuel + "\nBitcoin: " + BrokerAccount.accountBitcoin + 

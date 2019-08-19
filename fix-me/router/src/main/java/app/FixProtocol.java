@@ -26,7 +26,7 @@ public class FixProtocol {
         for (int i = 0; i < message.length(); i++) {
             total += messageBytes[i];
         }
-        //Modulous by 256 to get what the checksum value should be
+        //Modulus by 256 to get what the checksum value should be
         Integer checksumResult = total % 256;
 
         //For testing. To delete.
