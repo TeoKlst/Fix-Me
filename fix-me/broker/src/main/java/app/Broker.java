@@ -31,10 +31,11 @@ class Broker {
 
             //-Reading output from server and saving it
             //-Error of fatal close, string left null which faults echoer on server side
-            // BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            // String savedServerResponse = dIn.readLine();
-            // System.out.println("--Broker Connected--\n" + savedServerResponse);
-
+            BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String savedServerResponse = dIn.readLine();
+            System.out.println("--Broker Connected--\n" + savedServerResponse);
+            BrokerAccount.brokerCoverID = 1;
+            
             do {
                 StringBuilder sbMessage = new StringBuilder();
                 String brokerMessageType = "0";
@@ -58,9 +59,6 @@ class Broker {
                     System.out.println("Choose purchase Price:");
                     echoString = scanner.nextLine().toLowerCase();
                     sbMessage.append(echoString);
-                    //if (Successfull)
-                    //  Transfers value from market --> broker 
-                    BrokerFunctions.brokerBuySuccess(sbMessage.toString());
                     //-Sends message to echoer
                     stringToEcho.println(sbMessage.toString());
                 }
@@ -102,7 +100,12 @@ class Broker {
                 }
                 if (!echoString.equals("exit")) {
                     response = echoes.readLine();
-                    System.out.println(response);
+                    if (response.equals("Purchase Successful"))
+                        BrokerFunctions.brokerBuySuccess(sbMessage.toString());
+                    if (response.equals("Sale Successful"))
+                        BrokerFunctions.brokerSellSuccess(sbMessage.toString());
+                    else
+                        System.out.println(response);
                 }
             } while (!echoString.equals("exit"));
 

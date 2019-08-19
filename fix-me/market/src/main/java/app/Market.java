@@ -7,8 +7,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-// import router.BrokerCount;
-
 // A market has a list of instruments that can be traded.
 // When orders are received from brokers the market tries to execute it. If the execution is successfull,
 // it updates the internal instrument list and sends the broker an Executed message. If the order can’t be
@@ -31,22 +29,18 @@ class Market {
 
             System.out.println("--Market Connected--");
             do {
-                /*
-                GET MESSAGE FROM SERVER
-                if (echoString == Purchase -> Purchase Func Called)
-                    MarketFunctions.brokerPurchaseCheck(echoString);
-                else if (echoString == Sale -> Sale Func Called)
+                response = null;
+                echoString = echoes.readLine();
+                String[] echoStringParts = echoString.split("-");
+                System.out.println(echoString);
+                
+                if (echoStringParts[0].equals("1"))
+                    response = MarketFunctions.brokerPurchaseCheck(echoString);
+                else if (echoStringParts[0].equals("2"))
                     MarketFunctions.brokerSaleCheck(echoString);
                 else
-                    echoString == null;
-                */
-
-                echoString = scanner.nextLine();
-                stringToEcho.println(echoString.toString());
-                if (!echoString.equals("exit")) {
-                    response = echoes.readLine();
-                    System.out.println(response);
-                }
+                    response = "¯\\_(ツ)_/¯";
+                stringToEcho.println(response);   
             } while (!echoString.equals("exit"));
 
             scanner.close();

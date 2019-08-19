@@ -17,8 +17,9 @@ public class MarketFunctions {
         return amount;
     }
 
-    public static void brokerPurchaseCheck(String value) {
+    public static String brokerPurchaseCheck(String value) {
         Boolean checkPass = true;
+        String ret;
 
         String[] parts = value.split("-");
         int marketID = Integer.parseInt(parts[1]);
@@ -26,17 +27,19 @@ public class MarketFunctions {
         int purchaseAmount = Integer.parseInt(parts[3]);
         int purchasePrice = Integer.parseInt(parts[4]);
 
-        if (purchaseAmount > getMarketItemAmount(itemID) || purchaseAmount < getMarketItemAmount(itemID))
+        if (purchaseAmount > getMarketItemAmount(itemID) && purchaseAmount < getMarketItemAmount(itemID))
             checkPass = false;
         else if (itemID > 5 || itemID < 0)
             checkPass = false;
         if (checkPass)
-            brokerPurchaseExecuted(itemID, purchaseAmount, purchasePrice);
+            return ret = brokerPurchaseExecuted(itemID, purchaseAmount, purchasePrice);
         else
-            brokerPurchaseRejected();
+            return ret = brokerPurchaseRejected();
     }
 
-    public static void brokerPurchaseExecuted(int itemID, int purchaseAmount, int purchasePrice) {
+    public static String brokerPurchaseExecuted(int itemID, int purchaseAmount, int purchasePrice) {
+        String ret = "4";
+
         if (itemID == 1)
             MarketAccount.silver -= purchaseAmount;
         else if (itemID == 2)
@@ -49,12 +52,14 @@ public class MarketFunctions {
             MarketAccount.bitcoin -= purchaseAmount;
 
         MarketAccount.capital += purchasePrice;
-        //Send message to broker saying purchase was successful
+        
+        return ret;
     }
 
 
-    public static void brokerPurchaseRejected() {
-        //Send message to broker saying purchase was unsuccessful
+    public static String brokerPurchaseRejected() {
+        String ret = "5";
+        return ret;
     }
 
     public static void brokerSaleCheck(String value) {

@@ -36,7 +36,9 @@ public class Echoer extends Thread {
                 }
                 //-Buy from market
                 if (echoStringParts[0].equals("1")) {
-                    output.println("Message from Broker -> Buy Market => Data: " + echoString);
+                    Socket marketPort = Server.mapMarket.get(Integer.toString(1));
+                    output = new PrintWriter(marketPort.getOutputStream(), true);
+                    output.println(echoString);
                 }
                 //-Sell from market
                 if (echoStringParts[0].equals("2")) {
@@ -45,6 +47,16 @@ public class Echoer extends Thread {
                 //-List Markets
                 if (echoString.equals("3")) {
                     output.println("Market => " + Server.mapMarket);
+                }
+                if (echoStringParts[0].equals("4")) {
+                    Socket marketPort = Server.mapBroker.get(Integer.toString(1));
+                    output = new PrintWriter(marketPort.getOutputStream(), true);
+                    output.println("Purchase Successful");
+                }
+                if (echoStringParts[0].equals("5")) {
+                    Socket brokerPort = Server.mapBroker.get(Integer.toString(1));
+                    output = new PrintWriter(brokerPort.getOutputStream(), true);
+                    output.println("Purchase Failed");
                 }
                 else
                     output.println("Echo from server :" + echoString);

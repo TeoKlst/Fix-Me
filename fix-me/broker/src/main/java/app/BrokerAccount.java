@@ -4,6 +4,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class BrokerAccount {
     public static int brokerID;
+    public static int brokerCoverID;
 
     private static int min = 0;
     private static int max = 100;

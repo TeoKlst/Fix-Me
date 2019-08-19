@@ -61,16 +61,16 @@ public class Server {
                     echoer.start();
 
                     //-Broker Saved in Hash Map
-                    BrokerCount.brokerCount = BrokerCount.brokerCount + 1;
+                    LinkCounter.countBroker();
                     String username = getUserNameBroker(socket);
                     mapBroker.put(username, socket);
-                    System.out.println("Broker[" + BrokerCount.brokerCount + "] connected");
+                    System.out.println("Broker[" + LinkCounter.brokerCount + "] connected");
                     System.out.println("Saved Brokers => " + mapBroker);
 
                     //-Send message to broker
-                    // Socket brokerPort = mapBroker.get(Integer.toString(BrokerCount.brokerCount));
-                    // PrintWriter output = new PrintWriter(brokerPort.getOutputStream(), true);
-                    // output.println("You are broker: " + BrokerCount.brokerCount);
+                    Socket brokerPort = mapBroker.get(Integer.toString(LinkCounter.brokerCount));
+                    PrintWriter output = new PrintWriter(brokerPort.getOutputStream(), true);
+                    output.println("You are broker: " + LinkCounter.brokerCount);
                 } catch(Exception e) {
                     System.out.println("Broker Server exception " + e.getMessage());
                 }
