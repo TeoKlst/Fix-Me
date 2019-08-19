@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.TimeZone;
 
 public class FixProtocol {
+    // https://www.onixs.biz/fix-dictionary/4.4/msgs_by_category.html
     private String     userID;
     private int         msgSeqNum;
 
@@ -122,7 +123,53 @@ public class FixProtocol {
          */
         body.append("553=" + this.userID + "|");
 
-        String header = ConstructHeader(object, body.toString());
+        String header = constructHeader(object, body.toString(), "A"); //Logon = "A"
+
+        String message = header + body.toString() + checksumGenerator(header + body.toString()) + "|";
+
+        System.out.println("Message : " + message);
+
+        return message;
+    }
+
+    //Encryption|Heartbeat|resetSeqNum|UserID|
+    public String       orderMessage(HashMap<String, String> object) {
+        // https://www.onixs.biz/fix-dictionary/4.4/msgType_D_68.html
+        StringBuilder body = new StringBuilder();
+
+        //Message encryption scheme. "0" = NONE+OTHER (encryption is not used)
+        body.append("98=0|");
+
+        //Heartbeat interval in seconds.
+        if (object.containsKey("heartbeat")) {
+            body.append("108=" + object.get("heartbeat") + "|");
+        } else {
+            body.append("108=" + "120" + "|");
+        }
+
+        /*
+         * Each FIX message has a unique sequence number (MsgSecNum (34) tag) - https://kb.b2bits.com/display/B2BITS/Sequence+number+handling
+         * Sequence numbers are initialized at the start of the FIX session starting at 1 (one) and increment through the session
+         * 
+         * All sides of FIX session should have sequence numbers reset.
+         * Valid value is "Y" = Yes (reset)
+         */
+        if (object.containsKey("resetSeqNum") && object.get("resetSeqNum").equals("true")) {
+            body.append("141=Y|");
+            this.msgSeqNum = 0;
+        } else {
+            body.append("141=N|");
+        }
+
+        /*
+         * The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
+         */
+        body.append("553=" + this.userID + "|");
+
+
+
+
+        String header = constructHeader(object, body.toString(), "A"); //Logon = "A"
 
         String message = header + body.toString() + checksumGenerator(header + body.toString()) + "|";
 
@@ -145,7 +192,7 @@ public class FixProtocol {
      */
 
      //Protocol Version|length|Message Type|Message Sequence Number|Date|
-    public String ConstructHeader(HashMap<String, String> object, String bodyMessage) {
+    public String constructHeader(HashMap<String, String> object, String bodyMessage, String type) {
         StringBuilder header = new StringBuilder();
 
         //Protocol version. Always unencrypted, must be first field in message.
@@ -154,12 +201,12 @@ public class FixProtocol {
         StringBuilder message = new StringBuilder();
 
         //Message type. Always unencrypted, must be the third field in message.
-        if (object.containsKey("type")) {
-            message.append("35=" + object.get("type") + "|");
-        } else {
-            //Values: https://www.onixs.biz/fix-dictionary/4.2/tagnum_35.html
-            message.append("35=" + "1" + "|");          //Test request = 1
-        }
+        // if (object.containsKey("type")) {
+        message.append("35=" + type + "|");
+        // } else {
+        //     //Values: https://www.onixs.biz/fix-dictionary/4.2/tagnum_35.html
+        //     message.append("35=" + "1" + "|");          //Test request = 1
+        // }
 
         //Message Sequence Number
         this.msgSeqNum++;       //Message sequence number starts at 1
