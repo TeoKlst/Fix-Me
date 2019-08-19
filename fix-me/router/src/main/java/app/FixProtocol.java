@@ -98,6 +98,7 @@ public class FixProtocol {
         } else {
             body.append("108=" + "60" + "|");
         }
+
         /*
          * Each FIX message has a unique sequence number (MsgSecNum (34) tag) - https://kb.b2bits.com/display/B2BITS/Sequence+number+handling
          * Sequence numbers are initialized at the start of the FIX session starting at 1 (one) and increment through the session
@@ -118,10 +119,12 @@ public class FixProtocol {
          */
         body.append("553=" + this.username + "|");
 
+
+        
         /*
          * User password.
          */
-        body.append("554=" + this.password + "|");
+        /*body.append("554=" + this.password + "|");*/
 
         String header = ConstructHeader(object, body.toString());
 
