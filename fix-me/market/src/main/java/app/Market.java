@@ -29,23 +29,25 @@ class Market {
             String echoString;
             String response;
 
-            BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String savedServerResponse = dIn.readLine();
-            System.out.println("--Market Connected--\n" + savedServerResponse);
+            // BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            // String savedServerResponse = dIn.readLine();
+            // System.out.println("--Market Connected--\n" + savedServerResponse);
+            System.out.println("--Market Connected--");
             do {
-                // Continual loop looking for input
-                // Runs purchase with its check function
-                // Sends Back if transaction was successful
-                echoString = echoes.readLine();
                 /*
                 GET MESSAGE FROM SERVER
-
-                if (Message == Purchase -> Purchase Func Called)
+                if (echoString == Purchase -> Purchase Func Called)
                     MarketFunctions.brokerPurchaseCheck(echoString);
-                else if (Message == Sale -> Sale Func Called)
+                else if (echoString == Sale -> Sale Func Called)
                     MarketFunctions.brokerSaleCheck(echoString);
+                else
+                    echoString == null;
                 */
-                stringToEcho.println(echoString);
+
+                // echoString = echoes.readLine();
+                // System.out.println(echoString);
+                echoString = scanner.nextLine();
+                stringToEcho.println(echoString.toString());
                 if (!echoString.equals("exit")) {
                     response = echoes.readLine();
                     System.out.println(response);
