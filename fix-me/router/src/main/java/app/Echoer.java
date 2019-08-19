@@ -24,45 +24,30 @@ public class Echoer extends Thread {
     @Override
     public void run() {
         try {
-            BufferedReader input = new BufferedReader(
-                    new InputStreamReader(socket.getInputStream()));
+            BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
-
-            // Socket brokerPort = MainServer.brokerSockets.get(Integer.toString(BrokerCount.brokerCount));
-            // output = new PrintWriter(brokerPort.getOutputStream(), true);
-            // output.println("You are broker: " + BrokerCount.brokerCount);
 
             while (true) {
                 String echoString = input.readLine();
                 String[] echoStringParts = echoString.split("-");
-                //- java.lang.NullPointerException on this line when I close terminal withouting writing exit on broker
+                //- java.lang.NullPointerException on this-line ⬆ when I close terminal withouting writing exit on broker
                 if (echoStringParts[0].equals("exit")) {
                     break;
                 }
                 //-Buy from market
-                else if (echoStringParts[0].equals("1")) {
-                    // Socket brokerPort = MainServer.marketSockets.get("1");
-                    // output = new PrintWriter(brokerPort.getOutputStream(), true);
+                if (echoStringParts[0].equals("1")) {
                     output.println("Message from Broker -> Buy Market => Data: " + echoString);
                 }
                 //-Sell from market
-                else if (echoStringParts[0].equals("2")) {
-                    // Socket brokerPort = MainServer.marketSockets.get("1");
-                    // output = new PrintWriter(brokerPort.getOutputStream(), true);
+                if (echoStringParts[0].equals("2")) {
                     output.println("Message from Broker -> Sale Market => Data: " + echoString);
                 }
                 //-List Markets
-                else if (echoString.equals("3")) {
-                    Socket brokerPort = MainServer.brokerSockets.get("1");
-                    output = new PrintWriter(brokerPort.getOutputStream(), true);
-                    int key = 1;
-                    while (key <= MainServer.marketSockets.size()) {
-                        output.println("Market => " + MainServer.marketSockets.get(Integer.toString(key)));
-                        key++;
-                    }
+                if (echoString.equals("3")) {
+                    output.println("Market => " + Server.mapMarket);
                 }
-                output.println("Echo from server :" + echoString);
-                // Test TKelest Branch Merge
+                else
+                    output.println("Echo from server :" + echoString);
             }
         } catch(IOException e) {
             System.out.println("Oops: " + e.getMessage());

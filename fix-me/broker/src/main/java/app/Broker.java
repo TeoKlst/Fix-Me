@@ -31,9 +31,9 @@ class Broker {
 
             //-Reading output from server and saving it
             //-Error of fatal close, string left null which faults echoer on server side
-            BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String savedServerResponse = dIn.readLine();
-            System.out.println("--Broker Connected--\n" + savedServerResponse);
+            // BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            // String savedServerResponse = dIn.readLine();
+            // System.out.println("--Broker Connected--\n" + savedServerResponse);
 
             do {
                 StringBuilder sbMessage = new StringBuilder();
@@ -85,11 +85,11 @@ class Broker {
                     //-Sends message to echoer
                     stringToEcho.println(sbMessage.toString());
                 }
-                else if (echoString.equals("list markets")) {
+                else if (echoString.equals("listm")) {
                     brokerMessageType = "3";
                     stringToEcho.println(brokerMessageType);
                 }
-                else if (echoString.equals("display goods")) {
+                else if (echoString.equals("listg")) {
                     System.out.println("__/Your Account/__" + "\nSilver: " + BrokerAccount.accountSilver + 
                     "\nGold: " + BrokerAccount.accountGold+ "\nPlatinum: " + BrokerAccount.accountPlatinum + 
                     "\nFuel: " + BrokerAccount.accountFuel + "\nBitcoin: " + BrokerAccount.accountBitcoin + 

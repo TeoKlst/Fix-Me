@@ -21,7 +21,7 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib/</classpathPrefix>
-							<mainClass>app.MainServer</mainClass>
+							<mainClass>app.Server</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
