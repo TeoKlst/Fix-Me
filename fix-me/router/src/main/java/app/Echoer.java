@@ -27,10 +27,6 @@ public class Echoer extends Thread {
             BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
 
-            // Socket brokerPort = MainServer.brokerSockets.get(Integer.toString(BrokerCount.brokerCount));
-            // output = new PrintWriter(brokerPort.getOutputStream(), true);
-            // output.println("You are broker: " + BrokerCount.brokerCount);
-
             while (true) {
                 String echoString = input.readLine();
                 String[] echoStringParts = echoString.split("-");
@@ -40,25 +36,18 @@ public class Echoer extends Thread {
                 }
                 //-Buy from market
                 if (echoStringParts[0].equals("1")) {
-                    // Socket marketPort = MainServer.marketSockets.get(echoStringParts[1]);
-                    // output = new PrintWriter(marketPort.getOutputStream(), true);
                     output.println("Message from Broker -> Buy Market => Data: " + echoString);
                 }
                 //-Sell from market
                 if (echoStringParts[0].equals("2")) {
-                    // Socket marketPort = MainServer.marketSockets.get(echoStringParts[1]);
-                    // output = new PrintWriter(marketPort.getOutputStream(), true);
                     output.println("Message from Broker -> Sale Market => Data: " + echoString);
                 }
                 //-List Markets
                 if (echoString.equals("3")) {
-                    // Socket brokerPort = MainServer.brokerSockets.get("1");
-                    // output = new PrintWriter(brokerPort.getOutputStream(), true);
                     output.println("Market => " + Server.mapMarket);
                 }
                 else
                     output.println("Echo from server :" + echoString);
-                // Test TKelest Branch Merge
             }
         } catch(IOException e) {
             System.out.println("Oops: " + e.getMessage());
