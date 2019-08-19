@@ -29,9 +29,6 @@ class Market {
             String echoString;
             String response;
 
-            // BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            // String savedServerResponse = dIn.readLine();
-            // System.out.println("--Market Connected--\n" + savedServerResponse);
             System.out.println("--Market Connected--");
             do {
                 /*
@@ -44,8 +41,6 @@ class Market {
                     echoString == null;
                 */
 
-                // echoString = echoes.readLine();
-                // System.out.println(echoString);
                 echoString = scanner.nextLine();
                 stringToEcho.println(echoString.toString());
                 if (!echoString.equals("exit")) {
