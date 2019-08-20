@@ -125,7 +125,7 @@ public class FixProtocol {
 
         String header = constructHeader(object, body.toString(), "A"); //Logon = "A"
 
-        String message = header + body.toString() + checksumGenerator(header + body.toString()) + "|";
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 
         System.out.println("Message : " + message);
 
@@ -213,11 +213,11 @@ public class FixProtocol {
         message.append("34=" + this.msgSeqNum + "|");
 
         //Time of message transmission (always expressed in UTC (Universal Time Coordinated), also known as 'GMT'))
-        SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
+        SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyyMMddHH:mm:ss");
         dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         //Local time zone   
-        SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
+        SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyyMMddHH:mm:ss");
 
         try{
             message.append("52=" + dateFormatLocal.parse( dateFormatGmt.format(new Date()) ).toString() + "|");
