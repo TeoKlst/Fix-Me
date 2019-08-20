@@ -3,6 +3,9 @@ package app;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
@@ -20,6 +23,9 @@ public class Server {
     private ServerSocket socketMarket;
     private Runnable mS;
 
+    private ServerSocket socketHeartBeat;
+    private Runnable hB;
+
     public Server(int portA, int portB) throws IOException {
 
         mapBroker = new HashMap<String,Socket>();
@@ -27,14 +33,48 @@ public class Server {
 
         socketBroker = new ServerSocket(portA);
         socketMarket = new ServerSocket(portB);
+        socketHeartBeat = new ServerSocket(4999);
 
         bS = new BrokerSocket(socketBroker);
         mS = new MarketSocket(socketMarket);
+        hB = new Heartbeat(socketHeartBeat);
 
         Thread tb = new Thread(bS);
         Thread tm = new Thread(mS);
+        Thread tH = new Thread(hB);
         tb.start();
         tm.start();
+        tH.start();
+    }
+
+    class Heartbeat implements Runnable {
+        private ServerSocket socketH;
+
+        Heartbeat(ServerSocket sH) {
+            socketH = sH;
+        }
+        // join a Multicast group and send the group salutations
+
+		public void run() {
+            try {
+                    String msg = "Hello";
+                    InetAddress group = InetAddress.getByName("127.0.0.1");
+                    MulticastSocket s = new MulticastSocket(6789);
+                    
+                    s.joinGroup(group);
+                    DatagramPacket hi = new DatagramPacket(msg.getBytes(), msg.length(), group, 6789);
+                    s.send(hi);
+                    // get their responses!
+                    byte[] buf = new byte[1000];
+                    DatagramPacket recv = new DatagramPacket(buf, buf.length);
+                    s.receive(recv);
+
+                    // OK, I'm done talking - leave the group...
+                    s.leaveGroup(group);
+            } catch(Exception e) {
+                System.out.println("HeartBeat Server exception " + e.getMessage());
+            }
+		}
     }
 
     // TODO:CHECK HEART BEAT
