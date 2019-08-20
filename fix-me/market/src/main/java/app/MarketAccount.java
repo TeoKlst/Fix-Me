@@ -3,7 +3,9 @@ package app;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MarketAccount {
-    public static int marketID;
+    public static int marketServiceID;
+    public static int marketRouteID;
+    public static String[] parts;
 
     private static int min = 0;
     private static int max = 100;

@@ -7,7 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 // All messages will respect the FIX notation.
-// All messages will start with the ID asigned by the router and will be ended by the checksum.
+// All messages will start with the ID assigned by the router and will be ended by the checksum.
 // Buy and Sell messages will have the following mandatory fields:
 // • Instrument
 // • Quantity
@@ -29,31 +29,35 @@ public class Echoer extends Thread {
 
             while (true) {
                 String echoString = input.readLine();
+                if (echoString == null) {
+                    break;
+                }
                 String[] echoStringParts = echoString.split("-");
-                //- java.lang.NullPointerException on this-line ⬆ when I close terminal withouting writing exit on broker
+                //- java.lang.NullPointerException on this-line ⬆ when I close terminal without writing exit on broker
+                //- echoString == null Break; Helps Prevent null pointer exception when Broker or Market close unexpectedly
                 if (echoStringParts[0].equals("exit")) {
                     break;
                 }
                 //-Buy from market
                 if (echoStringParts[0].equals("1")) {
-                    Socket marketPort = Server.mapMarket.get(Integer.toString(1));
+                    Socket marketPort = Server.mapMarket.get(echoStringParts[1]);
                     output = new PrintWriter(marketPort.getOutputStream(), true);
                     output.println(echoString);
                 }
                 //-Sell from market
-                if (echoStringParts[0].equals("2")) {
+                else if (echoStringParts[0].equals("2")) {
                     output.println("Message from Broker -> Sale Market => Data: " + echoString);
                 }
                 //-List Markets
-                if (echoString.equals("3")) {
-                    output.println("Market => " + Server.mapMarket);
+                else if (echoString.equals("3")) {
+                    output.println("Available Market ID's => " + Server.mapMarket.keySet());
                 }
-                if (echoStringParts[0].equals("4")) {
+                else if (echoStringParts[0].equals("4")) {
                     Socket marketPort = Server.mapBroker.get(Integer.toString(1));
                     output = new PrintWriter(marketPort.getOutputStream(), true);
                     output.println("Purchase Successful");
                 }
-                if (echoStringParts[0].equals("5")) {
+                else if (echoStringParts[0].equals("5")) {
                     Socket brokerPort = Server.mapBroker.get(Integer.toString(1));
                     output = new PrintWriter(brokerPort.getOutputStream(), true);
                     output.println("Purchase Failed");

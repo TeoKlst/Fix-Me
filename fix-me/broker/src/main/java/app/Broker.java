@@ -22,8 +22,8 @@ class Broker {
     public static void main(String[] args) throws Exception {
         // new Socket("localhost", 5001) <- should also work with that string
         try (Socket socket = new Socket("127.0.0.1", 5000)) {
-            BufferedReader echoes = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter stringToEcho = new PrintWriter(socket.getOutputStream(), true);
+            BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter dOut = new PrintWriter(socket.getOutputStream(), true);
 
             Scanner scanner = new Scanner(System.in);
             String echoString;
@@ -31,10 +31,10 @@ class Broker {
 
             //-Reading output from server and saving it
             //-Error of fatal close, string left null which faults echoer on server side
-            BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String savedServerResponse = dIn.readLine();
-            System.out.println("--Broker Connected--\n" + savedServerResponse);
-            BrokerAccount.brokerCoverID = 1;
+            BrokerFunctions.assignRouteServiceID(savedServerResponse);
+            System.out.println("--Broker Connected--\n" + 
+            "You are Broker[" + BrokerAccount.brokerRouteID + "]" + " ServiceID => " + BrokerAccount.brokerServiceID);
             
             do {
                 StringBuilder sbMessage = new StringBuilder();
@@ -60,7 +60,7 @@ class Broker {
                     echoString = scanner.nextLine().toLowerCase();
                     sbMessage.append(echoString);
                     //-Sends message to echoer
-                    stringToEcho.println(sbMessage.toString());
+                    dOut.println(sbMessage.toString());
                 }
                 else if (echoString.equals("sell")) {
                     brokerMessageType = "2";
@@ -81,25 +81,25 @@ class Broker {
                     //  Transfers value from broker --> market
                     BrokerFunctions.brokerSellSuccess(sbMessage.toString());
                     //-Sends message to echoer
-                    stringToEcho.println(sbMessage.toString());
+                    dOut.println(sbMessage.toString());
                 }
                 else if (echoString.equals("listm")) {
                     brokerMessageType = "3";
-                    stringToEcho.println(brokerMessageType);
+                    dOut.println(brokerMessageType);
                 }
                 else if (echoString.equals("listg")) {
                     System.out.println("__/Your Account/__" + "\nSilver: " + BrokerAccount.accountSilver + 
                     "\nGold: " + BrokerAccount.accountGold+ "\nPlatinum: " + BrokerAccount.accountPlatinum + 
                     "\nFuel: " + BrokerAccount.accountFuel + "\nBitcoin: " + BrokerAccount.accountBitcoin + 
                     "\nCapital :" + BrokerAccount.capital);
-                    stringToEcho.println(echoString);
+                    dOut.println(echoString);
                 }
                 else {
                     //-Prints from echoer what has been written
-                    stringToEcho.println(echoString);
+                    dOut.println(echoString);
                 }
                 if (!echoString.equals("exit")) {
-                    response = echoes.readLine();
+                    response = dIn.readLine();
                     if (response.equals("Purchase Successful"))
                         BrokerFunctions.brokerBuySuccess(sbMessage.toString());
                     if (response.equals("Sale Successful"))

@@ -20,30 +20,32 @@ class Market {
     public static void main(String[] args) throws Exception {
         // new Socket("localhost", 5001) <- should also work with "localhost" string
         try (Socket socket = new Socket("127.0.0.1", 5001)) {
-            BufferedReader echoes = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter stringToEcho = new PrintWriter(socket.getOutputStream(), true);
-            Scanner scanner = new Scanner(System.in);
+            BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter dOut = new PrintWriter(socket.getOutputStream(), true);
             
             String echoString;
             String response;
 
-            System.out.println("--Market Connected--");
+            //-Reading output from server and saving it
+            String savedServerResponse = dIn.readLine();
+            MarketFunctions.assignRouteServiceID(savedServerResponse);
+            System.out.println("--Market Connected--\n" + 
+            "Market[" + MarketAccount.marketRouteID + "]" + " ServiceID => " + MarketAccount.marketServiceID);
+
             do {
                 response = null;
-                echoString = echoes.readLine();
+                echoString = dIn.readLine();
                 String[] echoStringParts = echoString.split("-");
                 System.out.println(echoString);
                 
                 if (echoStringParts[0].equals("1"))
                     response = MarketFunctions.brokerPurchaseCheck(echoString);
                 else if (echoStringParts[0].equals("2"))
-                    MarketFunctions.brokerSaleCheck(echoString);
+                    response = MarketFunctions.brokerSaleCheck(echoString);
                 else
                     response = "¯\\_(ツ)_/¯";
-                stringToEcho.println(response);   
+                dOut.println(response);   
             } while (!echoString.equals("exit"));
-
-            scanner.close();
 
         } catch(IOException e) {
             System.out.println("Market Error: " + e.getMessage());

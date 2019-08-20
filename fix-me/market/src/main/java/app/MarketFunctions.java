@@ -2,6 +2,12 @@ package app;
 
 public class MarketFunctions {
 
+    public static void assignRouteServiceID(String value) {
+        String[] parts = value.split("-");
+        MarketAccount.marketRouteID = Integer.parseInt(parts[0]);
+        MarketAccount.marketServiceID = Integer.parseInt(parts[1]);
+    }
+
     public static int getMarketItemAmount(int itemID) {
         int amount = 0;
         if (itemID == 1)
@@ -62,8 +68,9 @@ public class MarketFunctions {
         return ret;
     }
 
-    public static void brokerSaleCheck(String value) {
+    public static String brokerSaleCheck(String value) {
         Boolean checkPass = true;
+        String ret;
 
         String[] parts = value.split("-");
         int marketID = Integer.parseInt(parts[1]);
@@ -76,12 +83,14 @@ public class MarketFunctions {
         else if (itemID > 5 || itemID < 0)
             checkPass = false;
         if (checkPass)
-            brokerSaleExecuted(itemID, purchaseAmount, purchasePrice);
+            return ret = brokerSaleExecuted(itemID, purchaseAmount, purchasePrice);
         else
-            brokerSaleRejected();
+            return ret = brokerSaleRejected();
     }
 
-    public static void brokerSaleExecuted(int itemID, int purchaseAmount, int purchasePrice) {
+    public static String  brokerSaleExecuted(int itemID, int purchaseAmount, int purchasePrice) {
+        String ret = "4";
+
         if (itemID == 1)
             MarketAccount.silver += purchaseAmount;
         else if (itemID == 2)
@@ -94,11 +103,13 @@ public class MarketFunctions {
             MarketAccount.bitcoin += purchaseAmount;
 
         MarketAccount.capital -= purchasePrice;
-        //Send message saying sale was successful
+        
+        return ret;
     }
 
-    public static void brokerSaleRejected() {
-        //Send message saying sale was unsuccessful
+    public static String brokerSaleRejected() {
+        String ret = "5";
+        return ret;
     }
     
 }

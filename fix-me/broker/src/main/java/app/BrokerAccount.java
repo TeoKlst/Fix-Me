@@ -3,8 +3,9 @@ package app;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BrokerAccount {
-    public static int brokerID;
-    public static int brokerCoverID;
+    public static int brokerServiceID;
+    public static int brokerRouteID;
+    public static String[] parts;
 
     private static int min = 0;
     private static int max = 100;

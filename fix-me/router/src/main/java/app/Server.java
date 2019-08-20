@@ -37,14 +37,8 @@ public class Server {
         tm.start();
     }
 
-    private static String getUserNameBroker(Socket s) {
-        return Integer.toString(BrokerCount.brokerCount);
-    }
-
-    private static String getUserNameMarket(Socket s) {
-        return Integer.toString(MarketCount.marketCount);
-    }
-
+    // TODO:CHECK HEART BEAT
+    // TODO:BROKER MARKET REMOVAL ON DISCONNECT
     class BrokerSocket implements Runnable {
         private ServerSocket socketB;
 
@@ -62,15 +56,16 @@ public class Server {
 
                     //-Broker Saved in Hash Map
                     LinkCounter.countBroker();
-                    String username = getUserNameBroker(socket);
-                    mapBroker.put(username, socket);
+                    int serviceID = LinkCounter.generateServiceID();
+                    String routeID = LinkCounter.getBrokerRouteID(socket);
+                    mapBroker.put(routeID, socket);
                     System.out.println("Broker[" + LinkCounter.brokerCount + "] connected");
                     System.out.println("Saved Brokers => " + mapBroker);
 
                     //-Send message to broker
                     Socket brokerPort = mapBroker.get(Integer.toString(LinkCounter.brokerCount));
                     PrintWriter output = new PrintWriter(brokerPort.getOutputStream(), true);
-                    output.println("You are broker: " + LinkCounter.brokerCount);
+                    output.println(LinkCounter.brokerCount + "-" + serviceID);
                 } catch(Exception e) {
                     System.out.println("Broker Server exception " + e.getMessage());
                 }
@@ -94,16 +89,17 @@ public class Server {
                     echoer.start();
 
                     //-Market Saved in Hash Map
-                    MarketCount.marketCount = MarketCount.marketCount + 1;
-                    String username = getUserNameMarket(socket);
-                    mapMarket.put(username, socket);
-                    System.out.println("Market[" + MarketCount.marketCount + "] connected");
+                    LinkCounter.countMarket();
+                    int serviceID = LinkCounter.generateServiceID();
+                    String routeID = LinkCounter.getMarketRouteID(socket);
+                    mapMarket.put(routeID, socket);
+                    System.out.println("Market[" + LinkCounter.marketCount + "] connected");
                     System.out.println("Saved Markets => " + mapMarket);
 
                     //-Send message to market
-                    // Socket brokerPort = mapMarket.get(Integer.toString(BrokerCount.brokerCount));
-                    // PrintWriter output = new PrintWriter(brokerPort.getOutputStream(), true);
-                    // output.println("You are market: " + MarketCount.marketCount);
+                    Socket marketPort = mapMarket.get(Integer.toString(LinkCounter.marketCount));
+                    PrintWriter output = new PrintWriter(marketPort.getOutputStream(), true);
+                    output.println(LinkCounter.marketCount + "-" + serviceID);
                 } catch(Exception e) {
                     System.out.println("Market Server exception " + e.getMessage());
                 }

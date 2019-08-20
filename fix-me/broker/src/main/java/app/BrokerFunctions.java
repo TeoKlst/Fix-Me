@@ -2,6 +2,12 @@ package app;
 
 public class BrokerFunctions {
 
+    public static void assignRouteServiceID(String value) {
+        String[] parts = value.split("-");
+        BrokerAccount.brokerRouteID = Integer.parseInt(parts[0]);
+        BrokerAccount.brokerServiceID = Integer.parseInt(parts[1]);
+    }
+
     public static void brokerBuySuccess(String value) {
         String[] parts = value.split("-");
         int marketID = Integer.parseInt(parts[1]);
