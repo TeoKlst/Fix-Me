@@ -1,13 +1,16 @@
 package app;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-// public class HeartBeat extends Thread{
+// public class HBReceiver extends Thread{
 
-//     public static Boolean hearbeatmessage = true;
+//     public static Boolean heartbeatmessage = true;
   
 //     Socket clientSocket = new Socket();
+//     BufferedReader dIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 //     PrintWriter dOut = new PrintWriter(clientSocket.getOutputStream(), true);
 
 //     public void receiver(Socket clientsocket) {
@@ -19,6 +22,7 @@ import java.net.Socket;
 //       while(true) {
 //         if(heartbeatmessage) {
 //           thread.sleep(10000);
+//           System.out.println("-√v^√v^√❤ Received-");
 //           dOut.println("heartbeat");
 //         }
 //       }

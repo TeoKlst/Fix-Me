@@ -35,11 +35,17 @@ public class Echoer extends Thread {
                 String[] echoStringParts = echoString.split("-");
                 //- java.lang.NullPointerException on this-line ⬆ when I close terminal without writing exit on broker
                 //- echoString == null Break; Helps Prevent null pointer exception when Broker or Market close unexpectedly
-                if (echoStringParts[0].equals("exit")) {
+                if (echoString.equals("exit")) {
                     break;
                 }
+                //Transfers HB to server
+                else if (echoStringParts[0].equals("HB")) {
+                    Socket hbPort = Server.mapBroker.get("0");
+                    output = new PrintWriter(hbPort.getOutputStream(), true);
+                    output.println(echoString);
+                }
                 //-Buy from market
-                if (echoStringParts[0].equals("1")) {
+                else if (echoStringParts[0].equals("1")) {
                     Socket marketPort = Server.mapMarket.get(echoStringParts[1]);
                     output = new PrintWriter(marketPort.getOutputStream(), true);
                     output.println(echoString);

@@ -22,6 +22,10 @@ class Broker {
     public static void main(String[] args) throws Exception {
         // new Socket("localhost", 5001) <- should also work with that string
         try (Socket socket = new Socket("127.0.0.1", 5000)) {
+            //-Starts Broker HeartBeat
+            BrokerHBSender brokerHBSender = new BrokerHBSender(socket);
+            brokerHBSender.start();
+
             BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter dOut = new PrintWriter(socket.getOutputStream(), true);
 
@@ -77,9 +81,6 @@ class Broker {
                     System.out.println("Choose sale Price:");
                     echoString = scanner.nextLine().toLowerCase();
                     sbMessage.append(echoString);
-                    //if (Successfull)
-                    //  Transfers value from broker --> market
-                    BrokerFunctions.brokerSellSuccess(sbMessage.toString());
                     //-Sends message to echoer
                     dOut.println(sbMessage.toString());
                 }
@@ -109,6 +110,7 @@ class Broker {
                 }
             } while (!echoString.equals("exit"));
 
+            brokerHBSender.interrupt();
             scanner.close();
             System.out.println("Connection Closed");
 
