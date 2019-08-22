@@ -38,13 +38,17 @@ public class MarketFunctions {
         else if (itemID > 5 || itemID < 0)
             checkPass = false;
         if (checkPass)
-            return ret = brokerPurchaseExecuted(itemID, purchaseAmount, purchasePrice);
+            return ret = brokerPurchaseExecuted(value);
         else
-            return ret = brokerPurchaseRejected();
+            return ret = brokerPurchaseRejected(value);
     }
 
-    public static String brokerPurchaseExecuted(int itemID, int purchaseAmount, int purchasePrice) {
-        String ret = "4";
+    public static String brokerPurchaseExecuted(String value) {
+        String[] parts = value.split("-");
+        int itemID = Integer.parseInt(parts[2]);
+        int purchaseAmount = Integer.parseInt(parts[3]);
+        int purchasePrice = Integer.parseInt(parts[4]);
+        String brokerID = parts[5];
 
         if (itemID == 1)
             MarketAccount.silver -= purchaseAmount;
@@ -58,13 +62,16 @@ public class MarketFunctions {
             MarketAccount.bitcoin -= purchaseAmount;
 
         MarketAccount.capital += purchasePrice;
-        
+
+        String ret = "4" + "-" + brokerID + "-" + "1";
         return ret;
     }
 
 
-    public static String brokerPurchaseRejected() {
-        String ret = "5";
+    public static String brokerPurchaseRejected(String value) {
+        String[] parts = value.split("-");
+        String brokerID = parts[5];
+        String ret = "5" + brokerID;
         return ret;
     }
 

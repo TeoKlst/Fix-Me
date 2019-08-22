@@ -33,6 +33,7 @@ class Market {
             "Market[" + MarketAccount.marketRouteID + "]" + " ServiceID => " + MarketAccount.marketServiceID);
 
             do {
+                // ERROR HERE DOESNT WAIT FOR INPUT
                 response = null;
                 echoString = dIn.readLine();
                 String[] echoStringParts = echoString.split("-");

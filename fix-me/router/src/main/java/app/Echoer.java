@@ -44,29 +44,35 @@ public class Echoer extends Thread {
                     output = new PrintWriter(hbPort.getOutputStream(), true);
                     output.println(echoString);
                 }
+                // Condense Buy and Sell into one
                 //-Buy from market
                 else if (echoStringParts[0].equals("1")) {
                     Socket marketPort = Server.mapMarket.get(echoStringParts[1]);
                     output = new PrintWriter(marketPort.getOutputStream(), true);
                     output.println(echoString);
                 }
-                //-Sell from market
+                //-Sell to market
                 else if (echoStringParts[0].equals("2")) {
-                    output.println("Message from Broker -> Sale Market => Data: " + echoString);
+                    Socket marketPort = Server.mapMarket.get(echoStringParts[1]);
+                    output = new PrintWriter(marketPort.getOutputStream(), true);
+                    output.println(echoString);
                 }
                 //-List Markets
                 else if (echoString.equals("3")) {
                     output.println("Available Market ID's => " + Server.mapMarket.keySet());
                 }
+                // Condense Executed and Rejected into one
+                //-Purchase/Sale Executed
                 else if (echoStringParts[0].equals("4")) {
-                    Socket marketPort = Server.mapBroker.get(Integer.toString(1));
+                    Socket marketPort = Server.mapBroker.get(echoStringParts[1]);
                     output = new PrintWriter(marketPort.getOutputStream(), true);
-                    output.println("Purchase Successful");
+                    output.println(echoString);
                 }
+                //-Purchase/Sale Rejected
                 else if (echoStringParts[0].equals("5")) {
-                    Socket brokerPort = Server.mapBroker.get(Integer.toString(1));
+                    Socket brokerPort = Server.mapBroker.get(echoStringParts[1]);
                     output = new PrintWriter(brokerPort.getOutputStream(), true);
-                    output.println("Purchase Failed");
+                    output.println(echoString);
                 }
                 else
                     output.println("Echo from server :" + echoString);

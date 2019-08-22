@@ -62,7 +62,8 @@ class Broker {
                     sbMessage.append(echoString + "-");
                     System.out.println("Choose purchase Price:");
                     echoString = scanner.nextLine().toLowerCase();
-                    sbMessage.append(echoString);
+                    sbMessage.append(echoString + "-");
+                    sbMessage.append(BrokerAccount.brokerRouteID);
                     //-Sends message to echoer
                     dOut.println(sbMessage.toString());
                 }
@@ -80,7 +81,8 @@ class Broker {
                     sbMessage.append(echoString + "-");
                     System.out.println("Choose sale Price:");
                     echoString = scanner.nextLine().toLowerCase();
-                    sbMessage.append(echoString);
+                    sbMessage.append(echoString + "-");
+                    sbMessage.append(BrokerAccount.brokerRouteID);
                     //-Sends message to echoer
                     dOut.println(sbMessage.toString());
                 }
@@ -99,12 +101,19 @@ class Broker {
                     //-Prints from echoer what has been written
                     dOut.println(echoString);
                 }
+                // ERROR ON CHECKING IF PURCHASE
                 if (!echoString.equals("exit")) {
                     response = dIn.readLine();
-                    if (response.equals("Purchase Successful"))
-                        BrokerFunctions.brokerBuySuccess(sbMessage.toString());
-                    if (response.equals("Sale Successful"))
-                        BrokerFunctions.brokerSellSuccess(sbMessage.toString());
+                    String[] echoStringParts = response.split("-");
+                    if (echoStringParts[0].equals("4")) {
+                        if (echoStringParts[2].equals("1"))
+                            BrokerFunctions.brokerBuySuccess(sbMessage.toString());
+                        if (echoStringParts[2].equals("2"))
+                            BrokerFunctions.brokerBuySuccess(sbMessage.toString());
+                        System.out.println("Transaction Successful");
+                    }
+                    else if (echoStringParts[0].equals("5"))
+                        System.out.println("Transaction Failed");
                     else
                         System.out.println(response);
                 }
