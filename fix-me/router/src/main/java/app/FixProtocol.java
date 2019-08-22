@@ -256,7 +256,12 @@ public class FixProtocol {
 
        } else {
            //Reject through the checksum
-        //    https://javarevisited.blogspot.com/2011/02/fix-protocol-tutorials-difference.html#axzz5xJpaSpsa
+           String[] message = fixMessage.split("\\|");
+           for (int i=0; i < message.length; i++) {
+                if (message[i].startsWith("34=") && );
+                int msgSqnNum = //Convert to integer after checking int and num
+           }
+           this.RejectMessage(0, 99, "InvalidCheckSum");
        }
    }
    
