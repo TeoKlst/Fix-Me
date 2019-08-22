@@ -251,7 +251,14 @@ public class FixProtocol {
         return header.toString();
     }
    
-   
+   public void          readMessage(String fixMessage) {
+       if (fixMessageValidator(fixMessage)) {
+
+       } else {
+           //Reject through the checksum
+        //    https://javarevisited.blogspot.com/2011/02/fix-protocol-tutorials-difference.html#axzz5xJpaSpsa
+       }
+   }
    
    
    
