@@ -11,7 +11,9 @@ import java.net.MulticastSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,10 +29,16 @@ public class Server {
     private ServerSocket socketMarket;
     private Runnable mS;
 
+    public static Map<String, Integer> mapHBBroker;
+    public static Map<String, Integer> mapHBMarket;
+
     public Server(int portA, int portB) throws IOException {
 
         mapBroker = new HashMap<String,Socket>();
         mapMarket = new HashMap<String,Socket>();
+
+        mapHBBroker = new HashMap<String,Integer>();
+        mapHBMarket = new HashMap<String,Integer>();
 
         socketBroker = new ServerSocket(portA);
         socketMarket = new ServerSocket(portB);
@@ -54,27 +62,28 @@ public class Server {
             this.socket = socket;
         }
 
-        private Duration timeout = Duration.ofMillis(7000);
-        
-        // public void timeoutCheck() {
-        //     int i = 0;
-        //     while (i < mapBroker.size()) {
-        //         // mapBroker
-        //     }
-        // }
-
 		public void run() {
             try {
                 BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-    
+
+                // HBTimeOut hbTimeOut = new HBTimeOut();
+                // hbTimeOut.start();
+
                 while (true) {
                     String echoString = dIn.readLine();
+                    Calendar cal = Calendar.getInstance();
+                    int seconds = cal.get(Calendar.SECOND);
                     if (echoString == null) {
                         break;
                     }
                     String[] echoStringParts = echoString.split("-");
                     if (echoStringParts[0].equals("HB")) {
+
+                        mapHBBroker.put(echoStringParts[1], seconds);
+                        
                         System.out.println("-√v^√v^√❤ Received-" + echoStringParts[1]);
+                        System.out.println( "Seconds in current minute = " + seconds);
+                        System.out.println(mapHBBroker);
                     }
                 }
             } catch(IOException e) {

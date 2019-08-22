@@ -15,7 +15,7 @@ import java.util.Scanner;
 
 // and will receive from the market messages of the following types:
 
-// • Exeuted - when the order was accepted by the market and the action succeeded
+// • Executed - when the order was accepted by the market and the action succeeded
 // • Rejected - when the order could not be met
 
 class Broker {
@@ -23,8 +23,8 @@ class Broker {
         // new Socket("localhost", 5001) <- should also work with that string
         try (Socket socket = new Socket("127.0.0.1", 5000)) {
             //-Starts Broker HeartBeat
-            BrokerHBSender brokerHBSender = new BrokerHBSender(socket);
-            brokerHBSender.start();
+            // BrokerHBSender brokerHBSender = new BrokerHBSender(socket);
+            // brokerHBSender.start();
 
             BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter dOut = new PrintWriter(socket.getOutputStream(), true);
@@ -110,7 +110,7 @@ class Broker {
                 }
             } while (!echoString.equals("exit"));
 
-            brokerHBSender.interrupt();
+            // brokerHBSender.interrupt();
             scanner.close();
             System.out.println("Connection Closed");
 
