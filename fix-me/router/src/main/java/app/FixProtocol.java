@@ -16,6 +16,27 @@ public class FixProtocol {
         this.userID = userID;
         this.msgSeqNum = 0;
     }
+
+    public static boolean 	isNumeric(String str) {
+		try {
+			double d = Double.parseDouble(str);
+		} catch(NumberFormatException nfe) {
+			return false;
+		}
+		return true;
+	}
+
+    public static boolean isInteger(String s) {
+		try {
+			Integer.parseInt(s);
+		} catch(NumberFormatException e) {
+			return false;
+		} catch(NullPointerException e) {
+			return false;
+		}
+		// only got here if we didn't return false
+		return true;
+    }
     
     public String       checksumGenerator(String messageInput) {
         //Replace | with the ascii value of 1 (a non-printable character) to ensure the correct byte size
@@ -255,13 +276,18 @@ public class FixProtocol {
        if (fixMessageValidator(fixMessage)) {
 
        } else {
+            int msgSqnNum = -1;
            //Reject through the checksum
            String[] message = fixMessage.split("\\|");
            for (int i=0; i < message.length; i++) {
-                if (message[i].startsWith("34=") && );
-                int msgSqnNum = //Convert to integer after checking int and num
+                if (message[i].startsWith("34=") && isNumeric(message[i].substring(3)) && isInteger(message[i])) {
+                    msgSqnNum = Integer.parseInt(message[i].substring(3));
+                }
            }
-           this.RejectMessage(0, 99, "InvalidCheckSum");
+           if (msgSqnNum < 1) {
+               msgSqnNum = 1;
+           }
+           this.RejectMessage(msgSqnNum, 99, "InvalidCheckSum");
        }
    }
    
