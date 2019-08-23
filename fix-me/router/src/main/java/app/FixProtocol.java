@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.TimeZone;
 
 public class FixProtocol {
+    // https://www.onixs.biz/fix-dictionary/4.4/msgs_by_category.html
     private String     userID;
     private int         msgSeqNum;
 
@@ -74,14 +75,19 @@ public class FixProtocol {
     }
 
 
-    //Encryption|Heartbeat|resetSeqNum|UserID|
-    public String       logonMessage(HashMap<String, String> object) {
+    //Encryption|UserID|Heartbeat|resetSeqNum|
+    public String       logonMessage(int heartbeat) {
         StringBuilder body = new StringBuilder();
 
         /* 
          * Define a message encryption scheme. Valid value is "0" = NONE+OTHER (encryption is not used)
          */
         body.append("98=0|");
+
+        /*
+         * The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
+         */
+        body.append("553=" + this.userID + "|");
 
         /*
          * Heartbeat interval in seconds.
@@ -92,8 +98,8 @@ public class FixProtocol {
          * 30 seconds is default interval value. If HeartBtInt is set to 0 no heartbeat message is required.
          * 
          */
-        if (object.containsKey("heartbeat")) {
-            body.append("108=" + object.get("heartbeat") + "|");
+        if (heartbeat > 0) {
+            body.append("108=" + heartbeat + "|");
         } else {
             body.append("108=" + "120" + "|");
         }
@@ -108,44 +114,108 @@ public class FixProtocol {
          */
         body.append("141=Y|");
         this.msgSeqNum = 0;
+       
 
-        //For other messages
-        // if (object.containsKey("resetSeqNum") && object.get("resetSeqNum").equals("true")) {
-        //     body.append("141=Y|");
-        //     this.msgSeqNum = 0;
-        // } else {
-        //     body.append("141=N|");
-        // }
+        String header = constructHeader(body.toString(), "A"); //Logon = "A"
 
-        /*
-         * The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
-         */
-        body.append("553=" + this.userID + "|");
-
-        String header = ConstructHeader(object, body.toString());
-
-        String message = header + body.toString() + checksumGenerator(header + body.toString()) + "|";
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 
         System.out.println("Message : " + message);
 
         return message;
     }
 
-    /*
-     * The header is the first part of the FIX message and it is composed of the following fields:
-     * 
-     * BeginString -> defines the FIX protocol version e.g.FIX4.4
-     * BodyLength -> states the length of the message in characters, excluding the BeginString, the BodyLength and the Trailer fields
-     * MsgType -> defines the message type, so that the receiver knows how to parse the body
-     * SenderComID
-     * TargetCompID -> the target of our message
-     * SenderSubID -> the trader login
-     * MsgSeqNum -> the sequence number of the message. Needs to be increased for each message sent in the same session 
-     * Sending Time -> the time of message transmission
-     */
+    //Encryption|UserID|
+    public String       logoutMessage() {
+        StringBuilder body = new StringBuilder();
 
-     //Protocol Version|length|Message Type|Message Sequence Number|Date|
-    public String ConstructHeader(HashMap<String, String> object, String bodyMessage) {
+        /* 
+         * Define a message encryption scheme. Valid value is "0" = NONE+OTHER (encryption is not used)
+         */
+        body.append("98=0|");
+
+        /*
+         * The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
+         */
+        body.append("553=" + this.userID + "|");
+
+        String header = constructHeader(body.toString(), "5"); //Logout = "5"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        System.out.println("Message : " + message);
+
+        return message;
+    }
+
+    //Encryption|UserID|Heartbeat|resetSeqNum
+    public String       heartBeatMessage() {
+        StringBuilder body = new StringBuilder();
+
+        /* 
+         * Define a message encryption scheme. Valid value is "0" = NONE+OTHER (encryption is not used)
+         */
+        body.append("98=0|");
+
+        /*
+         * The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
+         */
+        body.append("553=" + this.userID + "|");    
+
+        String header = constructHeader(body.toString(), "0"); //Heartbeat = "0"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        System.out.println("Message : " + message);
+
+        return message;
+    }
+
+    //Encryption|UserID|RefSeqNum|sessionRejectReason|Text
+    public String       RejectMessage(int refSeqNum, int sessionRejectReason, String text) {
+        StringBuilder body = new StringBuilder();
+
+        /* 
+         * Define a message encryption scheme. Valid value is "0" = NONE+OTHER (encryption is not used)
+         */
+        body.append("98=0|");
+
+        /*
+         * The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
+         */
+        body.append("553=" + this.userID + "|");
+
+        /*
+         * Reference to the Message Sequence Number that was rejected
+         */
+        body.append("45=" + refSeqNum + "|");
+
+        /*
+         * Setting the sessionRejectionReason value, as well as adding text to explain further
+         */
+        if ((sessionRejectReason >= 0 && sessionRejectReason <= 17)) {
+            body.append("373=" + sessionRejectReason + "|");
+        } else if (sessionRejectReason == 99) {
+            body.append("373=" + sessionRejectReason + "|");
+        } else {
+            System.out.println("Invalid rejection value entered.");
+            return null;
+        }
+        if (text != null && !text.isEmpty()) {
+            body.append("58=" + text + "|");
+        }
+
+        String header = constructHeader(body.toString(), "3"); //Reject = "3"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        System.out.println("Message : " + message);
+
+        return message;
+    }
+
+   //Protocol Version|length|Message Type|Message Sequence Number|Date|
+   public String constructHeader(String bodyMessage, String type) {
         StringBuilder header = new StringBuilder();
 
         //Protocol version. Always unencrypted, must be first field in message.
@@ -154,23 +224,18 @@ public class FixProtocol {
         StringBuilder message = new StringBuilder();
 
         //Message type. Always unencrypted, must be the third field in message.
-        if (object.containsKey("type")) {
-            message.append("35=" + object.get("type") + "|");
-        } else {
-            //Values: https://www.onixs.biz/fix-dictionary/4.2/tagnum_35.html
-            message.append("35=" + "1" + "|");          //Test request = 1
-        }
+        message.append("35=" + type + "|");
 
         //Message Sequence Number
         this.msgSeqNum++;       //Message sequence number starts at 1
         message.append("34=" + this.msgSeqNum + "|");
 
         //Time of message transmission (always expressed in UTC (Universal Time Coordinated), also known as 'GMT'))
-        SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
+        SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyyMMddHH:mm:ss");
         dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         //Local time zone   
-        SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
+        SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyyMMddHH:mm:ss");
 
         try{
             message.append("52=" + dateFormatLocal.parse( dateFormatGmt.format(new Date()) ).toString() + "|");
@@ -184,7 +249,60 @@ public class FixProtocol {
         header.append(message);
 
         return header.toString();
+    }
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+    //Encryption|Heartbeat|resetSeqNum|UserID|              INCORRECT DO NOT USE
+    public String       orderMessage(HashMap<String, String> object) {
+        // https://www.onixs.biz/fix-dictionary/4.4/msgType_D_68.html
+        StringBuilder body = new StringBuilder();
 
-        // https://help.ctrader.com/fix/fixsample
+        //Message encryption scheme. "0" = NONE+OTHER (encryption is not used)
+        body.append("98=0|");
+
+        //Heartbeat interval in seconds.
+        if (object.containsKey("heartbeat")) {
+            body.append("108=" + object.get("heartbeat") + "|");
+        } else {
+            body.append("108=" + "120" + "|");
+        }
+
+        /*
+         * Each FIX message has a unique sequence number (MsgSecNum (34) tag) - https://kb.b2bits.com/display/B2BITS/Sequence+number+handling
+         * Sequence numbers are initialized at the start of the FIX session starting at 1 (one) and increment through the session
+         * 
+         * All sides of FIX session should have sequence numbers reset.
+         * Valid value is "Y" = Yes (reset)
+         */
+        if (object.containsKey("resetSeqNum") && object.get("resetSeqNum").equals("true")) {
+            body.append("141=Y|");
+            this.msgSeqNum = 0;
+        } else {
+            body.append("141=N|");
+        }
+
+        /*
+         * The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
+         */
+        body.append("553=" + this.userID + "|");
+
+        String header = constructHeader(body.toString(), "A"); //Logon = "A"
+
+        String message = header + body.toString() + checksumGenerator(header + body.toString()) + "|";
+
+        System.out.println("Message : " + message);
+
+        return message;
     }
 }
