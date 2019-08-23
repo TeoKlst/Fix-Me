@@ -1,8 +1,6 @@
 package app;
 
-import java.io.PrintWriter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
@@ -57,8 +55,8 @@ public class Server {
             while(true) {
                 try {
                     Socket socket = socketB.accept();
-                    Echoer echoer = new Echoer(socket);
-                    echoer.start();
+                    MessageProcessing messageProcessing = new MessageProcessing(socket);
+                    messageProcessing.start();
 
                     //-Broker Saved in Hash Map
                     BrokerCount.brokerCount = BrokerCount.brokerCount + 1;
@@ -90,8 +88,8 @@ public class Server {
             while(true) {
                 try {
                     Socket socket = socketM.accept();
-                    Echoer echoer = new Echoer(socket);
-                    echoer.start();
+                    MessageProcessing messageProcessing = new MessageProcessing(socket);
+                    messageProcessing.start();
 
                     //-Market Saved in Hash Map
                     MarketCount.marketCount = MarketCount.marketCount + 1;
