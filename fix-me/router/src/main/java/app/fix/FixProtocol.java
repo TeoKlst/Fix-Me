@@ -1,4 +1,4 @@
-package app;
+package app.fix;
 
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
@@ -15,6 +15,27 @@ public class FixProtocol {
     public FixProtocol(String userID) {
         this.userID = userID;
         this.msgSeqNum = 0;
+    }
+
+    public static boolean 	isNumeric(String str) {
+		try {
+			double d = Double.parseDouble(str);
+		} catch(NumberFormatException nfe) {
+			return false;
+		}
+		return true;
+	}
+
+    public static boolean isInteger(String s) {
+		try {
+			Integer.parseInt(s);
+		} catch(NumberFormatException e) {
+			return false;
+		} catch(NullPointerException e) {
+			return false;
+		}
+		// only got here if we didn't return false
+		return true;
     }
     
     public String       checksumGenerator(String messageInput) {
@@ -251,7 +272,24 @@ public class FixProtocol {
         return header.toString();
     }
    
-   
+   public void          readMessage(String fixMessage) {
+       if (fixMessageValidator(fixMessage)) {
+
+       } else {
+            int msgSqnNum = -1;
+           //Reject through the checksum
+           String[] message = fixMessage.split("\\|");
+           for (int i=0; i < message.length; i++) {
+                if (message[i].startsWith("34=") && isNumeric(message[i].substring(3)) && isInteger(message[i])) {
+                    msgSqnNum = Integer.parseInt(message[i].substring(3));
+                }
+           }
+           if (msgSqnNum < 1) {
+               msgSqnNum = 1;
+           }
+           this.RejectMessage(msgSqnNum, 99, "InvalidCheckSum");
+       }
+   }
    
    
    
