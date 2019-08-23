@@ -1,5 +1,7 @@
 package app.fix;
 
+import app.fix.exceptions.InvalidChecksumException;
+
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -89,8 +91,9 @@ public class FixProtocol {
         String checksumStr = checksumGenerator(values[0]);
 
         if (!checksumStr.equals(values[1].substring(0,3))) {
-            return false;
-        }
+            throw new InvalidChecksumException("Invalid Checksum");
+			return false;
+		}
         System.out.println("String valid");
         return true;
     }
@@ -273,6 +276,11 @@ public class FixProtocol {
     }
    
    public void          readMessage(String fixMessage) {
+    	try {
+			fixMessageValidator(fixMessage);
+		} catch (InvalidChecksumException e) {
+
+		}
        if (fixMessageValidator(fixMessage)) {
 
        } else {
