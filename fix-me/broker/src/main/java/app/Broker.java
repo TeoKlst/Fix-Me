@@ -64,8 +64,12 @@ class Broker {
                     echoString = scanner.nextLine().toLowerCase();
                     sbMessage.append(echoString + "-");
                     sbMessage.append(BrokerAccount.brokerRouteID);
-                    //-Sends message to echoer
-                    dOut.println(sbMessage.toString());
+                    if (BrokerFunctions.brokerPurchaseValidate(sbMessage.toString())) {
+                        //-Sends message to echoer
+                        dOut.println(sbMessage.toString());
+                    }
+                    else
+                        dOut.println("Purchase: Account amount error");
                 }
                 else if (echoString.equals("sell")) {
                     brokerMessageType = "2";
@@ -83,19 +87,31 @@ class Broker {
                     echoString = scanner.nextLine().toLowerCase();
                     sbMessage.append(echoString + "-");
                     sbMessage.append(BrokerAccount.brokerRouteID);
-                    //-Sends message to echoer
-                    dOut.println(sbMessage.toString());
+                    if (BrokerFunctions.brokerSaleValidate(sbMessage.toString())) {
+                        //-Sends message to echoer
+                        dOut.println(sbMessage.toString());
+                    }
+                    else
+                        dOut.println("Sale: Account amount error");
                 }
                 else if (echoString.equals("listm")) {
                     brokerMessageType = "3";
-                    dOut.println(brokerMessageType);
+                    sbMessage.append(brokerMessageType + "-");
+                    sbMessage.append(BrokerAccount.brokerRouteID);
+                    dOut.println(sbMessage);
                 }
                 else if (echoString.equals("listg")) {
-                    System.out.println("__/Your Account/__" + "\nSilver: " + BrokerAccount.accountSilver + 
-                    "\nGold: " + BrokerAccount.accountGold+ "\nPlatinum: " + BrokerAccount.accountPlatinum + 
-                    "\nFuel: " + BrokerAccount.accountFuel + "\nBitcoin: " + BrokerAccount.accountBitcoin + 
-                    "\nCapital :" + BrokerAccount.capital);
+                    BrokerFunctions.brokerGetDataBroker();
                     dOut.println(echoString);
+                }
+                else if (echoString.equals("listmg")) {
+                    System.out.println("Choose Market ID to view (its) goods:");
+                    echoString = scanner.nextLine().toLowerCase();
+                    brokerMessageType = "6";
+                    sbMessage.append(brokerMessageType + "-");
+                    sbMessage.append(echoString + "-");
+                    sbMessage.append(BrokerAccount.brokerRouteID);
+                    dOut.println(sbMessage);
                 }
                 else {
                     //-Prints from echoer what has been written
@@ -109,11 +125,13 @@ class Broker {
                         if (echoStringParts[2].equals("1"))
                             BrokerFunctions.brokerBuySuccess(sbMessage.toString());
                         if (echoStringParts[2].equals("2"))
-                            BrokerFunctions.brokerBuySuccess(sbMessage.toString());
+                            BrokerFunctions.brokerSellSuccess(sbMessage.toString());
                         System.out.println("Transaction Successful");
                     }
                     else if (echoStringParts[0].equals("5"))
                         System.out.println("Transaction Failed");
+                    else if (echoStringParts[0].equals("7"))
+                        BrokerFunctions.brokerReceiveDataMarket(response);
                     else
                         System.out.println(response);
                 }

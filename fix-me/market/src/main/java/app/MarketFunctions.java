@@ -33,9 +33,9 @@ public class MarketFunctions {
         int purchaseAmount = Integer.parseInt(parts[3]);
         int purchasePrice = Integer.parseInt(parts[4]);
 
-        if (purchaseAmount > getMarketItemAmount(itemID) && purchaseAmount < getMarketItemAmount(itemID))
+        if (itemID > 5 || itemID < 0)
             checkPass = false;
-        else if (itemID > 5 || itemID < 0)
+        else if (purchaseAmount > getMarketItemAmount(itemID) || purchaseAmount < getMarketItemAmount(itemID))
             checkPass = false;
         if (checkPass)
             return ret = brokerPurchaseExecuted(value);
@@ -71,7 +71,7 @@ public class MarketFunctions {
     public static String brokerPurchaseRejected(String value) {
         String[] parts = value.split("-");
         String brokerID = parts[5];
-        String ret = "5" + brokerID;
+        String ret = "5" + "-" + brokerID;
         return ret;
     }
 
@@ -82,40 +82,58 @@ public class MarketFunctions {
         String[] parts = value.split("-");
         int marketID = Integer.parseInt(parts[1]);
         int itemID = Integer.parseInt(parts[2]);
-        int purchaseAmount = Integer.parseInt(parts[3]);
-        int purchasePrice = Integer.parseInt(parts[4]);
+        int sellAmount = Integer.parseInt(parts[3]);
+        int sellPrice = Integer.parseInt(parts[4]);
+        int marketCapital = MarketAccount.capital;
 
-        if (purchaseAmount > getMarketItemAmount(itemID) || purchaseAmount < getMarketItemAmount(itemID))
+        if (sellPrice > marketCapital)
             checkPass = false;
         else if (itemID > 5 || itemID < 0)
             checkPass = false;
         if (checkPass)
-            return ret = brokerSaleExecuted(itemID, purchaseAmount, purchasePrice);
+            return ret = brokerSaleExecuted(value);
         else
-            return ret = brokerSaleRejected();
+            return ret = brokerSaleRejected(value);
     }
 
-    public static String  brokerSaleExecuted(int itemID, int purchaseAmount, int purchasePrice) {
-        String ret = "4";
+    public static String  brokerSaleExecuted(String value) {
+        String[] parts = value.split("-");
+        int itemID = Integer.parseInt(parts[2]);
+        int sellAmount = Integer.parseInt(parts[3]);
+        int sellPrice = Integer.parseInt(parts[4]);
+        String brokerID = parts[5];
 
         if (itemID == 1)
-            MarketAccount.silver += purchaseAmount;
+            MarketAccount.silver += sellAmount;
         else if (itemID == 2)
-            MarketAccount.gold += purchaseAmount;
+            MarketAccount.gold += sellAmount;
         else if (itemID == 3)
-            MarketAccount.platinum += purchaseAmount;
+            MarketAccount.platinum += sellAmount;
         else if (itemID == 4)
-            MarketAccount.fuel += purchaseAmount;
+            MarketAccount.fuel += sellAmount;
         else if (itemID == 5)
-            MarketAccount.bitcoin += purchaseAmount;
+            MarketAccount.bitcoin += sellAmount;
 
-        MarketAccount.capital -= purchasePrice;
+        MarketAccount.capital -= sellPrice;
         
+        String ret = "4" + "-" + brokerID + "-" + "2";
         return ret;
     }
 
-    public static String brokerSaleRejected() {
-        String ret = "5";
+    public static String brokerSaleRejected(String value) {
+        String[] parts = value.split("-");
+        String brokerID = parts[5];
+        String ret = "5" + "-" + brokerID;
+        return ret;
+    }
+
+    public static String marketQuery(String value) {
+        String[] parts = value.split("-");
+        int brokerID = Integer.parseInt(parts[2]);
+
+        String ret = "7" + "-" + MarketAccount.marketRouteID  + "-" + brokerID +
+        "-" + MarketAccount.silver + "-" + MarketAccount.gold + "-" + MarketAccount.platinum +
+        "-" + MarketAccount.fuel + "-" + MarketAccount.bitcoin + "-" + MarketAccount.capital;
         return ret;
     }
     

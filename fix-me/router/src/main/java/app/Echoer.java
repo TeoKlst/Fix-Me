@@ -45,46 +45,53 @@ public class Echoer extends Thread {
                     output.println(echoString);
                 }
                 // Condense Buy and Sell into one
-                //-Buy from market
-                else if (echoStringParts[0].equals("1")) {
-                    Socket marketPort = Server.mapMarket.get(echoStringParts[1]);
-                    output = new PrintWriter(marketPort.getOutputStream(), true);
-                    output.println(echoString);
-                }
-                //-Sell to market
-                else if (echoStringParts[0].equals("2")) {
+                //-Buy from market || Sell to market
+                else if (echoStringParts[0].equals("1") || echoStringParts[0].equals("2")){
                     Socket marketPort = Server.mapMarket.get(echoStringParts[1]);
                     output = new PrintWriter(marketPort.getOutputStream(), true);
                     output.println(echoString);
                 }
                 //-List Markets
-                else if (echoString.equals("3")) {
+                else if (echoStringParts[0].equals("3")) {
+                    Socket brokerPort = Server.mapBroker.get(echoStringParts[1]);
+                    output = new PrintWriter(brokerPort.getOutputStream(), true);
                     output.println("Available Market ID's => " + Server.mapMarket.keySet());
                 }
-                // Condense Executed and Rejected into one
-                //-Purchase/Sale Executed
+                //-Purchase || Sale Executed
                 else if (echoStringParts[0].equals("4")) {
                     Socket marketPort = Server.mapBroker.get(echoStringParts[1]);
                     output = new PrintWriter(marketPort.getOutputStream(), true);
                     output.println(echoString);
                 }
-                //-Purchase/Sale Rejected
+                //-Purchase || Sale Rejected
                 else if (echoStringParts[0].equals("5")) {
                     Socket brokerPort = Server.mapBroker.get(echoStringParts[1]);
                     output = new PrintWriter(brokerPort.getOutputStream(), true);
                     output.println(echoString);
                 }
-                else
+                //-List Market Goods Query
+                else if (echoStringParts[0].equals("6")) {
+                    Socket marketPort = Server.mapMarket.get(echoStringParts[1]);
+                    output = new PrintWriter(marketPort.getOutputStream(), true);
+                    output.println(echoString);
+                }
+                //-List Market Goods Data Return
+                else if (echoStringParts[0].equals("7")) {
+                    Socket marketPort = Server.mapBroker.get(echoStringParts[2]);
+                    output = new PrintWriter(marketPort.getOutputStream(), true);
+                    output.println(echoString);
+                }
+                else {
+                    output = new PrintWriter(socket.getOutputStream(), true);
                     output.println("Echo from server :" + echoString);
+                }
             }
         } catch(IOException e) {
             System.out.println("Oops: " + e.getMessage());
         } finally {
             try {
                 socket.close();
-            } catch(IOException e) {
-                //-Well fuck it
-            }
+            } catch(IOException e) {}
         }
     }
 }

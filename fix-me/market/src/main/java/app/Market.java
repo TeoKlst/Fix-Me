@@ -35,6 +35,7 @@ class Market {
             do {
                 // ERROR HERE DOESNT WAIT FOR INPUT
                 response = null;
+                // Thread.sleep(1000);
                 echoString = dIn.readLine();
                 String[] echoStringParts = echoString.split("-");
                 System.out.println(echoString);
@@ -43,6 +44,8 @@ class Market {
                     response = MarketFunctions.brokerPurchaseCheck(echoString);
                 else if (echoStringParts[0].equals("2"))
                     response = MarketFunctions.brokerSaleCheck(echoString);
+                else if (echoStringParts[0].equals("6"))
+                    response = MarketFunctions.marketQuery(echoString);
                 else
                     response = "¯\\_(ツ)_/¯";
                 dOut.println(response);   
