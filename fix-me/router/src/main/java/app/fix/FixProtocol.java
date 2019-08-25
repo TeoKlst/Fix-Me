@@ -279,24 +279,24 @@ public class FixProtocol {
     	try {
 			fixMessageValidator(fixMessage);
 		} catch (InvalidChecksumException e) {
-
+			int msgSqnNum = -1;
+			//Reject through the checksum
+			String[] message = fixMessage.split("\\|");
+			for (int i=0; i < message.length; i++) {
+				if (message[i].startsWith("34=") && isNumeric(message[i].substring(3)) && isInteger(message[i])) {
+					msgSqnNum = Integer.parseInt(message[i].substring(3));
+				}
+			}
+			if (msgSqnNum < 1) {
+				msgSqnNum = 1;
+			}
+			RejectMessage(msgSqnNum, 99, "InvalidCheckSum");
 		}
-       if (fixMessageValidator(fixMessage)) {
-
-       } else {
-            int msgSqnNum = -1;
-           //Reject through the checksum
-           String[] message = fixMessage.split("\\|");
-           for (int i=0; i < message.length; i++) {
-                if (message[i].startsWith("34=") && isNumeric(message[i].substring(3)) && isInteger(message[i])) {
-                    msgSqnNum = Integer.parseInt(message[i].substring(3));
-                }
-           }
-           if (msgSqnNum < 1) {
-               msgSqnNum = 1;
-           }
-           this.RejectMessage(msgSqnNum, 99, "InvalidCheckSum");
-       }
+//       if (fixMessageValidator(fixMessage)) {
+//
+//       } else {
+//
+//       }
    }
    
    
