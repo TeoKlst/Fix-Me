@@ -1,8 +1,6 @@
 package app;
 
 import app.fix.FixProtocol;
-import app.fix.exceptions.InvalidChecksumException;
-import app.fix.exceptions.InvalidMsgLengthException;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -118,32 +116,13 @@ public class Server {
         FixProtocol fixProtocol = new FixProtocol("000001");
         String logonMessage = fixProtocol.logonMessage(120);
         System.out.println("Logon message: " + logonMessage);
-        if (fixProtocol.validateMessage(logonMessage) == -1) {
-            System.out.println("Checksum invalid");
-        } else if (fixProtocol.validateMessage(logonMessage) == -2) {
-            System.out.println("Message Length invalid");
-        } else if (fixProtocol.validateMessage(logonMessage) == 1) {
-            System.out.println("Checksum valid");
-            System.out.println("Message Length valid");
-        }
-
-        if (fixProtocol.validateMessage("8=FIX4.4|9=60|35=A|34=1|52=2019082611:45:32|98=0|553=000001|108=120|141=Y|10=227|") == -1) {
-            System.out.println("Checksum invalid");
-        } else if (fixProtocol.validateMessage("8=FIX4.4|9=60|35=A|34=1|52=2019082611:45:32|98=0|553=000001|108=120|141=Y|10=227|") == -2) {
-            System.out.println("Message Length invalid");
-        } else if (fixProtocol.validateMessage("8=FIX4.4|9=60|35=A|34=1|52=2019082611:45:32|98=0|553=000001|108=120|141=Y|10=227|") == 1) {
-            System.out.println("Checksum valid");
-            System.out.println("Message Length valid");
-        }
-
-        if (fixProtocol.validateMessage("8=FIX4.4|9=61|35=A|34=1|52=2019082611:45:32|98=0|553=000001|108=120|141=Y|10=228|") == -1) {
-            System.out.println("Checksum invalid");
-        } else if (fixProtocol.validateMessage("8=FIX4.4|9=61|35=A|34=1|52=2019082611:45:32|98=0|553=000001|108=120|141=Y|10=228|") == -2) {
-            System.out.println("Message Length invalid");
-        } else if (fixProtocol.validateMessage("8=FIX4.4|9=61|35=A|34=1|52=2019082611:45:32|98=0|553=000001|108=120|141=Y|10=228|") == 1) {
-            System.out.println("Checksum valid");
-            System.out.println("Message Length valid");
-        }
+        fixProtocol.receiveMessage(logonMessage);
+        fixProtocol.receiveMessage("8=FIX4.4|9=60|35=A|34=1|52=2019082611:45:32|98=0|553=000001|108=120|141=Y|10=227|");
+		String test2 = "8=FIX4.4|9=61|35=A|34=1|52=2019082611:45:32|98=0|553=000001|108=120|141=Y|";
+        test2 = test2 + "10=" + fixProtocol.checksumGenerator(test2) + "|";
+        System.out.println("TEST2 " + test2);
+        fixProtocol.receiveMessage(test2);
+		fixProtocol.receiveMessage("");
 
 //        int portA = 5000;
 //        int portB = 5001;

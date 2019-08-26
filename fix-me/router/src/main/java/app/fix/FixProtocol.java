@@ -62,19 +62,12 @@ public class FixProtocol {
     
     public boolean          checksumValidator(String input) throws InvalidChecksumException {
         // Reference: https://gigi.nullneuron.net/gigilabs/calculating-the-checksum-of-a-fix-message/
-        
-        //Use to test:
-        /*
-        * FixProtocol fixProtocol = new FixProtocol();
-        * fixProtocol.checksumValidator("8=FIX.4.1|9=61|35=A|34=1|49=EXEC|52=20121105-23:24:06|56=BANZAI|98=0|108=30|10=003|");
-        */
-
         //Separates the checksum from the message
         String[] values = input.split("\\|10=");
 
         //Make sure that there are only 2 strings: the input and the checksum
         if (values.length != 2) {
-            return false;
+			throw new InvalidChecksumException("Invalid Checksum");
         }
         //Add the pipe back to the first string to end the input
         values[0] += '|';
@@ -92,6 +85,9 @@ public class FixProtocol {
         int msgLength = -1;
 
         //Get the start index of the message to get length
+		if (!messageInput.contains("|9=")) {
+			throw new InvalidMsgLengthException("Incorrect Message Length");
+		}
         int msgIndexStart = messageInput.indexOf("|9=") + 3;
         while (messageInput.charAt(msgIndexStart) != '|') { msgIndexStart++;}   //Gets to the message index to calculate the message length from
         msgIndexStart++;
@@ -197,7 +193,7 @@ public class FixProtocol {
         /*
          * The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
          */
-        body.append("553=" + this.userID + "|");    
+        body.append("553=" + this.userID + "|");
 
         String header = constructHeader(body.toString(), "0"); //Heartbeat = "0"
 
@@ -283,9 +279,39 @@ public class FixProtocol {
     	try {
             checksumValidator(fixMessage);
 		} catch (InvalidChecksumException e) {
+			return -1; //-1 means bad checksum
+		}
+    	try {
+			msgLengthValidator(fixMessage);
+
+		}catch (InvalidMsgLengthException me) {
+			return -2; // -2 means bad message length
+		}
+	   return 1;
+   }
+
+   public void 		receiveMessage(String messageInput) {
+		int ret = validateMessage(messageInput);
+		if (ret == -1) {
+			System.out.println("Checksum invalid");
+			int msgSqnNum = -1;
+			//Reject through the checksum - first get the msgSequence number
+			String[] message = messageInput.split("\\|");
+			for (int i=0; i < message.length; i++) {
+				if (message[i].startsWith("34=") && isNumeric(message[i].substring(3)) && isInteger(message[i].substring(3))) {
+					msgSqnNum = Integer.parseInt(message[i].substring(3));
+				}
+			}
+			if (msgSqnNum < 1) {
+				msgSqnNum = 1;
+			}
+			String rejectMessage = RejectMessage(msgSqnNum, 99, "InvalidCheckSum");
+			System.out.println("Reject message: " + rejectMessage);
+		} else if (ret == -2) {
+			System.out.println("Message Length invalid");
 //			int msgSqnNum = -1;
-//			//Reject through the checksum - first get the msgSequence number
-//			String[] message = fixMessage.split("\\|");
+//			//Reject through the msgLength - first get the msgSequence number
+//			String[] message = messageInput.split("\\|");
 //			for (int i=0; i < message.length; i++) {
 //				if (message[i].startsWith("34=") && isNumeric(message[i].substring(3)) && isInteger(message[i].substring(3))) {
 //					msgSqnNum = Integer.parseInt(message[i].substring(3));
@@ -294,19 +320,11 @@ public class FixProtocol {
 //			if (msgSqnNum < 1) {
 //				msgSqnNum = 1;
 //			}
-//			RejectMessage(msgSqnNum, 99, "InvalidCheckSum");
-			System.out.println("1) Checksum invalid");
-			return -1; //-1 means bad checksum
+//			String rejectMessage = RejectMessage(msgSqnNum, 99, "InvalidCheckSum");
+//			System.out.println("Reject message: " + rejectMessage);
+		} else if (ret == 1) {
+			System.out.println("Message valid");
 		}
-    	try {
-			msgLengthValidator(fixMessage);
-
-		}catch (InvalidMsgLengthException me) {
-			System.out.println("2) Message Length invalid");
-			return -2; // -2 means bad message length
-		}
-	   System.out.println("1> Checksum valid");
-	   return 1;
    }
    
    
