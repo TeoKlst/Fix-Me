@@ -1,7 +1,6 @@
 package app;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -33,8 +32,6 @@ class Broker {
             String echoString;
             String response;
 
-            //-Reading output from server and saving it
-            //-Error of fatal close, string left null which faults echoer on server side
             String savedServerResponse = dIn.readLine();
             BrokerFunctions.assignRouteServiceID(savedServerResponse);
             System.out.println("--Broker Connected--\n" + 
@@ -114,10 +111,8 @@ class Broker {
                     dOut.println(sbMessage);
                 }
                 else {
-                    //-Prints from echoer what has been written
                     dOut.println(echoString);
                 }
-                // ERROR ON CHECKING IF PURCHASE
                 if (!echoString.equals("exit")) {
                     response = dIn.readLine();
                     String[] echoStringParts = response.split("-");

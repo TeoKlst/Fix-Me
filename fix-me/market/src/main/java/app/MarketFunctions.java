@@ -35,7 +35,7 @@ public class MarketFunctions {
 
         if (itemID > 5 || itemID < 0)
             checkPass = false;
-        else if (purchaseAmount > getMarketItemAmount(itemID) || purchaseAmount < getMarketItemAmount(itemID))
+        else if (purchaseAmount > getMarketItemAmount(itemID) || purchaseAmount < 0)
             checkPass = false;
         if (checkPass)
             return ret = brokerPurchaseExecuted(value);

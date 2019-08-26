@@ -33,7 +33,6 @@ class Market {
             "Market[" + MarketAccount.marketRouteID + "]" + " ServiceID => " + MarketAccount.marketServiceID);
 
             do {
-                // ERROR HERE DOESNT WAIT FOR INPUT
                 response = null;
                 // Thread.sleep(1000);
                 echoString = dIn.readLine();
@@ -47,7 +46,7 @@ class Market {
                 else if (echoStringParts[0].equals("6"))
                     response = MarketFunctions.marketQuery(echoString);
                 else
-                    response = "¯\\_(ツ)_/¯";
+                    response = "Market Command Error";
                 dOut.println(response);   
             } while (!echoString.equals("exit"));
 

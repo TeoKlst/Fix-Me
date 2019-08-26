@@ -30,11 +30,10 @@ public class Echoer extends Thread {
             while (true) {
                 String echoString = input.readLine();
                 if (echoString == null) {
+                //- ⬆ echoString == null Break; Helps Prevent null pointer exception when Broker or Market close unexpectedly
                     break;
                 }
                 String[] echoStringParts = echoString.split("-");
-                //- java.lang.NullPointerException on this-line ⬆ when I close terminal without writing exit on broker
-                //- echoString == null Break; Helps Prevent null pointer exception when Broker or Market close unexpectedly
                 if (echoString.equals("exit")) {
                     break;
                 }
@@ -44,7 +43,6 @@ public class Echoer extends Thread {
                     output = new PrintWriter(hbPort.getOutputStream(), true);
                     output.println(echoString);
                 }
-                // Condense Buy and Sell into one
                 //-Buy from market || Sell to market
                 else if (echoStringParts[0].equals("1") || echoStringParts[0].equals("2")){
                     Socket marketPort = Server.mapMarket.get(echoStringParts[1]);
@@ -83,7 +81,7 @@ public class Echoer extends Thread {
                 }
                 else {
                     output = new PrintWriter(socket.getOutputStream(), true);
-                    output.println("Echo from server :" + echoString);
+                    output.println(echoString);
                 }
             }
         } catch(IOException e) {
