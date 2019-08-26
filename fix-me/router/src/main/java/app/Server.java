@@ -71,7 +71,7 @@ public class Server {
                     if (echoStringParts[0].equals("HB")) {
 
                         mapHBBroker.put(echoStringParts[1], seconds);
-                        
+
                         System.out.println("-√v^√v^√❤ Received-" + echoStringParts[1]);
                         // System.out.println( "Seconds in current minute = " + seconds);
                         System.out.println(mapHBBroker);
@@ -113,8 +113,8 @@ public class Server {
             while(true) {
                 try {
                     Socket socket = socketB.accept();
-                    Echoer echoer = new Echoer(socket);
-                    echoer.start();
+                    MessageProcessing messageProcessing = new MessageProcessing(socket);
+                    messageProcessing.start();
 
                     //-Broker Saved in Hash Map
                     int serviceID = LinkCounter.generateServiceID();
@@ -127,8 +127,8 @@ public class Server {
                     Socket brokerPort = mapBroker.get(Integer.toString(LinkCounter.brokerCount));
                     PrintWriter output = new PrintWriter(brokerPort.getOutputStream(), true);
                     output.println(LinkCounter.brokerCount + "-" + serviceID);
-                    
-                    //-Count added Broker(Avoid nulls with brokerHB) 
+
+                    //-Count added Broker(Avoid nulls with brokerHB)
                     LinkCounter.countBroker();
                 } catch(Exception e) {
                     System.out.println("Broker Server exception " + e.getMessage());
@@ -149,8 +149,8 @@ public class Server {
             while(true) {
                 try {
                     Socket socket = socketM.accept();
-                    Echoer echoer = new Echoer(socket);
-                    echoer.start();
+                    MessageProcessing messageProcessing = new MessageProcessing(socket);
+                    messageProcessing.start();
 
                     //-Market Saved in Hash Map
                     LinkCounter.countMarket();
@@ -183,4 +183,4 @@ public class Server {
             System.err.println("Could not start server: " + ie);
         }
     }
-} 
+}
