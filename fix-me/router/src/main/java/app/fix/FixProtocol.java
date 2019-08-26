@@ -2,6 +2,7 @@ package app.fix;
 
 import app.fix.exceptions.InvalidChecksumException;
 import app.fix.exceptions.InvalidMsgLengthException;
+import app.fix.exceptions.InvalidMsgTypeException;
 
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
@@ -264,7 +265,6 @@ public class FixProtocol {
         DateFormat df = new SimpleDateFormat("yyyyMMddHH:mm:ss");
         df.setTimeZone(TimeZone.getTimeZone("GMT"));
         Date date = new Date();
-        System.out.println(df.format(date));
         message.append("52=" + df.format(date) + "|");
 
         //Message body length. Always unencrypted, must be second field in message.
@@ -309,24 +309,40 @@ public class FixProtocol {
 			System.out.println("Reject message: " + rejectMessage);
 		} else if (ret == -2) {
 			System.out.println("Message Length invalid");
-//			int msgSqnNum = -1;
-//			//Reject through the msgLength - first get the msgSequence number
-//			String[] message = messageInput.split("\\|");
-//			for (int i=0; i < message.length; i++) {
-//				if (message[i].startsWith("34=") && isNumeric(message[i].substring(3)) && isInteger(message[i].substring(3))) {
-//					msgSqnNum = Integer.parseInt(message[i].substring(3));
-//				}
-//			}
-//			if (msgSqnNum < 1) {
-//				msgSqnNum = 1;
-//			}
-//			String rejectMessage = RejectMessage(msgSqnNum, 99, "InvalidCheckSum");
-//			System.out.println("Reject message: " + rejectMessage);
+			int msgSqnNum = -1;
+			//Reject through the msgLength - first get the msgSequence number
+			String[] message = messageInput.split("\\|");
+			for (int i=0; i < message.length; i++) {
+				if (message[i].startsWith("34=") && isNumeric(message[i].substring(3)) && isInteger(message[i].substring(3))) {
+					msgSqnNum = Integer.parseInt(message[i].substring(3));
+				}
+			}
+			if (msgSqnNum < 1) {
+				msgSqnNum = 1;
+			}
+			String rejectMessage = RejectMessage(msgSqnNum, 99, "InvalidMsgLength");
+			System.out.println("Reject message: " + rejectMessage);
 		} else if (ret == 1) {
 			System.out.println("Message valid");
 		}
    }
-   
+
+   public String		getMsgType(String messageInput) throws InvalidMsgTypeException {
+		String msgType = null;
+		if (!messageInput.contains("|35=")) {
+			throw new InvalidMsgTypeException("Invalid Message Type");
+		}
+		String[] message = messageInput.split("\\|");
+		for (int i=0; i < message.length; i++) {
+		   if (message[i].startsWith("35=")) {
+			   msgType =message[i].substring(3);
+		   }
+	   }
+	   if (msgType == null) {
+		   throw new InvalidMsgTypeException("Invalid Message Type");
+	   }
+    	return msgType;
+   }
    
    
    
