@@ -91,18 +91,12 @@ class Broker {
                     else
                         dOut.println("Sale: Account amount error");
                 }
-                else if (echoString.equals("listm") || echoString.equals("list markets")) {
+                else if (echoString.equals("listm")) {
                     brokerMessageType = "3";
                     sbMessage.append(brokerMessageType + "-");
                     sbMessage.append(BrokerAccount.brokerRouteID);
                     dOut.println(sbMessage);
                 }
-                else if (echoString.equals("listg")|| echoString.equals("list goods")) {
-                    System.out.println("__/Your Account/__" + "\nSilver: " + BrokerAccount.accountSilver + 
-                    "\nGold: " + BrokerAccount.accountGold+ "\nPlatinum: " + BrokerAccount.accountPlatinum + 
-                    "\nFuel: " + BrokerAccount.accountFuel + "\nBitcoin: " + BrokerAccount.accountBitcoin + 
-                    "\nCapital :" + BrokerAccount.capital);
-                    stringToEcho.println(echoString);
                 else if (echoString.equals("listg")) {
                     BrokerFunctions.brokerGetDataBroker();
                     dOut.println(echoString);
