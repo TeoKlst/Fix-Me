@@ -26,16 +26,25 @@ public class HBTimeOut extends Thread{
                 Calendar cal = Calendar.getInstance();
                 int seconds = cal.get(Calendar.SECOND);
 
+                String index = "base";
+                int i = 0;
+
                 for (String key : Server.mapHBBroker.keySet()) {
                     int val = Server.mapHBBroker.get(key) < seconds ? seconds - Server.mapHBBroker.get(key) : Server.mapHBBroker.get(key) - seconds;
-                    if (val >= 7) {
+                    if (val > 7) {
                         System.out.println("Broker Disconnected [" + Server.mapBroker.get(key) + "]");
+                        index = index + "," + key;
                         // Server.mapHBBroker.remove(key);
                         // Server.mapBroker.remove(key);
                     }
                     else {
                         System.out.println("Brokers [" + Server.mapBroker.get(key) + "] still connected");
                     }
+                }
+                String parts[] = index.split(",");
+                while (i != parts.length) {
+                    Server.mapHBBroker.remove(parts[i]);
+                    i++;
                 }
             }
         } catch(ConcurrentModificationException e) {

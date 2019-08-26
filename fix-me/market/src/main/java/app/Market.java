@@ -5,10 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Scanner;
 
 // A market has a list of instruments that can be traded.
-// When orders are received from brokers the market tries to execute it. If the execution is successfull,
+// When orders are received from brokers the market tries to execute it. If the execution is successfully,
 // it updates the internal instrument list and sends the broker an Executed message. If the order can’t be
 // met, the market sends a Rejected message.
 // The rules by which a market executes orders can be complex and you can play with

@@ -101,7 +101,7 @@ class Broker {
                     BrokerFunctions.brokerGetDataBroker();
                     dOut.println(echoString);
                 }
-                else if (echoString.equals("listmg")) || echoString.equals("list market goods") {
+                else if (echoString.equals("listmg") || echoString.equals("list market goods")) {
                     System.out.println("Choose Market ID to view (its) goods:");
                     echoString = scanner.nextLine().toLowerCase();
                     brokerMessageType = "6";
