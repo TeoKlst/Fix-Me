@@ -118,37 +118,33 @@ public class Server {
         FixProtocol fixProtocol = new FixProtocol("000001");
         String logonMessage = fixProtocol.logonMessage(120);
         System.out.println("Logon message: " + logonMessage);
-        try {
-            fixProtocol.checksumValidator(logonMessage);
-            System.out.println("Checksum valid");
-//            } else {
-//                System.out.println("Checksum invalid");
-//            }
-        }catch (InvalidChecksumException ce) {
+        if (fixProtocol.validateMessage(logonMessage) == -1) {
             System.out.println("Checksum invalid");
-        }
-        try {
-            fixProtocol.checksumValidator("8=FIX4.4|9=73|35=A|34=1|52=Mon Aug 26 11:05:30 SAST 2019|98=0|553=000001|108=120|141=Y|10=151|");
+        } else if (fixProtocol.validateMessage(logonMessage) == -2) {
+            System.out.println("Message Length invalid");
+        } else if (fixProtocol.validateMessage(logonMessage) == 1) {
             System.out.println("Checksum valid");
-//            } else {
-//                System.out.println("Checksum invalid");
-//            }
-        }catch (InvalidChecksumException ce) {
-            System.out.println("Checksum invalid");
+            System.out.println("Message Length valid");
         }
 
-        try {
-            fixProtocol.msgLengthValidator(logonMessage);
-            System.out.println("Message Length valid");
-        }catch (InvalidMsgLengthException me) {
+        if (fixProtocol.validateMessage("8=FIX4.4|9=60|35=A|34=1|52=2019082611:45:32|98=0|553=000001|108=120|141=Y|10=227|") == -1) {
+            System.out.println("Checksum invalid");
+        } else if (fixProtocol.validateMessage("8=FIX4.4|9=60|35=A|34=1|52=2019082611:45:32|98=0|553=000001|108=120|141=Y|10=227|") == -2) {
             System.out.println("Message Length invalid");
-        }
-        try {
-            fixProtocol.msgLengthValidator("8=FIX4.4|9=72|35=A|34=1|52=Mon Aug 26 10:11:45 SAST 2019|98=0|553=000001|108=120|141=Y|10=158|");
+        } else if (fixProtocol.validateMessage("8=FIX4.4|9=60|35=A|34=1|52=2019082611:45:32|98=0|553=000001|108=120|141=Y|10=227|") == 1) {
+            System.out.println("Checksum valid");
             System.out.println("Message Length valid");
-        }catch (InvalidMsgLengthException me) {
-            System.out.println("Message Length invalid");
         }
+
+        if (fixProtocol.validateMessage("8=FIX4.4|9=61|35=A|34=1|52=2019082611:45:32|98=0|553=000001|108=120|141=Y|10=228|") == -1) {
+            System.out.println("Checksum invalid");
+        } else if (fixProtocol.validateMessage("8=FIX4.4|9=61|35=A|34=1|52=2019082611:45:32|98=0|553=000001|108=120|141=Y|10=228|") == -2) {
+            System.out.println("Message Length invalid");
+        } else if (fixProtocol.validateMessage("8=FIX4.4|9=61|35=A|34=1|52=2019082611:45:32|98=0|553=000001|108=120|141=Y|10=228|") == 1) {
+            System.out.println("Checksum valid");
+            System.out.println("Message Length valid");
+        }
+
 //        int portA = 5000;
 //        int portB = 5001;
 //

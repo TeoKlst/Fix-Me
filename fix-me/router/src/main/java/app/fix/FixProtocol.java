@@ -29,7 +29,7 @@ public class FixProtocol {
 		return true;
 	}
 
-    public static boolean isInteger(String s) {
+    public static boolean   isInteger(String s) {
 		try {
 			Integer.parseInt(s);
 		} catch(NumberFormatException e) {
@@ -41,7 +41,7 @@ public class FixProtocol {
 		return true;
     }
     
-    public String       checksumGenerator(String messageInput) {
+    public String           checksumGenerator(String messageInput) {
         //Replace | with the ascii value of 1 (a non-printable character) to ensure the correct byte size
         String message = messageInput.replace('|', '\u0001');
         //Put the message in ascii byte value into a byte array
@@ -60,7 +60,7 @@ public class FixProtocol {
         return checksumStr;
     }
     
-    public boolean      checksumValidator(String input) throws InvalidChecksumException {
+    public boolean          checksumValidator(String input) throws InvalidChecksumException {
         // Reference: https://gigi.nullneuron.net/gigilabs/calculating-the-checksum-of-a-fix-message/
         
         //Use to test:
@@ -88,7 +88,7 @@ public class FixProtocol {
         return true;
     }
 
-    public boolean      msgLengthValidator(String messageInput) throws InvalidMsgLengthException {
+    public boolean          msgLengthValidator(String messageInput) throws InvalidMsgLengthException {
         int msgLength = -1;
 
         //Get the start index of the message to get length
@@ -116,11 +116,8 @@ public class FixProtocol {
         return true;
     }
 
-    //Todo Date Format
-
-
     //Encryption|UserID|Heartbeat|resetSeqNum|
-    public String       logonMessage(int heartbeat) {
+    public String           logonMessage(int heartbeat) {
         StringBuilder body = new StringBuilder();
 
         /* 
@@ -164,13 +161,11 @@ public class FixProtocol {
 
         String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 
-        System.out.println("Message : " + message);
-
         return message;
     }
 
     //Encryption|UserID|
-    public String       logoutMessage() {
+	public String       logoutMessage() {
         StringBuilder body = new StringBuilder();
 
         /* 
@@ -186,8 +181,6 @@ public class FixProtocol {
         String header = constructHeader(body.toString(), "5"); //Logout = "5"
 
         String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
-
-        System.out.println("Message : " + message);
 
         return message;
     }
@@ -210,7 +203,6 @@ public class FixProtocol {
 
         String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 
-        System.out.println("Message : " + message);
 
         return message;
     }
@@ -253,13 +245,11 @@ public class FixProtocol {
 
         String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 
-        System.out.println("Message : " + message);
-
         return message;
     }
 
    //Protocol Version|length|Message Type|Message Sequence Number|Date|
-   public String constructHeader(String bodyMessage, String type) {
+   public String            constructHeader(String bodyMessage, String type) {
         StringBuilder header = new StringBuilder();
 
         //Protocol version. Always unencrypted, must be first field in message.
@@ -289,23 +279,34 @@ public class FixProtocol {
         return header.toString();
     }
    
-   public void          readMessage(String fixMessage) {
+   public int          validateMessage(String fixMessage) {
     	try {
             checksumValidator(fixMessage);
 		} catch (InvalidChecksumException e) {
-			int msgSqnNum = -1;
-			//Reject through the checksum - first get the msgSequence number
-			String[] message = fixMessage.split("\\|");
-			for (int i=0; i < message.length; i++) {
-				if (message[i].startsWith("34=") && isNumeric(message[i].substring(3)) && isInteger(message[i].substring(3))) {
-					msgSqnNum = Integer.parseInt(message[i].substring(3));
-				}
-			}
-			if (msgSqnNum < 1) {
-				msgSqnNum = 1;
-			}
-			RejectMessage(msgSqnNum, 99, "InvalidCheckSum");
+//			int msgSqnNum = -1;
+//			//Reject through the checksum - first get the msgSequence number
+//			String[] message = fixMessage.split("\\|");
+//			for (int i=0; i < message.length; i++) {
+//				if (message[i].startsWith("34=") && isNumeric(message[i].substring(3)) && isInteger(message[i].substring(3))) {
+//					msgSqnNum = Integer.parseInt(message[i].substring(3));
+//				}
+//			}
+//			if (msgSqnNum < 1) {
+//				msgSqnNum = 1;
+//			}
+//			RejectMessage(msgSqnNum, 99, "InvalidCheckSum");
+			System.out.println("1) Checksum invalid");
+			return -1; //-1 means bad checksum
 		}
+    	try {
+			msgLengthValidator(fixMessage);
+
+		}catch (InvalidMsgLengthException me) {
+			System.out.println("2) Message Length invalid");
+			return -2; // -2 means bad message length
+		}
+	   System.out.println("1> Checksum valid");
+	   return 1;
    }
    
    
