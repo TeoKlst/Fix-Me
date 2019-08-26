@@ -1,5 +1,9 @@
 package app;
 
+import app.fix.FixProtocol;
+import app.fix.exceptions.InvalidChecksumException;
+import app.fix.exceptions.InvalidMsgLengthException;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -111,14 +115,48 @@ public class Server {
 
     public static void main(String[] args)
     {
-        int portA = 5000;
-        int portB = 5001;
-
-        Server server;
+        FixProtocol fixProtocol = new FixProtocol("000001");
+        String logonMessage = fixProtocol.logonMessage(120);
+        System.out.println("Logon message: " + logonMessage);
         try {
-            server = new Server(portA, portB);
-        } catch(IOException ie) {
-            System.err.println("Could not start server: " + ie);
+            fixProtocol.checksumValidator(logonMessage);
+            System.out.println("Checksum valid");
+//            } else {
+//                System.out.println("Checksum invalid");
+//            }
+        }catch (InvalidChecksumException ce) {
+            System.out.println("Checksum invalid");
         }
+        try {
+            fixProtocol.checksumValidator("8=FIX4.4|9=73|35=A|34=1|52=Mon Aug 26 11:05:30 SAST 2019|98=0|553=000001|108=120|141=Y|10=151|");
+            System.out.println("Checksum valid");
+//            } else {
+//                System.out.println("Checksum invalid");
+//            }
+        }catch (InvalidChecksumException ce) {
+            System.out.println("Checksum invalid");
+        }
+
+        try {
+            fixProtocol.msgLengthValidator(logonMessage);
+            System.out.println("Message Length valid");
+        }catch (InvalidMsgLengthException me) {
+            System.out.println("Message Length invalid");
+        }
+        try {
+            fixProtocol.msgLengthValidator("8=FIX4.4|9=72|35=A|34=1|52=Mon Aug 26 10:11:45 SAST 2019|98=0|553=000001|108=120|141=Y|10=158|");
+            System.out.println("Message Length valid");
+        }catch (InvalidMsgLengthException me) {
+            System.out.println("Message Length invalid");
+        }
+//        int portA = 5000;
+//        int portB = 5001;
+//
+//        Server server;
+//        try {
+//            server = new Server(portA, portB);
+//        } catch(IOException ie) {
+//            System.err.println("Could not start server: " + ie);
+//        }
     }
 } 

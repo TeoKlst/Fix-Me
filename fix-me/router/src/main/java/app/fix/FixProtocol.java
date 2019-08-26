@@ -1,6 +1,7 @@
 package app.fix;
 
 import app.fix.exceptions.InvalidChecksumException;
+import app.fix.exceptions.InvalidMsgLengthException;
 
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
@@ -53,28 +54,19 @@ public class FixProtocol {
         //Modulus by 256 to get what the checksum value should be
         Integer checksumResult = total % 256;
 
-        //For testing. To delete.
-        System.out.println("Size of message in bytes: " + total);
-        System.out.println("Checksum: " + checksumResult);
-        //
-
         //Get's the correct padding
         String checksumStr = "000".substring(checksumResult.toString().length()) + checksumResult.toString();
-
-        //To delete
-        System.out.println("Checksum String: " + checksumStr);
-        //
 
         return checksumStr;
     }
     
-    public boolean      fixMessageValidator(String input) {
+    public boolean      checksumValidator(String input) throws InvalidChecksumException {
         // Reference: https://gigi.nullneuron.net/gigilabs/calculating-the-checksum-of-a-fix-message/
         
         //Use to test:
         /*
         * FixProtocol fixProtocol = new FixProtocol();
-        * fixProtocol.fixMessageValidator("8=FIX.4.1|9=61|35=A|34=1|49=EXEC|52=20121105-23:24:06|56=BANZAI|98=0|108=30|10=003|");
+        * fixProtocol.checksumValidator("8=FIX.4.1|9=61|35=A|34=1|49=EXEC|52=20121105-23:24:06|56=BANZAI|98=0|108=30|10=003|");
         */
 
         //Separates the checksum from the message
@@ -82,7 +74,6 @@ public class FixProtocol {
 
         //Make sure that there are only 2 strings: the input and the checksum
         if (values.length != 2) {
-            System.out.println("Split failed");
             return false;
         }
         //Add the pipe back to the first string to end the input
@@ -92,11 +83,40 @@ public class FixProtocol {
 
         if (!checksumStr.equals(values[1].substring(0,3))) {
             throw new InvalidChecksumException("Invalid Checksum");
-			return false;
+//			return false;
 		}
-        System.out.println("String valid");
         return true;
     }
+
+    public boolean      msgLengthValidator(String messageInput) throws InvalidMsgLengthException {
+        int msgLength = -1;
+
+        //Get the start index of the message to get length
+        int msgIndexStart = messageInput.indexOf("|9=") + 3;
+        while (messageInput.charAt(msgIndexStart) != '|') { msgIndexStart++;}   //Gets to the message index to calculate the message length from
+        msgIndexStart++;
+
+        //Get the end index of the message to calculate length
+        int msgIndexEnd = messageInput.indexOf("|10=");
+        msgIndexEnd++;
+
+        //Get message to get length from
+        String innerMessage = messageInput.substring(msgIndexStart, msgIndexEnd);
+
+        //Get the given message length
+        String[] message = messageInput.split("\\|");
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("9=") && isNumeric(message[i].substring(2)) && isInteger(message[i].substring(2))) {
+                msgLength = Integer.parseInt(message[i].substring(2));
+            }
+        }
+        if (msgLength < 0 || msgLength != innerMessage.length()) {
+            throw new InvalidMsgLengthException("Incorrect Message Length");
+        }
+        return true;
+    }
+
+    //Todo Date Format
 
 
     //Encryption|UserID|Heartbeat|resetSeqNum|
@@ -277,13 +297,13 @@ public class FixProtocol {
    
    public void          readMessage(String fixMessage) {
     	try {
-			fixMessageValidator(fixMessage);
+            checksumValidator(fixMessage);
 		} catch (InvalidChecksumException e) {
 			int msgSqnNum = -1;
-			//Reject through the checksum
+			//Reject through the checksum - first get the msgSequence number
 			String[] message = fixMessage.split("\\|");
 			for (int i=0; i < message.length; i++) {
-				if (message[i].startsWith("34=") && isNumeric(message[i].substring(3)) && isInteger(message[i])) {
+				if (message[i].startsWith("34=") && isNumeric(message[i].substring(3)) && isInteger(message[i].substring(3))) {
 					msgSqnNum = Integer.parseInt(message[i].substring(3));
 				}
 			}
@@ -292,11 +312,6 @@ public class FixProtocol {
 			}
 			RejectMessage(msgSqnNum, 99, "InvalidCheckSum");
 		}
-//       if (fixMessageValidator(fixMessage)) {
-//
-//       } else {
-//
-//       }
    }
    
    
