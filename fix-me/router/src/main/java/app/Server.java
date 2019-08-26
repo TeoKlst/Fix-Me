@@ -57,8 +57,8 @@ public class Server {
             try {
                 BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-                // HBTimeOut hbTimeOut = new HBTimeOut();
-                // hbTimeOut.start();
+                HBTimeOut hbTimeOut = new HBTimeOut();
+                hbTimeOut.start();
 
                 while (true) {
                     String echoString = dIn.readLine();
@@ -73,7 +73,7 @@ public class Server {
                         mapHBBroker.put(echoStringParts[1], seconds);
                         
                         System.out.println("-√v^√v^√❤ Received-" + echoStringParts[1]);
-                        System.out.println( "Seconds in current minute = " + seconds);
+                        // System.out.println( "Seconds in current minute = " + seconds);
                         System.out.println(mapHBBroker);
                     }
                 }
@@ -94,6 +94,7 @@ public class Server {
 
         public void run() {
 
+            //HEARTBEAT SCANNER
             Socket hbSocket;
             try {
                 hbSocket = new Socket("127.0.0.1", 5000);
@@ -106,7 +107,8 @@ public class Server {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
             }
-            
+            //HEARTBEAT SCANNER
+
             System.out.println("--Broker Router Running--");
             while(true) {
                 try {

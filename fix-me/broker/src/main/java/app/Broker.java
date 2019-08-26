@@ -22,8 +22,8 @@ class Broker {
         // new Socket("localhost", 5001) <- should also work with that string
         try (Socket socket = new Socket("127.0.0.1", 5000)) {
             //-Starts Broker HeartBeat
-            // BrokerHBSender brokerHBSender = new BrokerHBSender(socket);
-            // brokerHBSender.start();
+            BrokerHBSender brokerHBSender = new BrokerHBSender(socket);
+            brokerHBSender.start();
 
             BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter dOut = new PrintWriter(socket.getOutputStream(), true);
