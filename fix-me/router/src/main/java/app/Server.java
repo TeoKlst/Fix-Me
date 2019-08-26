@@ -1,8 +1,13 @@
 package app;
 
+import java.io.PrintWriter;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,10 +23,16 @@ public class Server {
     private ServerSocket socketMarket;
     private Runnable mS;
 
+    public static Map<String, Integer> mapHBBroker;
+    public static Map<String, Integer> mapHBMarket;
+
     public Server(int portA, int portB) throws IOException {
 
         mapBroker = new HashMap<String,Socket>();
         mapMarket = new HashMap<String,Socket>();
+
+        mapHBBroker = new HashMap<String,Integer>();
+        mapHBMarket = new HashMap<String,Integer>();
 
         socketBroker = new ServerSocket(portA);
         socketMarket = new ServerSocket(portB);
@@ -35,12 +46,43 @@ public class Server {
         tm.start();
     }
 
-    private static String getUserNameBroker(Socket s) {
-        return Integer.toString(BrokerCount.brokerCount);
-    }
+    class HeartBeatScanner extends Thread {
+        private Socket socket;
 
-    private static String getUserNameMarket(Socket s) {
-        return Integer.toString(MarketCount.marketCount);
+        public HeartBeatScanner(Socket socket) {
+            this.socket = socket;
+        }
+
+		public void run() {
+            try {
+                BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+                // HBTimeOut hbTimeOut = new HBTimeOut();
+                // hbTimeOut.start();
+
+                while (true) {
+                    String echoString = dIn.readLine();
+                    Calendar cal = Calendar.getInstance();
+                    int seconds = cal.get(Calendar.SECOND);
+                    if (echoString == null) {
+                        break;
+                    }
+                    String[] echoStringParts = echoString.split("-");
+                    if (echoStringParts[0].equals("HB")) {
+
+                        mapHBBroker.put(echoStringParts[1], seconds);
+                        
+                        System.out.println("-√v^√v^√❤ Received-" + echoStringParts[1]);
+                        System.out.println( "Seconds in current minute = " + seconds);
+                        System.out.println(mapHBBroker);
+                    }
+                }
+            } catch(IOException e) {
+                System.out.println("Oops: " + e.getMessage());
+            } catch(Exception e) {
+                System.out.println("HeartBeat Server exception " + e.getMessage());
+            }
+		}
     }
 
     class BrokerSocket implements Runnable {
@@ -51,6 +93,20 @@ public class Server {
         }
 
         public void run() {
+
+            Socket hbSocket;
+            try {
+                hbSocket = new Socket("127.0.0.1", 5000);
+                HeartBeatScanner heartBeatScanner = new HeartBeatScanner(hbSocket);
+                heartBeatScanner.start();
+            } catch (UnknownHostException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            
             System.out.println("--Broker Router Running--");
             while(true) {
                 try {
@@ -59,16 +115,19 @@ public class Server {
                     messageProcessing.start();
 
                     //-Broker Saved in Hash Map
-                    BrokerCount.brokerCount = BrokerCount.brokerCount + 1;
-                    String username = getUserNameBroker(socket);
-                    mapBroker.put(username, socket);
-                    System.out.println("Broker[" + BrokerCount.brokerCount + "] connected");
+                    int serviceID = LinkCounter.generateServiceID();
+                    String routeID = LinkCounter.getBrokerRouteID(socket);
+                    mapBroker.put(routeID, socket);
+                    System.out.println("Broker[" + LinkCounter.brokerCount + "] connected");
                     System.out.println("Saved Brokers => " + mapBroker);
 
                     //-Send message to broker
-                    // Socket brokerPort = mapBroker.get(Integer.toString(BrokerCount.brokerCount));
-                    // PrintWriter output = new PrintWriter(brokerPort.getOutputStream(), true);
-                    // output.println("You are broker: " + BrokerCount.brokerCount);
+                    Socket brokerPort = mapBroker.get(Integer.toString(LinkCounter.brokerCount));
+                    PrintWriter output = new PrintWriter(brokerPort.getOutputStream(), true);
+                    output.println(LinkCounter.brokerCount + "-" + serviceID);
+                    
+                    //-Count added Broker(Avoid nulls with brokerHB) 
+                    LinkCounter.countBroker();
                 } catch(Exception e) {
                     System.out.println("Broker Server exception " + e.getMessage());
                 }
@@ -92,16 +151,17 @@ public class Server {
                     messageProcessing.start();
 
                     //-Market Saved in Hash Map
-                    MarketCount.marketCount = MarketCount.marketCount + 1;
-                    String username = getUserNameMarket(socket);
-                    mapMarket.put(username, socket);
-                    System.out.println("Market[" + MarketCount.marketCount + "] connected");
+                    LinkCounter.countMarket();
+                    int serviceID = LinkCounter.generateServiceID();
+                    String routeID = LinkCounter.getMarketRouteID(socket);
+                    mapMarket.put(routeID, socket);
+                    System.out.println("Market[" + LinkCounter.marketCount + "] connected");
                     System.out.println("Saved Markets => " + mapMarket);
 
                     //-Send message to market
-                    // Socket brokerPort = mapMarket.get(Integer.toString(BrokerCount.brokerCount));
-                    // PrintWriter output = new PrintWriter(brokerPort.getOutputStream(), true);
-                    // output.println("You are market: " + MarketCount.marketCount);
+                    Socket marketPort = mapMarket.get(Integer.toString(LinkCounter.marketCount));
+                    PrintWriter output = new PrintWriter(marketPort.getOutputStream(), true);
+                    output.println(LinkCounter.marketCount + "-" + serviceID);
                 } catch(Exception e) {
                     System.out.println("Market Server exception " + e.getMessage());
                 }

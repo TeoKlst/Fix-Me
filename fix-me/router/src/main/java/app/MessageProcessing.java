@@ -29,32 +29,67 @@ public class MessageProcessing extends Thread {
 
             while (true) {
                 String echoString = input.readLine();
-                String[] echoStringParts = echoString.split("-");
-                // TODO java.lang.NullPointerException on this-line ⬆ when I close terminal without writing exit on broker
-                if (echoStringParts[0].equals("exit")) {
+                if (echoString == null) {
+                //- ⬆ echoString == null Break; Helps Prevent null pointer exception when Broker or Market close unexpectedly
                     break;
                 }
-                //-Buy from market
-                if (echoStringParts[0].equals("1")) {
-                    output.println("Message from Broker -> Buy Market => Data: " + echoString);
+                String[] echoStringParts = echoString.split("-");
+                if (echoString.equals("exit")) {
+                    break;
                 }
-                //-Sell from market
-                if (echoStringParts[0].equals("2")) {
-                    output.println("Message from Broker -> Sale Market => Data: " + echoString);
+                //Transfers HB to server
+                else if (echoStringParts[0].equals("HB")) {
+                    Socket hbPort = Server.mapBroker.get("0");
+                    output = new PrintWriter(hbPort.getOutputStream(), true);
+                    output.println(echoString);
+                }
+                //-Buy from market || Sell to market
+                else if (echoStringParts[0].equals("1") || echoStringParts[0].equals("2")){
+                    Socket marketPort = Server.mapMarket.get(echoStringParts[1]);
+                    output = new PrintWriter(marketPort.getOutputStream(), true);
+                    output.println(echoString);
                 }
                 //-List Markets
-                if (echoString.equals("3")) {
-                    output.println("Market => " + Server.mapMarket);
+                else if (echoStringParts[0].equals("3")) {
+                    Socket brokerPort = Server.mapBroker.get(echoStringParts[1]);
+                    output = new PrintWriter(brokerPort.getOutputStream(), true);
+                    output.println("Available Market ID's => " + Server.mapMarket.keySet());
                 }
-                else
-                    output.println("Echo from server :" + echoString);
+                //-Purchase || Sale Executed
+                else if (echoStringParts[0].equals("4")) {
+                    Socket marketPort = Server.mapBroker.get(echoStringParts[1]);
+                    output = new PrintWriter(marketPort.getOutputStream(), true);
+                    output.println(echoString);
+                }
+                //-Purchase || Sale Rejected
+                else if (echoStringParts[0].equals("5")) {
+                    Socket brokerPort = Server.mapBroker.get(echoStringParts[1]);
+                    output = new PrintWriter(brokerPort.getOutputStream(), true);
+                    output.println(echoString);
+                }
+                //-List Market Goods Query
+                else if (echoStringParts[0].equals("6")) {
+                    Socket marketPort = Server.mapMarket.get(echoStringParts[1]);
+                    output = new PrintWriter(marketPort.getOutputStream(), true);
+                    output.println(echoString);
+                }
+                //-List Market Goods Data Return
+                else if (echoStringParts[0].equals("7")) {
+                    Socket marketPort = Server.mapBroker.get(echoStringParts[2]);
+                    output = new PrintWriter(marketPort.getOutputStream(), true);
+                    output.println(echoString);
+                }
+                else {
+                    output = new PrintWriter(socket.getOutputStream(), true);
+                    output.println(echoString);
+                }
             }
         } catch(IOException e) {
             System.out.println("Oops: " + e.getMessage());
         } finally {
             try {
                 socket.close();
-            } catch(IOException e) { }
+            } catch(IOException e) {}
         }
     }
 }
