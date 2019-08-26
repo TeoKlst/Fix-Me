@@ -111,8 +111,8 @@ public class Server {
             while(true) {
                 try {
                     Socket socket = socketB.accept();
-                    Echoer echoer = new Echoer(socket);
-                    echoer.start();
+                    MessageProcessing messageProcessing = new MessageProcessing(socket);
+                    messageProcessing.start();
 
                     //-Broker Saved in Hash Map
                     int serviceID = LinkCounter.generateServiceID();
@@ -147,8 +147,8 @@ public class Server {
             while(true) {
                 try {
                     Socket socket = socketM.accept();
-                    Echoer echoer = new Echoer(socket);
-                    echoer.start();
+                    MessageProcessing messageProcessing = new MessageProcessing(socket);
+                    messageProcessing.start();
 
                     //-Market Saved in Hash Map
                     LinkCounter.countMarket();

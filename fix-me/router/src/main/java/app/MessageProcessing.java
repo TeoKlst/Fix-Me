@@ -14,10 +14,10 @@ import java.net.Socket;
 // • Market
 // • Price
 
-public class Echoer extends Thread {
+public class MessageProcessing extends Thread {
     private Socket socket;
 
-    public Echoer(Socket socket) {
+    public MessageProcessing(Socket socket) {
         this.socket = socket;
     }
 
