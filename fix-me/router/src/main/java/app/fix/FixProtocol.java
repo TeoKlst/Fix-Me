@@ -4,7 +4,7 @@ import app.fix.exceptions.InvalidChecksumException;
 import app.fix.exceptions.InvalidMsgLengthException;
 
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -275,17 +275,11 @@ public class FixProtocol {
         message.append("34=" + this.msgSeqNum + "|");
 
         //Time of message transmission (always expressed in UTC (Universal Time Coordinated), also known as 'GMT'))
-        SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyyMMddHH:mm:ss");
-        dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
-
-        //Local time zone   
-        SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyyMMddHH:mm:ss");
-
-        try{
-            message.append("52=" + dateFormatLocal.parse( dateFormatGmt.format(new Date()) ).toString() + "|");
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        DateFormat df = new SimpleDateFormat("yyyyMMddHH:mm:ss");
+        df.setTimeZone(TimeZone.getTimeZone("GMT"));
+        Date date = new Date();
+        System.out.println(df.format(date));
+        message.append("52=" + df.format(date) + "|");
 
         //Message body length. Always unencrypted, must be second field in message.
         int length = message.length() + bodyMessage.length();
