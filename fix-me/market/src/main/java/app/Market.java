@@ -7,8 +7,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-// import router.BrokerCount;
-
 // A market has a list of instruments that can be traded.
 // When orders are received from brokers the market tries to execute it. If the execution is successfull,
 // it updates the internal instrument list and sends the broker an Executed message. If the order can’t be
@@ -22,34 +20,35 @@ class Market {
     public static void main(String[] args) throws Exception {
         // new Socket("localhost", 5001) <- should also work with "localhost" string
         try (Socket socket = new Socket("127.0.0.1", 5001)) {
-            BufferedReader echoes = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter stringToEcho = new PrintWriter(socket.getOutputStream(), true);
-            Scanner scanner = new Scanner(System.in);
+            BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter dOut = new PrintWriter(socket.getOutputStream(), true);
             
             String echoString;
             String response;
 
-            System.out.println("--Market Connected--");
+            //-Reading output from server and saving it
+            String savedServerResponse = dIn.readLine();
+            MarketFunctions.assignRouteServiceID(savedServerResponse);
+            System.out.println("--Market Connected--\n" + 
+            "Market[" + MarketAccount.marketRouteID + "]" + " ServiceID => " + MarketAccount.marketServiceID);
+
             do {
-                /*
-                GET MESSAGE FROM SERVER
-                if (echoString == Purchase -> Purchase Func Called)
-                    MarketFunctions.brokerPurchaseCheck(echoString);
-                else if (echoString == Sale -> Sale Func Called)
-                    MarketFunctions.brokerSaleCheck(echoString);
+                response = null;
+                // Thread.sleep(1000);
+                echoString = dIn.readLine();
+                String[] echoStringParts = echoString.split("-");
+                System.out.println(echoString);
+                
+                if (echoStringParts[0].equals("1"))
+                    response = MarketFunctions.brokerPurchaseCheck(echoString);
+                else if (echoStringParts[0].equals("2"))
+                    response = MarketFunctions.brokerSaleCheck(echoString);
+                else if (echoStringParts[0].equals("6"))
+                    response = MarketFunctions.marketQuery(echoString);
                 else
-                    echoString == null;
-                */
-
-                echoString = scanner.nextLine();
-                stringToEcho.println(echoString.toString());
-                if (!echoString.equals("exit")) {
-                    response = echoes.readLine();
-                    System.out.println(response);
-                }
+                    response = "Market Command Error";
+                dOut.println(response);   
             } while (!echoString.equals("exit"));
-
-            scanner.close();
 
         } catch(IOException e) {
             System.out.println("Market Error: " + e.getMessage());

@@ -1,7 +1,6 @@
 package app;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -15,26 +14,29 @@ import java.util.Scanner;
 
 // and will receive from the market messages of the following types:
 
-// • Exeuted - when the order was accepted by the market and the action succeeded
+// • Executed - when the order was accepted by the market and the action succeeded
 // • Rejected - when the order could not be met
 
 class Broker {
     public static void main(String[] args) throws Exception {
         // new Socket("localhost", 5001) <- should also work with that string
         try (Socket socket = new Socket("127.0.0.1", 5000)) {
-            BufferedReader echoes = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter stringToEcho = new PrintWriter(socket.getOutputStream(), true);
+            //-Starts Broker HeartBeat
+            // BrokerHBSender brokerHBSender = new BrokerHBSender(socket);
+            // brokerHBSender.start();
+
+            BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter dOut = new PrintWriter(socket.getOutputStream(), true);
 
             Scanner scanner = new Scanner(System.in);
             String echoString;
             String response;
 
-            //-Reading output from server and saving it
-            //-Error of fatal close, string left null which faults echoer on server side
-            // BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            // String savedServerResponse = dIn.readLine();
-            // System.out.println("--Broker Connected--\n" + savedServerResponse);
-
+            String savedServerResponse = dIn.readLine();
+            BrokerFunctions.assignRouteServiceID(savedServerResponse);
+            System.out.println("--Broker Connected--\n" + 
+            "You are Broker[" + BrokerAccount.brokerRouteID + "]" + " ServiceID => " + BrokerAccount.brokerServiceID);
+            
             do {
                 StringBuilder sbMessage = new StringBuilder();
                 String brokerMessageType = "0";
@@ -57,12 +59,14 @@ class Broker {
                     sbMessage.append(echoString + "-");
                     System.out.println("Choose purchase Price:");
                     echoString = scanner.nextLine().toLowerCase();
-                    sbMessage.append(echoString);
-                    //if (Successfull)
-                    //  Transfers value from market --> broker 
-                    BrokerFunctions.brokerBuySuccess(sbMessage.toString());
-                    //-Sends message to echoer
-                    stringToEcho.println(sbMessage.toString());
+                    sbMessage.append(echoString + "-");
+                    sbMessage.append(BrokerAccount.brokerRouteID);
+                    if (BrokerFunctions.brokerPurchaseValidate(sbMessage.toString())) {
+                        //-Sends message to echoer
+                        dOut.println(sbMessage.toString());
+                    }
+                    else
+                        dOut.println("Purchase: Account amount error");
                 }
                 else if (echoString.equals("sell")) {
                     brokerMessageType = "2";
@@ -78,34 +82,57 @@ class Broker {
                     sbMessage.append(echoString + "-");
                     System.out.println("Choose sale Price:");
                     echoString = scanner.nextLine().toLowerCase();
-                    sbMessage.append(echoString);
-                    //if (Successfull)
-                    //  Transfers value from broker --> market
-                    BrokerFunctions.brokerSellSuccess(sbMessage.toString());
-                    //-Sends message to echoer
-                    stringToEcho.println(sbMessage.toString());
+                    sbMessage.append(echoString + "-");
+                    sbMessage.append(BrokerAccount.brokerRouteID);
+                    if (BrokerFunctions.brokerSaleValidate(sbMessage.toString())) {
+                        //-Sends message to echoer
+                        dOut.println(sbMessage.toString());
+                    }
+                    else
+                        dOut.println("Sale: Account amount error");
                 }
-                else if (echoString.equals("listm") || echoString.equals("list markets")) {
+                else if (echoString.equals("listm")) {
                     brokerMessageType = "3";
-                    stringToEcho.println(brokerMessageType);
+                    sbMessage.append(brokerMessageType + "-");
+                    sbMessage.append(BrokerAccount.brokerRouteID);
+                    dOut.println(sbMessage);
                 }
-                else if (echoString.equals("listg")|| echoString.equals("list goods")) {
-                    System.out.println("__/Your Account/__" + "\nSilver: " + BrokerAccount.accountSilver + 
-                    "\nGold: " + BrokerAccount.accountGold+ "\nPlatinum: " + BrokerAccount.accountPlatinum + 
-                    "\nFuel: " + BrokerAccount.accountFuel + "\nBitcoin: " + BrokerAccount.accountBitcoin + 
-                    "\nCapital :" + BrokerAccount.capital);
-                    stringToEcho.println(echoString);
+                else if (echoString.equals("listg")) {
+                    BrokerFunctions.brokerGetDataBroker();
+                    dOut.println(echoString);
+                }
+                else if (echoString.equals("listmg")) {
+                    System.out.println("Choose Market ID to view (its) goods:");
+                    echoString = scanner.nextLine().toLowerCase();
+                    brokerMessageType = "6";
+                    sbMessage.append(brokerMessageType + "-");
+                    sbMessage.append(echoString + "-");
+                    sbMessage.append(BrokerAccount.brokerRouteID);
+                    dOut.println(sbMessage);
                 }
                 else {
-                    //-Prints from echoer what has been written
-                    stringToEcho.println(echoString);
+                    dOut.println(echoString);
                 }
                 if (!echoString.equals("exit")) {
-                    response = echoes.readLine();
-                    System.out.println(response);
+                    response = dIn.readLine();
+                    String[] echoStringParts = response.split("-");
+                    if (echoStringParts[0].equals("4")) {
+                        if (echoStringParts[2].equals("1"))
+                            BrokerFunctions.brokerBuySuccess(sbMessage.toString());
+                        if (echoStringParts[2].equals("2"))
+                            BrokerFunctions.brokerSellSuccess(sbMessage.toString());
+                        System.out.println("Transaction Successful");
+                    }
+                    else if (echoStringParts[0].equals("5"))
+                        System.out.println("Transaction Failed");
+                    else if (echoStringParts[0].equals("7"))
+                        BrokerFunctions.brokerReceiveDataMarket(response);
+                    else
+                        System.out.println(response);
                 }
             } while (!echoString.equals("exit"));
 
+            // brokerHBSender.interrupt();
             scanner.close();
             System.out.println("Connection Closed");
 
