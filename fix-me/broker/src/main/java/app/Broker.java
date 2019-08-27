@@ -18,6 +18,7 @@ import java.util.Scanner;
 // • Rejected - when the order could not be met
 
 class Broker {
+
     public static void main(String[] args) throws Exception {
         // new Socket("localhost", 5001) <- should also work with that string
         try (Socket socket = new Socket("127.0.0.1", 5000)) {

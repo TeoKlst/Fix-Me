@@ -212,43 +212,29 @@ public class Server {
 
     public static void main(String[] args)
     {
-	    fixProtocol = new FixProtocol("000001");
-
-	    String logonMessage = fixProtocol.logonMessage(120);
-        String heartBeatMessage = fixProtocol.heartBeatMessage();
-        String logoutMessage = fixProtocol.logoutMessage();
-//        System.out.println("Logon message: " + logonMessage);
-//        fixProtocol.receiveMessage(logonMessage);
-//        fixProtocol.receiveMessage("8=FIX4.4|9=60|35=A|34=1|52=2019082611:45:32|98=0|553=000001|108=120|141=Y|10=227|");
-//		String test2 = "8=FIX4.4|9=61|35=A|34=1|52=2019082611:45:32|98=0|553=000001|108=120|141=Y|";
-//        test2 = test2 + "10=" + fixProtocol.checksumGenerator(test2) + "|";
-//        System.out.println("TEST2 " + test2);
-//        fixProtocol.receiveMessage(test2);
-//		fixProtocol.receiveMessage("");
-//		try {
-//			System.out.println("Message type: " + fixProtocol.getMsgType(logonMessage));
-//			System.out.println("Message type: " + fixProtocol.getMsgType(heartBeatMessage));
-//			System.out.println("Message type: " + fixProtocol.getMsgType(logoutMessage));
-//		} catch (InvalidMsgTypeException mte) {
-//			System.out.println("Invalid message exception found");
-//		}
-	    readMessage(logonMessage);
-	    readMessage(heartBeatMessage);
-	    readMessage(logoutMessage);
-	    readMessage("8=FIX4.4|9=60|35=A|34=1|52=2019082611:45:32|98=0|553=000001|108=120|141=Y|10=227|");
-	    String test2 = "8=FIX4.4|9=61|35=A|34=1|52=2019082611:45:32|98=0|553=000001|108=120|141=Y|";
-	    test2 = test2 + "10=" + fixProtocol.checksumGenerator(test2) + "|";
-	    readMessage(test2);
-	    readMessage("");
-	    readMessage("8=FIX4.4|9=77|35=3|34=4|52=2019082708:29:00|98=0|553=000001|45=1|373=99|58=InvalidCheckSum|10=248|");
-//        int portA = 5000;
-//        int portB = 5001;
+//	    fixProtocol = new FixProtocol("000001");
 //
-//        Server server;
-//        try {
-//            server = new Server(portA, portB);
-//        } catch(IOException ie) {
-//            System.err.println("Could not start server: " + ie);
-//        }
+//	    String logonMessage = fixProtocol.logonMessage(120);
+//        String heartBeatMessage = fixProtocol.heartBeatMessage();
+//        String logoutMessage = fixProtocol.logoutMessage();
+//	    readMessage(logonMessage);
+//	    readMessage(heartBeatMessage);
+//	    readMessage(logoutMessage);
+//	    readMessage("8=FIX4.4|9=60|35=A|34=1|52=2019082611:45:32|98=0|553=000001|108=120|141=Y|10=227|");
+//	    String test2 = "8=FIX4.4|9=61|35=A|34=1|52=2019082611:45:32|98=0|553=000001|108=120|141=Y|";
+//	    test2 = test2 + "10=" + fixProtocol.checksumGenerator(test2) + "|";
+//	    readMessage(test2);
+//	    readMessage("");
+//	    readMessage("8=FIX4.4|9=77|35=3|34=4|52=2019082708:29:00|98=0|553=000001|45=1|373=99|58=InvalidCheckSum|10=248|");
+
+        int portA = 5000;
+        int portB = 5001;
+
+        Server server;
+        try {
+            server = new Server(portA, portB);
+        } catch(IOException ie) {
+            System.err.println("Could not start server: " + ie);
+        }
     }
 } 
