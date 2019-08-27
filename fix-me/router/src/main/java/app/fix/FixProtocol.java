@@ -162,7 +162,7 @@ public class FixProtocol {
     }
 
     //Encryption|UserID|
-	public String       logoutMessage() {
+	public String           logoutMessage() {
         StringBuilder body = new StringBuilder();
 
         /* 
@@ -183,7 +183,7 @@ public class FixProtocol {
     }
 
     //Encryption|UserID|Heartbeat|resetSeqNum
-    public String       heartBeatMessage() {
+    public String           heartBeatMessage() {
         StringBuilder body = new StringBuilder();
 
         /* 
@@ -205,7 +205,7 @@ public class FixProtocol {
     }
 
     //Encryption|UserID|RefSeqNum|sessionRejectReason|Text
-    public String       RejectMessage(int refSeqNum, int sessionRejectReason, String text) {
+    public String           RejectMessage(int refSeqNum, int sessionRejectReason, String text) {
         StringBuilder body = new StringBuilder();
 
         /* 
@@ -275,7 +275,7 @@ public class FixProtocol {
         return header.toString();
     }
    
-   public int          validateMessage(String fixMessage) {
+   public int               validateMessage(String fixMessage) {
     	try {
             checksumValidator(fixMessage);
 		} catch (InvalidChecksumException e) {
@@ -290,10 +290,12 @@ public class FixProtocol {
 	   return 1;
    }
 
-   public void 		receiveMessage(String messageInput) {
+   public String 		    receiveMessage(String messageInput) {
 		int ret = validateMessage(messageInput);
+	   String rejectMessage = null;
+
 		if (ret == -1) {
-			System.out.println("Checksum invalid");
+			//Checksum invalid
 			int msgSqnNum = -1;
 			//Reject through the checksum - first get the msgSequence number
 			String[] message = messageInput.split("\\|");
@@ -305,10 +307,8 @@ public class FixProtocol {
 			if (msgSqnNum < 1) {
 				msgSqnNum = 1;
 			}
-			String rejectMessage = RejectMessage(msgSqnNum, 99, "InvalidCheckSum");
-			System.out.println("Reject message: " + rejectMessage);
+			rejectMessage = RejectMessage(msgSqnNum, 99, "InvalidCheckSum");
 		} else if (ret == -2) {
-			System.out.println("Message Length invalid");
 			int msgSqnNum = -1;
 			//Reject through the msgLength - first get the msgSequence number
 			String[] message = messageInput.split("\\|");
@@ -320,11 +320,12 @@ public class FixProtocol {
 			if (msgSqnNum < 1) {
 				msgSqnNum = 1;
 			}
-			String rejectMessage = RejectMessage(msgSqnNum, 99, "InvalidMsgLength");
-			System.out.println("Reject message: " + rejectMessage);
+			rejectMessage = RejectMessage(msgSqnNum, 99, "InvalidMsgLength");
 		} else if (ret == 1) {
-			System.out.println("Message valid");
+			//Message valid
+			return null;
 		}
+		return rejectMessage;
    }
 
    public String		getMsgType(String messageInput) throws InvalidMsgTypeException {
@@ -354,45 +355,45 @@ public class FixProtocol {
    
    
     //Encryption|Heartbeat|resetSeqNum|UserID|              INCORRECT DO NOT USE
-    public String       orderMessage(HashMap<String, String> object) {
-        // https://www.onixs.biz/fix-dictionary/4.4/msgType_D_68.html
-        StringBuilder body = new StringBuilder();
-
-        //Message encryption scheme. "0" = NONE+OTHER (encryption is not used)
-        body.append("98=0|");
-
-        //Heartbeat interval in seconds.
-        if (object.containsKey("heartbeat")) {
-            body.append("108=" + object.get("heartbeat") + "|");
-        } else {
-            body.append("108=" + "120" + "|");
-        }
-
-        /*
-         * Each FIX message has a unique sequence number (MsgSecNum (34) tag) - https://kb.b2bits.com/display/B2BITS/Sequence+number+handling
-         * Sequence numbers are initialized at the start of the FIX session starting at 1 (one) and increment through the session
-         * 
-         * All sides of FIX session should have sequence numbers reset.
-         * Valid value is "Y" = Yes (reset)
-         */
-        if (object.containsKey("resetSeqNum") && object.get("resetSeqNum").equals("true")) {
-            body.append("141=Y|");
-            this.msgSeqNum = 0;
-        } else {
-            body.append("141=N|");
-        }
-
-        /*
-         * The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
-         */
-        body.append("553=" + this.userID + "|");
-
-        String header = constructHeader(body.toString(), "A"); //Logon = "A"
-
-        String message = header + body.toString() + checksumGenerator(header + body.toString()) + "|";
-
-        System.out.println("Message : " + message);
-
-        return message;
-    }
+//    public String       orderMessage(HashMap<String, String> object) {
+//        // https://www.onixs.biz/fix-dictionary/4.4/msgType_D_68.html
+//        StringBuilder body = new StringBuilder();
+//
+//        //Message encryption scheme. "0" = NONE+OTHER (encryption is not used)
+//        body.append("98=0|");
+//
+//        //Heartbeat interval in seconds.
+//        if (object.containsKey("heartbeat")) {
+//            body.append("108=" + object.get("heartbeat") + "|");
+//        } else {
+//            body.append("108=" + "120" + "|");
+//        }
+//
+//        /*
+//         * Each FIX message has a unique sequence number (MsgSecNum (34) tag) - https://kb.b2bits.com/display/B2BITS/Sequence+number+handling
+//         * Sequence numbers are initialized at the start of the FIX session starting at 1 (one) and increment through the session
+//         *
+//         * All sides of FIX session should have sequence numbers reset.
+//         * Valid value is "Y" = Yes (reset)
+//         */
+//        if (object.containsKey("resetSeqNum") && object.get("resetSeqNum").equals("true")) {
+//            body.append("141=Y|");
+//            this.msgSeqNum = 0;
+//        } else {
+//            body.append("141=N|");
+//        }
+//
+//        /*
+//         * The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
+//         */
+//        body.append("553=" + this.userID + "|");
+//
+//        String header = constructHeader(body.toString(), "A"); //Logon = "A"
+//
+//        String message = header + body.toString() + checksumGenerator(header + body.toString()) + "|";
+//
+//        System.out.println("Message : " + message);
+//
+//        return message;
+//    }
 }
