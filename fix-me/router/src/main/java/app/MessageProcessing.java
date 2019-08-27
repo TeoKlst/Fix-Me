@@ -37,10 +37,16 @@ public class MessageProcessing extends Thread {
                 if (echoString.equals("exit")) {
                     break;
                 }
-                //Transfers HB to server
-                else if (echoStringParts[0].equals("HB")) {
+                //Transfers HB to broker server
+                else if (echoStringParts[0].equals("HBB")) {
                     Socket hbPort = Server.mapBroker.get("0");
                     output = new PrintWriter(hbPort.getOutputStream(), true);
+                    output.println(echoString);
+                }
+                //Transfers HB to market server
+                else if (echoStringParts[0].equals("HBM")) {
+                    Socket mbPort = Server.mapMarket.get("0");
+                    output = new PrintWriter(mbPort.getOutputStream(), true);
                     output.println(echoString);
                 }
                 //-Buy from market || Sell to market

@@ -46,45 +46,6 @@ public class Server {
         tm.start();
     }
 
-    class HeartBeatScanner extends Thread {
-        private Socket socket;
-
-        public HeartBeatScanner(Socket socket) {
-            this.socket = socket;
-        }
-
-		public void run() {
-            try {
-                BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-                HBTimeOut hbTimeOut = new HBTimeOut();
-                hbTimeOut.start();
-
-                while (true) {
-                    String echoString = dIn.readLine();
-                    Calendar cal = Calendar.getInstance();
-                    int seconds = cal.get(Calendar.SECOND);
-                    if (echoString == null) {
-                        break;
-                    }
-                    String[] echoStringParts = echoString.split("-");
-                    if (echoStringParts[0].equals("HB")) {
-
-                        mapHBBroker.put(echoStringParts[1], seconds);
-
-                        System.out.println("-√v^√v^√❤ Received-" + echoStringParts[1]);
-                        // System.out.println( "Seconds in current minute = " + seconds);
-                        System.out.println(mapHBBroker);
-                    }
-                }
-            } catch(IOException e) {
-                System.out.println("Oops: " + e.getMessage());
-            } catch(Exception e) {
-                System.out.println("HeartBeat Server exception " + e.getMessage());
-            }
-		}
-    }
-
     class BrokerSocket implements Runnable {
         private ServerSocket socketB;
 
@@ -94,22 +55,21 @@ public class Server {
 
         public void run() {
 
-            //HEARTBEAT SCANNER
-            Socket hbSocket;
             try {
+                Socket hbSocket;
                 hbSocket = new Socket("127.0.0.1", 5000);
-                HeartBeatScanner heartBeatScanner = new HeartBeatScanner(hbSocket);
-                heartBeatScanner.start();
-            } catch (UnknownHostException e1) {
-                e1.printStackTrace();
+                HBScannerBroker hbScannerBroker = new HBScannerBroker(hbSocket);
+                hbScannerBroker.start();
+                System.out.println(" -Broker HBScanner Running-");
             } catch (IOException e1) {
+                // TODO Auto-generated catch block
                 e1.printStackTrace();
             }
-            //HEARTBEAT SCANNER
 
             System.out.println("--Broker Router Running--");
+
             while(true) {
-                try {
+                try {          
                     Socket socket = socketB.accept();
                     MessageProcessing messageProcessing = new MessageProcessing(socket);
                     messageProcessing.start();
@@ -143,7 +103,20 @@ public class Server {
         }
 
         public void run() {
+
+            try {
+                Socket hbSocket;
+                hbSocket = new Socket("127.0.0.1", 5001);
+                HBScannerMarket hbScannerMarket = new HBScannerMarket(hbSocket);
+                hbScannerMarket.start();
+                System.out.println(" -Market HBScanner Running-");
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+
             System.out.println("--Market Router Running--");
+            
             while(true) {
                 try {
                     Socket socket = socketM.accept();
@@ -151,7 +124,6 @@ public class Server {
                     messageProcessing.start();
 
                     //-Market Saved in Hash Map
-                    LinkCounter.countMarket();
                     int serviceID = LinkCounter.generateServiceID();
                     String routeID = LinkCounter.getMarketRouteID(socket);
                     mapMarket.put(routeID, socket);
@@ -162,6 +134,9 @@ public class Server {
                     Socket marketPort = mapMarket.get(Integer.toString(LinkCounter.marketCount));
                     PrintWriter output = new PrintWriter(marketPort.getOutputStream(), true);
                     output.println(LinkCounter.marketCount + "-" + serviceID);
+                
+                    //-Count added Broker(Avoid nulls with brokerHB)
+                    LinkCounter.countMarket();
                 } catch(Exception e) {
                     System.out.println("Market Server exception " + e.getMessage());
                 }

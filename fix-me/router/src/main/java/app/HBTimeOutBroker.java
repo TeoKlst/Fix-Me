@@ -5,7 +5,7 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.Map;
 
-public class HBTimeOut extends Thread{
+public class HBTimeOutBroker extends Thread{
 
     public static void printMap(Map mp) {
         Iterator it = mp.entrySet().iterator();
@@ -22,7 +22,7 @@ public class HBTimeOut extends Thread{
     public void run() {
         try {
             while (true) {
-                Thread.sleep(7000);
+                Thread.sleep(5000);
                 Calendar cal = Calendar.getInstance();
                 int seconds = cal.get(Calendar.SECOND);
 
@@ -31,18 +31,19 @@ public class HBTimeOut extends Thread{
 
                 for (String key : Server.mapHBBroker.keySet()) {
                     int val = Server.mapHBBroker.get(key) < seconds ? seconds - Server.mapHBBroker.get(key) : Server.mapHBBroker.get(key) - seconds;
-                    if (val > 7) {
-                        System.out.println("Broker Disconnected [" + Server.mapBroker.get(key) + "]");
-                        index = index + "," + key;
+                    if (val > 5) {
+                        // System.out.println("Broker Disconnected [" + Server.mapBroker.get(key) + "]");
+                        index = "," + key;
                         // Server.mapHBBroker.remove(key);
                         // Server.mapBroker.remove(key);
                     }
                     else {
-                        System.out.println("Brokers [" + Server.mapBroker.get(key) + "] still connected");
+                        // System.out.println("Brokers [" + Server.mapBroker.get(key) + "] still connected");
                     }
                 }
                 String parts[] = index.split(",");
                 while (i != parts.length) {
+                    // System.out.println("Index Saved Key=>" + Server.mapHBBroker);
                     Server.mapHBBroker.remove(parts[i]);
                     i++;
                 }

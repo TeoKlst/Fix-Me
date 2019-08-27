@@ -19,13 +19,16 @@ class Market {
     public static void main(String[] args) throws Exception {
         // new Socket("localhost", 5001) <- should also work with "localhost" string
         try (Socket socket = new Socket("127.0.0.1", 5001)) {
+            //-Starts Market HeartBeat
+            MarketHBSender marketHBSender = new MarketHBSender(socket);
+            marketHBSender.start();
+
             BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter dOut = new PrintWriter(socket.getOutputStream(), true);
             
             String echoString;
             String response;
 
-            //-Reading output from server and saving it
             String savedServerResponse = dIn.readLine();
             MarketFunctions.assignRouteServiceID(savedServerResponse);
             System.out.println("--Market Connected--\n" + 
@@ -48,6 +51,8 @@ class Market {
                     response = "Market Command Error";
                 dOut.println(response);   
             } while (!echoString.equals("exit"));
+
+            marketHBSender.interrupt();
 
         } catch(IOException e) {
             System.out.println("Market Error: " + e.getMessage());

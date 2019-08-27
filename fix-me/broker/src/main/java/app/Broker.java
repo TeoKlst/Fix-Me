@@ -132,7 +132,7 @@ class Broker {
                 }
             } while (!echoString.equals("exit"));
 
-            // brokerHBSender.interrupt();
+            brokerHBSender.interrupt();
             scanner.close();
             System.out.println("Connection Closed");
 
