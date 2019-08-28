@@ -9,10 +9,15 @@ public class HBTimeOutMarket extends Thread{
 
     public static void printMap(Map mp) {
         Iterator it = mp.entrySet().iterator();
+        Calendar cal = Calendar.getInstance();
+        int seconds = cal.get(Calendar.SECOND);
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             System.out.println(pair.getKey() + " = " + pair.getValue());
-            it.remove(); // avoids ConcurrentModificationException
+            int keyValue = (Integer) pair.getValue();
+            int val = keyValue < seconds ? seconds - keyValue : keyValue - seconds;
+            if (val > 5)
+                it.remove(); // avoids ConcurrentModificationException
         }
     }
 
@@ -27,6 +32,8 @@ public class HBTimeOutMarket extends Thread{
                 String index = "base";
                 int i = 0;
 
+                // printMap(Server.mapHBMarket);
+
                 for (String key : Server.mapHBMarket.keySet()) {
                     int val = Server.mapHBMarket.get(key) < seconds ? seconds - Server.mapHBMarket.get(key) : Server.mapHBMarket.get(key) - seconds;
                     if (val > 5) {
@@ -36,7 +43,6 @@ public class HBTimeOutMarket extends Thread{
                 }
                 String parts[] = index.split(",");
                 while (i != parts.length) {
-                    // System.out.println("Index Saved Key=>" + Server.mapHBMarket);
                     Server.mapHBMarket.remove(parts[i]);
                     Server.mapMarket.remove(parts[i]);
                     i++;

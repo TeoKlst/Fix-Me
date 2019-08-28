@@ -63,7 +63,7 @@ public class Server {
                 System.out.println(" -Broker HBScanner Running-");
             } catch (IOException e1) {
                 // TODO Auto-generated catch block
-                e1.printStackTrace();
+                System.out.println("Broker HBSocket exception " + e1.getMessage());
             }
 
             System.out.println("--Broker Router Running--");
@@ -86,7 +86,6 @@ public class Server {
                     PrintWriter output = new PrintWriter(brokerPort.getOutputStream(), true);
                     output.println(LinkCounter.brokerCount + "-" + serviceID);
 
-                    //-Count added Broker(Avoid nulls with brokerHB)
                     LinkCounter.countBroker();
                 } catch(Exception e) {
                     System.out.println("Broker Server exception " + e.getMessage());
@@ -111,8 +110,7 @@ public class Server {
                 hbScannerMarket.start();
                 System.out.println(" -Market HBScanner Running-");
             } catch (IOException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
+                System.out.println("Market HBSocket exception " + e1.getMessage());
             }
 
             System.out.println("--Market Router Running--");
@@ -134,8 +132,7 @@ public class Server {
                     Socket marketPort = mapMarket.get(Integer.toString(LinkCounter.marketCount));
                     PrintWriter output = new PrintWriter(marketPort.getOutputStream(), true);
                     output.println(LinkCounter.marketCount + "-" + serviceID);
-                
-                    //-Count added Broker(Avoid nulls with brokerHB)
+            
                     LinkCounter.countMarket();
                 } catch(Exception e) {
                     System.out.println("Market Server exception " + e.getMessage());

@@ -50,16 +50,30 @@ public class MessageProcessing extends Thread {
                     output.println(echoString);
                 }
                 //-Buy from market || Sell to market
-                else if (echoStringParts[0].equals("1") || echoStringParts[0].equals("2")){
+                else if (echoStringParts[0].equals("1") || echoStringParts[0].equals("2")) {
                     Socket marketPort = Server.mapMarket.get(echoStringParts[1]);
-                    output = new PrintWriter(marketPort.getOutputStream(), true);
-                    output.println(echoString);
+                    if (marketPort != null) {
+                        if (echoStringParts[1].equals("0")) {
+                            Socket brokerPort = Server.mapMarket.get(echoStringParts[5]);
+                            output = new PrintWriter(brokerPort.getOutputStream(), true);
+                            output.println("Message String Error");
+                        }
+                        else {
+                            output = new PrintWriter(marketPort.getOutputStream(), true);
+                            output.println(echoString);
+                        }
+                    }
+                    else {
+                        Socket brokerPort = Server.mapBroker.get(echoStringParts[5]);
+                        output = new PrintWriter(brokerPort.getOutputStream(), true);
+                        output.println("Message String Error");
+                    }
                 }
                 //-List Markets
                 else if (echoStringParts[0].equals("3")) {
                     Socket brokerPort = Server.mapBroker.get(echoStringParts[1]);
                     output = new PrintWriter(brokerPort.getOutputStream(), true);
-                    output.println("Available Market ID's => " + Server.mapMarket.keySet());
+                    output.println("Available Market ID's => " + (Server.mapHBMarket.keySet()));
                 }
                 //-Purchase || Sale Executed
                 else if (echoStringParts[0].equals("4")) {

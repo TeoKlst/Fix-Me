@@ -17,7 +17,6 @@ import java.net.Socket;
 
 class Market {
     public static void main(String[] args) throws Exception {
-        // new Socket("localhost", 5001) <- should also work with "localhost" string
         try (Socket socket = new Socket("127.0.0.1", 5001)) {
             //-Starts Market HeartBeat
             MarketHBSender marketHBSender = new MarketHBSender(socket);

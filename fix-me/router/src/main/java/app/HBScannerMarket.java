@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.Calendar;
 
-public class HBScannerMarket extends Thread{
+public class HBScannerMarket extends Thread {
     private Socket socket;
 
     public HBScannerMarket(Socket socket) {
@@ -30,10 +30,6 @@ public class HBScannerMarket extends Thread{
                 String[] echoStringParts = echoString.split("-");
                 if (echoStringParts[0].equals("HBM")) {
                     Server.mapHBMarket.put(echoStringParts[1], seconds);
-                    // System.out.println("-√v^√v^√❤ Received-" + echoStringParts[1]);
-                    // System.out.println( "Seconds in current minute = " + seconds);
-                    System.out.println("::::: Market HB Map ::::: " + Server.mapHBMarket);
-                    System.out.println(":::::  MNormal Map  ::::: " + Server.mapMarket);
                 }
             }
         } catch(IOException e) {

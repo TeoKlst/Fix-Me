@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class BrokerHBSender extends Thread{
+public class BrokerHBSender extends Thread {
     private Socket socket;
 
     public BrokerHBSender(Socket socket) {
