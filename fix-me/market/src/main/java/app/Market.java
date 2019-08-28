@@ -82,6 +82,8 @@ class Market {
                 String[] echoStringParts = echoString.split("-");
                 System.out.println(echoString);
                 
+                readMessage(echoString);
+
                 if (echoStringParts[0].equals("1"))
                     response = MarketFunctions.brokerPurchaseCheck(echoString);
                 else if (echoStringParts[0].equals("2"))
