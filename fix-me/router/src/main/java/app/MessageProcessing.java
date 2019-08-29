@@ -6,14 +6,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-// All messages will respect the FIX notation.
-// All messages will start with the ID assigned by the router and will be ended by the checksum.
-// Buy and Sell messages will have the following mandatory fields:
-// • Instrument
-// • Quantity
-// • Market
-// • Price
-
 public class MessageProcessing extends Thread {
     private Socket socket;
 
@@ -37,23 +29,43 @@ public class MessageProcessing extends Thread {
                 if (echoString.equals("exit")) {
                     break;
                 }
-                //Transfers HB to server
-                else if (echoStringParts[0].equals("HB")) {
+                //Transfers HB to broker server
+                else if (echoStringParts[0].equals("HBB")) {
                     Socket hbPort = Server.mapBroker.get("0");
                     output = new PrintWriter(hbPort.getOutputStream(), true);
                     output.println(echoString);
                 }
-                //-Buy from market || Sell to market
-                else if (echoStringParts[0].equals("1") || echoStringParts[0].equals("2")){
-                    Socket marketPort = Server.mapMarket.get(echoStringParts[1]);
-                    output = new PrintWriter(marketPort.getOutputStream(), true);
+                //Transfers HB to market server
+                else if (echoStringParts[0].equals("HBM")) {
+                    Socket mbPort = Server.mapMarket.get("0");
+                    output = new PrintWriter(mbPort.getOutputStream(), true);
                     output.println(echoString);
+                }
+                //-Buy from market || Sell to market
+                else if (echoStringParts[0].equals("1") || echoStringParts[0].equals("2")) {
+                    Socket marketPort = Server.mapMarket.get(echoStringParts[1]);
+                    if (marketPort != null) {
+                        if (echoStringParts[1].equals("0")) {
+                            Socket brokerPort = Server.mapMarket.get(echoStringParts[5]);
+                            output = new PrintWriter(brokerPort.getOutputStream(), true);
+                            output.println("Market Find  Error");
+                        }
+                        else {
+                            output = new PrintWriter(marketPort.getOutputStream(), true);
+                            output.println(echoString);
+                        }
+                    }
+                    else {
+                        Socket brokerPort = Server.mapBroker.get(echoStringParts[5]);
+                        output = new PrintWriter(brokerPort.getOutputStream(), true);
+                        output.println("Market Find Error");
+                    }
                 }
                 //-List Markets
                 else if (echoStringParts[0].equals("3")) {
                     Socket brokerPort = Server.mapBroker.get(echoStringParts[1]);
                     output = new PrintWriter(brokerPort.getOutputStream(), true);
-                    output.println("Available Market ID's => " + Server.mapMarket.keySet());
+                    output.println("Available Market ID's => " + (Server.mapHBMarket.keySet()));
                 }
                 //-Purchase || Sale Executed
                 else if (echoStringParts[0].equals("4")) {
@@ -70,8 +82,22 @@ public class MessageProcessing extends Thread {
                 //-List Market Goods Query
                 else if (echoStringParts[0].equals("6")) {
                     Socket marketPort = Server.mapMarket.get(echoStringParts[1]);
-                    output = new PrintWriter(marketPort.getOutputStream(), true);
-                    output.println(echoString);
+                    if (marketPort != null) {
+                        if(echoStringParts[1].equals("0")) {
+                            Socket brokerPort = Server.mapMarket.get(echoStringParts[2]);
+                            output = new PrintWriter(brokerPort.getOutputStream(), true);
+                            output.println("Market Find  Error");
+                        }
+                        else {
+                            output = new PrintWriter(marketPort.getOutputStream(), true);
+                            output.println(echoString);
+                        }
+                    }
+                    else {
+                        Socket brokerPort = Server.mapMarket.get(echoStringParts[2]);
+                        output = new PrintWriter(brokerPort.getOutputStream(), true);
+                        output.println("Market Find  Error");
+                    }
                 }
                 //-List Market Goods Data Return
                 else if (echoStringParts[0].equals("7")) {
