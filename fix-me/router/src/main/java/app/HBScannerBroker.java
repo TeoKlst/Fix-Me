@@ -29,13 +29,7 @@ public class HBScannerBroker extends Thread {
                 }
                 String[] echoStringParts = echoString.split("-");
                 if (echoStringParts[0].equals("HBB")) {
-
                     Server.mapHBBroker.put(echoStringParts[1], seconds);
-
-                    // System.out.println("-√v^√v^√❤ Received-" + echoStringParts[1]);
-                    // System.out.println( "Seconds in current minute = " + seconds);
-                    
-                    // System.out.println(Server.mapHBBroker);
                 }
             }
         } catch(IOException e) {

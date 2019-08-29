@@ -1,13 +1,9 @@
 package app;
 
 import java.io.PrintWriter;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +19,9 @@ public class Server {
     private ServerSocket socketMarket;
     private Runnable mS;
 
+    //-Heart-Beat Broker
     public static Map<String, Integer> mapHBBroker;
+    //-Heart-Beat Market
     public static Map<String, Integer> mapHBMarket;
 
     public Server(int portA, int portB) throws IOException {
@@ -62,7 +60,6 @@ public class Server {
                 hbScannerBroker.start();
                 System.out.println(" -Broker HBScanner Running-");
             } catch (IOException e1) {
-                // TODO Auto-generated catch block
                 System.out.println("Broker HBSocket exception " + e1.getMessage());
             }
 

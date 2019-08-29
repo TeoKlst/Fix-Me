@@ -7,16 +7,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-// The Broker will send two types of messages:
-
-// • Buy. - An order where the broker wants to buy an instrument
-// • Sell. - An order where the broker want to sell an instrument
-
-// and will receive from the market messages of the following types:
-
-// • Executed - when the order was accepted by the market and the action succeeded
-// • Rejected - when the order could not be met
-
 class Broker {
     public static void main(String[] args) throws Exception {
         try (Socket socket = new Socket("127.0.0.1", 5000)) {

@@ -2,24 +2,8 @@ package app;
 
 import java.util.Calendar;
 import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.Map;
 
-public class HBTimeOutMarket extends Thread{
-
-    public static void printMap(Map mp) {
-        Iterator it = mp.entrySet().iterator();
-        Calendar cal = Calendar.getInstance();
-        int seconds = cal.get(Calendar.SECOND);
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            System.out.println(pair.getKey() + " = " + pair.getValue());
-            int keyValue = (Integer) pair.getValue();
-            int val = keyValue < seconds ? seconds - keyValue : keyValue - seconds;
-            if (val > 5)
-                it.remove(); // avoids ConcurrentModificationException
-        }
-    }
+public class HBTimeOutMarket extends Thread {
 
     @Override
     public void run() {
@@ -28,11 +12,8 @@ public class HBTimeOutMarket extends Thread{
                 Thread.sleep(5000);
                 Calendar cal = Calendar.getInstance();
                 int seconds = cal.get(Calendar.SECOND);
-
                 String index = "base";
                 int i = 0;
-
-                // printMap(Server.mapHBMarket);
 
                 for (String key : Server.mapHBMarket.keySet()) {
                     int val = Server.mapHBMarket.get(key) < seconds ? seconds - Server.mapHBMarket.get(key) : Server.mapHBMarket.get(key) - seconds;
@@ -51,7 +32,7 @@ public class HBTimeOutMarket extends Thread{
         } catch(ConcurrentModificationException e) {
             System.out.println("HB Modification exception " + e.getMessage());
         } catch (InterruptedException e) {
-			System.out.println("HB Interrupted " + e.getMessage());
+			System.out.println("HB Market Interrupted " + e.getMessage());
 		}
     }
 }

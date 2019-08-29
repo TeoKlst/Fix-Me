@@ -17,7 +17,6 @@ public class BrokerHBSender extends Thread {
             PrintWriter dOut = new PrintWriter(socket.getOutputStream(), true);
 
             while (true) {
-                // System.out.println("-√v^√v^√❤ Sent-");
                 Thread.sleep(3000);
                 dOut.println("HBB" + "-" + BrokerAccount.brokerRouteID);
                 }
