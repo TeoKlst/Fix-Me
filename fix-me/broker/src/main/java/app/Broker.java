@@ -7,23 +7,12 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-// The Broker will send two types of messages:
-
-// • Buy. - An order where the broker wants to buy an instrument
-// • Sell. - An order where the broker want to sell an instrument
-
-// and will receive from the market messages of the following types:
-
-// • Executed - when the order was accepted by the market and the action succeeded
-// • Rejected - when the order could not be met
-
 class Broker {
     public static void main(String[] args) throws Exception {
-        // new Socket("localhost", 5001) <- should also work with that string
         try (Socket socket = new Socket("127.0.0.1", 5000)) {
             //-Starts Broker HeartBeat
-            // BrokerHBSender brokerHBSender = new BrokerHBSender(socket);
-            // brokerHBSender.start();
+            BrokerHBSender brokerHBSender = new BrokerHBSender(socket);
+            brokerHBSender.start();
 
             BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter dOut = new PrintWriter(socket.getOutputStream(), true);
@@ -34,9 +23,9 @@ class Broker {
 
             String savedServerResponse = dIn.readLine();
             BrokerFunctions.assignRouteServiceID(savedServerResponse);
-            System.out.println("--Broker Connected--\n" + 
+            System.out.println("--Broker Connected--\n" +
             "You are Broker[" + BrokerAccount.brokerRouteID + "]" + " ServiceID => " + BrokerAccount.brokerServiceID);
-            
+
             do {
                 StringBuilder sbMessage = new StringBuilder();
                 String brokerMessageType = "0";
@@ -97,11 +86,11 @@ class Broker {
                     sbMessage.append(BrokerAccount.brokerRouteID);
                     dOut.println(sbMessage);
                 }
-                else if (echoString.equals("listg")) {
+                else if (echoString.equals("listg") || echoString.equals("list goods")) {
                     BrokerFunctions.brokerGetDataBroker();
                     dOut.println(echoString);
                 }
-                else if (echoString.equals("listmg")) {
+                else if (echoString.equals("listmg") || echoString.equals("list market goods")) {
                     System.out.println("Choose Market ID to view (its) goods:");
                     echoString = scanner.nextLine().toLowerCase();
                     brokerMessageType = "6";
@@ -132,7 +121,7 @@ class Broker {
                 }
             } while (!echoString.equals("exit"));
 
-            // brokerHBSender.interrupt();
+            brokerHBSender.interrupt();
             scanner.close();
             System.out.println("Connection Closed");
 
