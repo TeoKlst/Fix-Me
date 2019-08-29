@@ -25,7 +25,17 @@ public class MessageProcessing extends Thread {
                 //- ⬆ echoString == null Break; Helps Prevent null pointer exception when Broker or Market close unexpectedly
                     break;
                 }
+
+                //Check if message follows fix notation from broker/market here
+                //echoString is a message(buy/sell/accept buy/reject buy/ etc.) from either broker or market
+                Server.readMessage(echoString);
+                // 
+
+                //Message gets split up here to be passed to specific statements
+                //that will either send it to broker or market 
                 String[] echoStringParts = echoString.split("-");
+                //
+
                 if (echoString.equals("exit")) {
                     break;
                 }
