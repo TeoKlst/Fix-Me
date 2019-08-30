@@ -5,8 +5,21 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class MessageProcessing extends Thread {
+
+	// JDBC driver name and database URL
+	static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+	static final String DB_URL = "jdbc:mysql://localhost:3306/fixme";
+
+	//  Database credentials
+	static final String USER = "java";
+	static final String PASS = "123";
+
     private Socket socket;
 
     public MessageProcessing(Socket socket) {
@@ -15,12 +28,30 @@ public class MessageProcessing extends Thread {
 
     @Override
     public void run() {
+
+		Connection conn = null;
+		Statement stmt = null;
+		try {
+			Class.forName(JDBC_DRIVER);
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			stmt = conn.createStatement();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+        
         try {
             BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
 
             while (true) {
                 String echoString = input.readLine();
+                try {
+                    String sql = "INSERT INTO fixmessages (Message) " +
+                                "VALUES ('" + echoString + "')";
+                    stmt.executeUpdate(sql);
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
                 if (echoString == null) {
                 //- ⬆ echoString == null Break; Helps Prevent null pointer exception when Broker or Market close unexpectedly
                     break;
@@ -116,6 +147,17 @@ public class MessageProcessing extends Thread {
             try {
                 socket.close();
             } catch(IOException e) {}
+            try{
+				if(stmt!=null)
+					stmt.close();
+			}catch(SQLException se){
+			}
+			try{
+				if(conn!=null)
+					conn.close();
+			}catch(SQLException se){
+                se.printStackTrace();
+            }
         }
     }
 }

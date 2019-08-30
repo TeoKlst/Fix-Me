@@ -6,7 +6,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class Server {
 
@@ -50,7 +53,7 @@ public class Server {
 			"(" +
 				"ID INT NOT NULL AUTO_INCREMENT, " +
 				"Message VARCHAR(120) NOT NULL, " +
-				"Response VARCHAR(120) NOT NULL, " +
+				"Response VARCHAR(120), " +
 				"PRIMARY KEY (ID)" +
 			")";
 			stmt.executeUpdate(sql);
