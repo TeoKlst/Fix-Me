@@ -6,11 +6,66 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import app.fix.FixProtocol;
+import app.fix.exceptions.InvalidMsgTypeException;
+
 public class MessageProcessing extends Thread {
     private Socket socket;
 
     public MessageProcessing(Socket socket) {
         this.socket = socket;
+    }
+
+    private static FixProtocol fixProtocol;
+    
+    public static void readMessage(String input, BufferedReader input1, PrintWriter output) {
+    	String rejectMessage = fixProtocol.receiveMessage(input);
+    	if (rejectMessage != null) {
+    		//Send rejectMessage
+            Socket brokerPort = Server.mapBroker.get(brokerRouteID);
+            output = new PrintWriter(brokerPort.getOutputStream(), true);
+            output.println("Reject message: " + rejectMessage);
+		    return;
+	    }
+    	try {
+    		String type = fixProtocol.getMsgType(input);
+    		if (type.equals("A") || type.equals("5") || type.equals("0")) {
+    			//Message for router
+			    System.out.println("Message for Router");
+		    } else if (type.equals("3") || type.equals("AK") || type.equals("D")) {
+
+				//Send through message to recipient
+                // if (messageType for Broker) {}
+                    Socket brokerPort = Server.mapBroker.get(brokerRouteID);
+                    output = new PrintWriter(brokerPort.getOutputStream(), true);
+                    output.println("Message for recipient");
+                // else for Market
+                    Socket marketPort = Server.mapMarket.get(marketRouteID);
+                    output = new PrintWriter(marketPort.getOutputStream(), true);
+                    output.println("Message for recipient");
+                
+		    } else {
+    			throw new InvalidMsgTypeException("No valid type sent through");
+		    }
+	    } catch (InvalidMsgTypeException mte) {
+		    System.out.println("Invalid message exception found");
+		    int msgSqnNum = -1;
+		    //Reject through the msgLength - first get the msgSequence number
+		    String[] message = input.split("\\|");
+		    for (int i=0; i < message.length; i++) {
+			    if (message[i].startsWith("34=") && fixProtocol.isNumeric(message[i].substring(3)) && fixProtocol.isInteger(message[i].substring(3))) {
+				    msgSqnNum = Integer.parseInt(message[i].substring(3));
+			    }
+		    }
+		    if (msgSqnNum < 1) {
+			    msgSqnNum = 1;
+		    }
+		    rejectMessage = fixProtocol.RejectMessage(msgSqnNum, 11, "InvalidMsgType");
+            //Send reject message
+            Socket brokerPort = Server.mapBroker.get(brokerRouteID);
+            output = new PrintWriter(brokerPort.getOutputStream(), true);
+            output.println("Reject message: " + rejectMessage);
+	    }
     }
 
     @Override
@@ -56,7 +111,7 @@ public class MessageProcessing extends Thread {
                     Socket marketPort = Server.mapMarket.get(echoStringParts[1]);
                     if (marketPort != null) {
                         if (echoStringParts[1].equals("0")) {
-                            Socket brokerPort = Server.mapMarket.get(echoStringParts[5]);
+                            Socket brokerPort = Server.mapBroker.get(echoStringParts[5]);
                             output = new PrintWriter(brokerPort.getOutputStream(), true);
                             output.println("Market Find  Error");
                         }
