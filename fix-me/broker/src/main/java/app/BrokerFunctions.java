@@ -25,13 +25,10 @@ public class BrokerFunctions {
 
     public static Boolean brokerPurchaseValidate(String value) {
         Boolean ret = true;
-        String[] parts = value.split("-");
-        int purchasePrice = Integer.parseInt(parts[4]);
 
-        if (purchasePrice > BrokerAccount.capital) {
+        if (Integer.parseInt(value) > BrokerAccount.capital) {
             ret = false;
         }
-
         return ret;
     }
 

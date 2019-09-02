@@ -160,6 +160,63 @@ public class FixProtocol {
         return message;
     }
 
+        // Get Broker/Market Route ID
+        public String		    getRouteID(String messageInput) throws InvalidMsgTypeException {
+            String msgType = null;
+            if (!messageInput.contains("|554=")) {
+                // TODO To be able to distinguish if message is required to check for broker or market routeID and give appropriate error return
+                throw new InvalidMsgTypeException("Invalid RouteID (Broker/Market) Type");
+            }
+            String[] message = messageInput.split("\\|");
+            for (int i=0; i < message.length; i++) {
+               if (message[i].startsWith("554=")) {
+                   msgType =message[i].substring(3);
+               }
+           }
+           if (msgType == null) {
+               throw new InvalidMsgTypeException("Invalid Message Type");
+           }
+            return msgType;
+       }
+
+        // Purchase Message Builder
+        public String           PurchaseMessage(String marketID, String itemID, String purchaseAmount,
+                                                String purchasePrice, String brokerRouteID) {
+            StringBuilder body = new StringBuilder();
+
+            body.append("553=" + this.userID + "|");
+
+            body.append("554=" + brokerRouteID + "|");
+
+            body.append("100=" + itemID + "|");
+
+            body.append("101=" + purchaseAmount + "|");
+
+            body.append("102=" + purchasePrice + "|");
+
+            body.append("103=" + marketID + "|");
+
+            String header = constructHeader(body.toString(), "1"); //Purchase = "1"
+
+            String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+            return message;
+        }
+    
+        // Sale Message Builder
+        public String           SaleMessage(String marketID, String itemID, String purchaseAmount,
+                                            String purchasePrice, String brokerRouteID) {
+            StringBuilder body = new StringBuilder();
+
+            // Append to body
+
+            String header = constructHeader(body.toString(), "2"); //Sale = "2"
+
+            String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+            return message;
+        }
+
     //Encryption|UserID|
 	public String           logoutMessage() {
         StringBuilder body = new StringBuilder();

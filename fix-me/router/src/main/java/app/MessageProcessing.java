@@ -21,7 +21,8 @@ public class MessageProcessing extends Thread {
     public static void readMessage(String input, BufferedReader input1, PrintWriter output) {
     	String rejectMessage = fixProtocol.receiveMessage(input);
     	if (rejectMessage != null) {
-    		//Send rejectMessage
+            //Send rejectMessage
+            // 553 = USERID
             Socket brokerPort = Server.mapBroker.get(brokerRouteID);
             output = new PrintWriter(brokerPort.getOutputStream(), true);
             output.println("Reject message: " + rejectMessage);
@@ -33,17 +34,18 @@ public class MessageProcessing extends Thread {
     			//Message for router
 			    System.out.println("Message for Router");
 		    } else if (type.equals("3") || type.equals("AK") || type.equals("D")) {
-
-				//Send through message to recipient
-                // if (messageType for Broker) {}
+				//Send through message to broker
+                if (type.equals("AK") || type.equals("3")) {
                     Socket brokerPort = Server.mapBroker.get(brokerRouteID);
                     output = new PrintWriter(brokerPort.getOutputStream(), true);
                     output.println("Message for recipient");
-                // else for Market
+                }
+                //Send through message to market
+                if (type.equals("D")) {
                     Socket marketPort = Server.mapMarket.get(marketRouteID);
                     output = new PrintWriter(marketPort.getOutputStream(), true);
                     output.println("Message for recipient");
-                
+                }
 		    } else {
     			throw new InvalidMsgTypeException("No valid type sent through");
 		    }

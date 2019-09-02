@@ -160,6 +160,20 @@ public class FixProtocol {
 
         return message;
     }
+    
+
+    // Purchase Message Builder
+    public String           PurchaseMessage(int refSeqNum, int sessionRejectReason, String text) {
+        StringBuilder body = new StringBuilder();
+        return text;
+    }
+
+    // Sale Message Builder
+    public String           SaleMessage(int refSeqNum, int sessionRejectReason, String text) {
+        StringBuilder body = new StringBuilder();
+        return text;
+    }
+
 
     //Encryption|UserID|
 	public String           logoutMessage() {
