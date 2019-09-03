@@ -401,8 +401,35 @@ public class FixProtocol {
     	return msgType;
    }
    
-   
-   
+   public String       orderMessage(String marketID, String itemID, String purchaseAmount,
+                                                String purchasePrice, String brokerRouteID) {
+        StringBuilder body = new StringBuilder();
+
+        //Encryption
+        body.append("98=0|");
+
+        //UserID
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|"); //Need to remove this one somehow, only one ID
+
+        //Side <54> = 1 to buy
+
+        //Instrument -> Product<460> -> Type of product
+        body.append("100=" + itemID + "|"); //To fix
+
+        body.append("101=" + purchaseAmount + "|"); //Quantity<53>
+
+        body.append("102=" + purchasePrice + "|"); //Price<44>
+
+        body.append("103=" + marketID + "|");
+
+        String header = constructHeader(body.toString(), "1"); //Purchase = "1"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+   }
    
    
    
