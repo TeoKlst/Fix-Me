@@ -35,13 +35,13 @@ public class MarketFunctions {
 
         for (int i=0; i < message.length; i++) {
             if (message[i].startsWith("100=")) {
-                itemID = Integer.parseInt(message[i].substring(3));
+                itemID = Integer.parseInt(message[i].substring(4));
             }
             if (message[i].startsWith("101=")) {
-                purchaseAmount = Integer.parseInt(message[i].substring(3));
+                purchaseAmount = Integer.parseInt(message[i].substring(4));
             }
             if (message[i].startsWith("102=")) {
-                purchasePrice = Integer.parseInt(message[i].substring(3));
+                purchasePrice = Integer.parseInt(message[i].substring(4));
             }
         }
 
@@ -65,16 +65,16 @@ public class MarketFunctions {
 
         for (int i=0; i < message.length; i++) {
             if (message[i].startsWith("100=")) {
-                itemID = Integer.parseInt(message[i].substring(3));
+                itemID = Integer.parseInt(message[i].substring(4));
             }
             if (message[i].startsWith("101=")) {
-                purchaseAmount = Integer.parseInt(message[i].substring(3));
+                purchaseAmount = Integer.parseInt(message[i].substring(4));
             }
             if (message[i].startsWith("102=")) {
-                purchasePrice = Integer.parseInt(message[i].substring(3));
+                purchasePrice = Integer.parseInt(message[i].substring(4));
             }
             if (message[i].startsWith("554=")) {
-                brokerID = message[i].substring(3);
+                brokerID = message[i].substring(4);
             }
         }
 
@@ -91,6 +91,7 @@ public class MarketFunctions {
 
         MarketAccount.capital += purchasePrice;
 
+        // Build Receive Message String Here
         String ret = "4" + "-" + brokerID + "-" + "1";
         return ret;
     }

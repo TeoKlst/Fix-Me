@@ -171,7 +171,7 @@ public class FixProtocol {
         String[] message = messageInput.split("\\|");
         for (int i=0; i < message.length; i++) {
             if (message[i].startsWith("554=")) {
-                msgRouteID =message[i].substring(3);
+                msgRouteID =message[i].substring(4);
             }
         }
         if (msgRouteID == null) {
@@ -189,7 +189,7 @@ public class FixProtocol {
         String[] message = messageInput.split("\\|");
         for (int i=0; i < message.length; i++) {
             if (message[i].startsWith("103=")) {
-                msgRouteID =message[i].substring(3);
+                msgRouteID =message[i].substring(4);
             }
         }
         if (msgRouteID == null) {

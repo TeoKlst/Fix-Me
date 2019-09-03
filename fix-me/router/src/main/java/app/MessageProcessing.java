@@ -17,8 +17,7 @@ public class MessageProcessing extends Thread {
     }
 
     // ERROR
-    private static FixProtocol fixProtocol;
-    fixProtocol = new FixProtocol(Integer.toString(BrokerAccount.brokerServiceID));
+    private static FixProtocol fixProtocol = new FixProtocol(Integer.toString(1));
 
     @Override
     public void run() {
