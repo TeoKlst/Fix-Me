@@ -179,6 +179,25 @@ public class FixProtocol {
             return msgType;
        }
 
+        // Get Sale/Purchase success status
+        public String		    getSalePurchaseState(String messageInput) throws InvalidMsgTypeException {
+        String msgType = null;
+        if (!messageInput.contains("|655=")) {
+            throw new InvalidMsgTypeException("Invalid Purchase/Sale State");
+        }
+        String[] message = messageInput.split("\\|");
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("655=")) {
+                msgType =message[i].substring(3);
+            }
+        }
+        if (msgType == null) {
+            throw new InvalidMsgTypeException("Invalid Message Type");
+        }
+        return msgType;
+    }
+
+
         // Purchase Message Builder
         public String           PurchaseMessage(String marketID, String itemID, String purchaseAmount,
                                                 String purchasePrice, String brokerRouteID) {
@@ -208,7 +227,17 @@ public class FixProtocol {
                                             String purchasePrice, String brokerRouteID) {
             StringBuilder body = new StringBuilder();
 
-            // Append to body
+            body.append("553=" + this.userID + "|");
+
+            body.append("554=" + brokerRouteID + "|");
+
+            body.append("100=" + itemID + "|");
+
+            body.append("101=" + purchaseAmount + "|");
+
+            body.append("102=" + purchasePrice + "|");
+
+            body.append("103=" + marketID + "|");
 
             String header = constructHeader(body.toString(), "2"); //Sale = "2"
 

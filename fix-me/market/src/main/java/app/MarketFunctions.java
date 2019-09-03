@@ -27,11 +27,23 @@ public class MarketFunctions {
         Boolean checkPass = true;
         String ret;
 
-        String[] parts = value.split("-");
-        int marketID = Integer.parseInt(parts[1]);
-        int itemID = Integer.parseInt(parts[2]);
-        int purchaseAmount = Integer.parseInt(parts[3]);
-        int purchasePrice = Integer.parseInt(parts[4]);
+        String[] message = value.split("\\|");
+        int itemID = 0;
+        int purchaseAmount = 0;
+        // TODO Check if market has enough money to send to broker
+        int purchasePrice = 0;
+
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("100=")) {
+                itemID = Integer.parseInt(message[i].substring(3));
+            }
+            if (message[i].startsWith("101=")) {
+                purchaseAmount = Integer.parseInt(message[i].substring(3));
+            }
+            if (message[i].startsWith("102=")) {
+                purchasePrice = Integer.parseInt(message[i].substring(3));
+            }
+        }
 
         if (itemID > 5 || itemID < 0)
             checkPass = false;
@@ -44,11 +56,27 @@ public class MarketFunctions {
     }
 
     public static String brokerPurchaseExecuted(String value) {
-        String[] parts = value.split("-");
-        int itemID = Integer.parseInt(parts[2]);
-        int purchaseAmount = Integer.parseInt(parts[3]);
-        int purchasePrice = Integer.parseInt(parts[4]);
-        String brokerID = parts[5];
+
+        String[] message = value.split("\\|");
+        int itemID = 0;
+        int purchaseAmount = 0;
+        int purchasePrice = 0;
+        String brokerID = "";
+
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("100=")) {
+                itemID = Integer.parseInt(message[i].substring(3));
+            }
+            if (message[i].startsWith("101=")) {
+                purchaseAmount = Integer.parseInt(message[i].substring(3));
+            }
+            if (message[i].startsWith("102=")) {
+                purchasePrice = Integer.parseInt(message[i].substring(3));
+            }
+            if (message[i].startsWith("554=")) {
+                brokerID = message[i].substring(3);
+            }
+        }
 
         if (itemID == 1)
             MarketAccount.silver -= purchaseAmount;

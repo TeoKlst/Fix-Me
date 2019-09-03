@@ -161,6 +161,42 @@ public class FixProtocol {
         return message;
     }
     
+    // Get Broker/Market Route ID
+    public String		    getRouteID(String messageInput) throws InvalidMsgTypeException {
+        String msgRouteID = null;
+        if (!messageInput.contains("|554=")) {
+            // TODO To be able to distinguish if message is required to check for broker or market routeID and give appropriate error return
+            throw new InvalidMsgTypeException("Invalid RouteID (Broker/Market) Type");
+        }
+        String[] message = messageInput.split("\\|");
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("554=")) {
+                msgRouteID =message[i].substring(3);
+            }
+        }
+        if (msgRouteID == null) {
+            throw new InvalidMsgTypeException("Invalid Message Type");
+        }
+        return msgRouteID;
+    }
+
+    // Get Market Route ID
+    public String		    getMarketRouteID(String messageInput) throws InvalidMsgTypeException {
+        String msgRouteID = null;
+        if (!messageInput.contains("|103=")) {
+            throw new InvalidMsgTypeException("Invalid RouteID Market");
+        }
+        String[] message = messageInput.split("\\|");
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("103=")) {
+                msgRouteID =message[i].substring(3);
+            }
+        }
+        if (msgRouteID == null) {
+            throw new InvalidMsgTypeException("Invalid Message Type");
+        }
+        return msgRouteID;
+    }
 
     // Purchase Message Builder
     public String           PurchaseMessage(int refSeqNum, int sessionRejectReason, String text) {

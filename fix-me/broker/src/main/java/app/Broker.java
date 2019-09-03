@@ -20,8 +20,8 @@ class Broker {
             fixProtocol = new FixProtocol(Integer.toString(BrokerAccount.brokerServiceID));
 
             //-Starts Broker HeartBeat
-            BrokerHBSender brokerHBSender = new BrokerHBSender(socket);
-            brokerHBSender.start();
+            // BrokerHBSender brokerHBSender = new BrokerHBSender(socket);
+            // brokerHBSender.start();
 
             BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter dOut = new PrintWriter(socket.getOutputStream(), true);
@@ -34,7 +34,6 @@ class Broker {
             BrokerFunctions.assignRouteServiceID(savedServerResponse);
             System.out.println("--Broker Connected--\n" +
             "You are Broker[" + BrokerAccount.brokerRouteID + "]" + " ServiceID => " + BrokerAccount.brokerServiceID);
-            fixProtocol = new FixProtocol("" + BrokerAccount.brokerServiceID);
 
             do {
                 StringBuilder sbMessage = new StringBuilder();
@@ -109,24 +108,24 @@ class Broker {
                 }
                 if (!echoString.equals("exit")) {
                     response = dIn.readLine();
-                    String[] echoStringParts = response.split("-");
-                    if (echoStringParts[0].equals("4")) {
-                        if (echoStringParts[2].equals("1"))
+                    String responseType = fixProtocol.getMsgType(response);
+                    if (responseType.equals("AK")) {
+                        if (fixProtocol.getSalePurchaseState(response).equals("1"))
                             BrokerFunctions.brokerBuySuccess(sbMessage.toString());
-                        if (echoStringParts[2].equals("2"))
+                        if (fixProtocol.getSalePurchaseState(response).equals("2"))
                             BrokerFunctions.brokerSellSuccess(sbMessage.toString());
                         System.out.println("Transaction Successful");
                     }
-                    else if (echoStringParts[0].equals("5"))
+                    else if (responseType.equals("3"))
                         System.out.println("Transaction Failed");
-                    else if (echoStringParts[0].equals("7"))
+                    else if (responseType.equals("6"))
                         BrokerFunctions.brokerReceiveDataMarket(response);
                     else
                         System.out.println(response);
                 }
             } while (!echoString.equals("exit"));
 
-            brokerHBSender.interrupt();
+            // brokerHBSender.interrupt();
             scanner.close();
             System.out.println("Connection Closed");
 
