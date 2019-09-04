@@ -10,7 +10,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 class Market {
-    private static FixProtocol      fixProtocol;
+    public static FixProtocol      fixProtocol;
 
     public static void main(String[] args) throws Exception {
         try (Socket socket = new Socket("127.0.0.1", 5001)) {

@@ -1,5 +1,7 @@
 package app;
 
+import app.fix.FixProtocol;
+
 public class MarketFunctions {
 
     public static void assignRouteServiceID(String value) {
@@ -91,8 +93,7 @@ public class MarketFunctions {
 
         MarketAccount.capital += purchasePrice;
 
-        // Build Receive Message String Here
-        String ret = "4" + "-" + brokerID + "-" + "1";
+        String ret = Market.fixProtocol.PurchaseMessageSuccess(brokerID, "1");
         return ret;
     }
 
