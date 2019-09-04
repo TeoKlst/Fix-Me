@@ -414,6 +414,7 @@ public class FixProtocol {
         body.append("554=" + brokerRouteID + "|"); //Need to remove this one somehow, only one ID
 
         //Side <54> = 1 to buy
+        body.append("54=1|");
 
         //Instrument -> Product<460> -> Type of product
         body.append("100=" + itemID + "|"); //To fix
