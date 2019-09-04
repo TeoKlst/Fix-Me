@@ -401,7 +401,7 @@ public class FixProtocol {
     	return msgType;
    }
    
-   public String       orderMessage(String marketID, String itemID, String purchaseAmount,
+   public String       buyOrderMessage(String marketID, String itemID, String purchaseAmount,
                                                 String purchasePrice, String brokerRouteID) {
         StringBuilder body = new StringBuilder();
 
@@ -420,22 +420,18 @@ public class FixProtocol {
 
         body.append("101=" + purchaseAmount + "|"); //Quantity<53>
 
-        body.append("102=" + purchasePrice + "|"); //Price<44>
+        body.append("44=" + purchasePrice + "|"); //Price<44>
 
-        body.append("103=" + marketID + "|");
+        body.append("49=" + marketID + "|");//SenderCompID <49>
 
-        String header = constructHeader(body.toString(), "1"); //Purchase = "1"
+        String header = constructHeader(body.toString(), "D"); //New Order - Single = "D"
 
         String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 
         return message;
    }
    
-   
-   
-   
-   
-   
+      
    
     //Encryption|Heartbeat|resetSeqNum|UserID|              INCORRECT DO NOT USE
 //    public String       orderMessage(HashMap<String, String> object) {
