@@ -543,9 +543,8 @@ public class FixProtocol {
 
     //Market Data Request Snapshot/Full Refresh (FromMarket)
     // https://www.btobits.com/fixopaedia/fixdic44/message_Market_Data_Snapshot_Full_Refresh_W_.html
-    // <Header MsgTyp=W>|Encryption|UserID|MDReqID<262>|Text<58>|Tail
-    public String           sellOrderMessage(String marketID, String itemID, String purchaseAmount,
-                String purchasePrice, String brokerRouteID) {
+    // <Header MsgTyp=W>|Encryption|UserID|MDReqID<262>|Text<58>|SenderCompID|Tail
+    public String           marketsDataResponse(String brokerID, String marketDataReqID, String marketData) {
 
         // itemID, Sell_Price, Sell_Amount, MarketID.
         StringBuilder body = new StringBuilder();
@@ -553,24 +552,18 @@ public class FixProtocol {
          //Encryption
          body.append("98=0|");
 
-         //UserID
-         body.append("553=" + this.userID + "|");
+         //UserID (who the market is sending to)
+         body.append("553=" + brokerID + "|");
  
-         body.append("554=" + brokerRouteID + "|"); //Need to remove this one somehow, only one ID
- 
-         //Side <54> = 2 to sell
-         body.append("54=2|");
- 
-         //Instrument -> Product<460> -> Type of product
-         body.append("100=" + itemID + "|"); //To fix
- 
-         body.append("101=" + purchaseAmount + "|"); //Quantity<53>
- 
-         body.append("44=" + purchasePrice + "|"); //Price<44>
- 
-         body.append("49=" + marketID + "|");//SenderCompID <49>
+         //MarketDataReq ID
+        body.append("262=" + marketDataReqID + "|");
 
-        String header = constructHeader(body.toString(), "D"); //New Order - Single = "D"
+        //Text
+        body.append("58=" + marketData + "|");
+ 
+        body.append("49=" + this.userID + "|");//SenderCompID <49>
+
+        String header = constructHeader(body.toString(), "W"); //Market Data Request Snapshot/Full Refresh = "W"
 
         String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 
@@ -579,5 +572,27 @@ public class FixProtocol {
    
     //Market Data Request Reject (From Market)
     // https://www.btobits.com/fixopaedia/fixdic44/message_Market_Data_Request_Reject_Y_.html
-    // <Header MsgTyp=Y>|MDReqID<262>|Tail
+    // <Header MsgTyp=Y>|UserID|MDReqID<262>|SenderCompID|Tail
+    public String           marketsDataReject(String brokerID, String marketDataReqID, String marketData) {
+
+        // itemID, Sell_Price, Sell_Amount, MarketID.
+        StringBuilder body = new StringBuilder();
+
+         //Encryption
+         body.append("98=0|");
+
+         //UserID (who the market is sending to)
+         body.append("553=" + brokerID + "|");
+ 
+         //MarketDataReq ID
+        body.append("262=" + marketDataReqID + "|");
+ 
+        body.append("49=" + this.userID + "|");//SenderCompID <49>
+
+        String header = constructHeader(body.toString(), "Y"); //Market Data Request Snapshot/Full Refresh = "Y"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
 }
