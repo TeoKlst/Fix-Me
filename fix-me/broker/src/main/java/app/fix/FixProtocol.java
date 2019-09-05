@@ -467,18 +467,116 @@ public class FixProtocol {
     }
    
     //List Markets (List status request)
-    //<Header MsgType=M>|Encryption|UserID|ListID<66>?|<TAIL>
+    //<Header MsgType=M>|Encryption|UserID|<TAIL>
+    //ListID<66>?
+    public String           listMarketsRequest(String brokerRouteID) {
+        // itemID, Sell_Price, Sell_Amount, MarketID.
+        StringBuilder body = new StringBuilder();
+
+        //Encryption
+        body.append("98=0|");
+
+        //UserID
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|"); //Need to remove this one somehow, only one ID
+
+        String header = constructHeader(body.toString(), "M"); //List status request (list markets) - Single = "M"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
 
     //list markets (ListStatus<N> -> Answer)
-    //<Header MsgType=N>Encryption|UserID|ListID<66>?|Text<58>|Tail|
+    //<Header MsgType=N>Encryption|Text<58>|Tail|
+    //ListID<66>?
+    public String           listMarketsResponse(String marketsList) {
+        // itemID, Sell_Price, Sell_Amount, MarketID.
+        StringBuilder body = new StringBuilder();
+
+        //Encryption
+        body.append("98=0|");
+
+        //Text
+        body.append("58=" + marketsList + "|");
+
+        String header = constructHeader(body.toString(), "N"); //List status request (list markets) - Single = "M"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
 
     //list market goods
     //Market Data Request (From broker)
     // https://www.btobits.com/fixopaedia/fixdic44/message_Market_Data_Request_V_.html
+    // <Header MsgTyp=Y>|Encryption|UserID|MDReqID<262>|SenderCompId<49>|Tail
+    // MDReqID -> unique request ID
+    //Could have instrument? Not sure how
+    public String           marketsDataRequest(String brokerRouteID, String marketDataReqID, String marketID) {
+        // itemID, Sell_Price, Sell_Amount, MarketID.
+        StringBuilder body = new StringBuilder();
+
+        //Encryption
+        body.append("98=0|");
+        
+        //UserID
+        body.append("553=" + this.userID + "|");
+        
+        body.append("554=" + brokerRouteID + "|"); //Need to remove this one somehow, only one ID
+        
+        //MarketDataReq ID
+        body.append("262=" + marketDataReqID + "|");
+        
+        //MarketID
+        body.append("49=" + marketID + "|");//SenderCompID <49>
+        // //Text
+        // body.append("58=" + marketsList + "|");
+
+        String header = constructHeader(body.toString(), "N"); //List status request (list markets) - Single = "M"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
 
     //Market Data Request Snapshot/Full Refresh (FromMarket)
     // https://www.btobits.com/fixopaedia/fixdic44/message_Market_Data_Snapshot_Full_Refresh_W_.html
-    
+    // <Header MsgTyp=W>|Encryption|UserID|MDReqID<262>|Text<58>|Tail
+    public String           sellOrderMessage(String marketID, String itemID, String purchaseAmount,
+                String purchasePrice, String brokerRouteID) {
+
+        // itemID, Sell_Price, Sell_Amount, MarketID.
+        StringBuilder body = new StringBuilder();
+
+         //Encryption
+         body.append("98=0|");
+
+         //UserID
+         body.append("553=" + this.userID + "|");
+ 
+         body.append("554=" + brokerRouteID + "|"); //Need to remove this one somehow, only one ID
+ 
+         //Side <54> = 2 to sell
+         body.append("54=2|");
+ 
+         //Instrument -> Product<460> -> Type of product
+         body.append("100=" + itemID + "|"); //To fix
+ 
+         body.append("101=" + purchaseAmount + "|"); //Quantity<53>
+ 
+         body.append("44=" + purchasePrice + "|"); //Price<44>
+ 
+         body.append("49=" + marketID + "|");//SenderCompID <49>
+
+        String header = constructHeader(body.toString(), "D"); //New Order - Single = "D"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+   
     //Market Data Request Reject (From Market)
     // https://www.btobits.com/fixopaedia/fixdic44/message_Market_Data_Request_Reject_Y_.html
     // <Header MsgTyp=Y>|MDReqID<262>|Tail
