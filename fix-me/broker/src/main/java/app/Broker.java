@@ -54,7 +54,6 @@ class Broker {
                     String brokerRouteID = Integer.toString(BrokerAccount.brokerRouteID);
                     String fixMessage = fixProtocol.PurchaseMessage(marketID, itemID, purchaseAmount, purchasePrice, brokerRouteID);
                     if (BrokerFunctions.brokerPurchaseValidate(purchasePrice)) {
-                        //-Sends message to MessageProcessor
                         dOut.println(fixMessage);
                     }
                     else
@@ -62,24 +61,18 @@ class Broker {
                         dOut.println("Purchase: Account amount error");
                 }
                 else if (echoString.equals("sell")) {
-                    brokerMessageType = "2";
-                    sbMessage.append(brokerMessageType + "-");
                     System.out.println("Choose Market ID:");
-                    echoString = scanner.nextLine().toLowerCase();
-                    sbMessage.append(echoString + "-");
+                    String marketID = scanner.nextLine().toLowerCase();
                     System.out.println("Choose Item ID to sell:");
-                    echoString = scanner.nextLine().toLowerCase();
-                    sbMessage.append(echoString + "-");
+                    String itemID = scanner.nextLine().toLowerCase();
                     System.out.println("Choose sale Amount:");
-                    echoString = scanner.nextLine().toLowerCase();
-                    sbMessage.append(echoString + "-");
+                    String saleAmount = scanner.nextLine().toLowerCase();
                     System.out.println("Choose sale Price:");
-                    echoString = scanner.nextLine().toLowerCase();
-                    sbMessage.append(echoString + "-");
-                    sbMessage.append(BrokerAccount.brokerRouteID);
-                    if (BrokerFunctions.brokerSaleValidate(sbMessage.toString())) {
-                        //-Sends message to echoer
-                        dOut.println(sbMessage.toString());
+                    String salePrice = scanner.nextLine().toLowerCase();
+                    String brokerRouteID = Integer.toString(BrokerAccount.brokerRouteID);
+                    String fixMessage = fixProtocol.SaleMessage(marketID, itemID, saleAmount, salePrice, brokerRouteID);
+                    if (BrokerFunctions.brokerSaleValidate(saleAmount, itemID)) {
+                        dOut.println(fixMessage);
                     }
                     else
                         dOut.println("Sale: Account amount error");
@@ -110,11 +103,14 @@ class Broker {
                     response = dIn.readLine();
                     String responseType = fixProtocol.getMsgType(response);
                     if (responseType.equals("AK")) {
-                        if (fixProtocol.getSalePurchaseState(response).equals("1"))
+                        if (fixProtocol.getTransactionState(response).equals("1")) {
                             BrokerFunctions.brokerBuySuccess(sbMessage.toString());
-                        if (fixProtocol.getSalePurchaseState(response).equals("2"))
+                            System.out.println("Purchase Successful");
+                        }
+                        if (fixProtocol.getTransactionState(response).equals("2")) {
                             BrokerFunctions.brokerSellSuccess(sbMessage.toString());
-                        System.out.println("Transaction Successful");
+                            System.out.println("Sale Successful");
+                        }
                     }
                     else if (responseType.equals("3"))
                         System.out.println("Transaction Failed");
