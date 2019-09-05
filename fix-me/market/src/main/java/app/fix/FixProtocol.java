@@ -177,21 +177,12 @@ public class FixProtocol {
         return message;
     }
 
-    public String           PurchaseMessageFail(String marketID, String itemID, String purchaseAmount,
-                                                    String purchasePrice, String brokerRouteID) {
+    public String           PurchaseMessageFail(String brokerRouteID) {
         StringBuilder body = new StringBuilder();
 
         body.append("553=" + this.userID + "|");
 
         body.append("554=" + brokerRouteID + "|");
-
-        body.append("100=" + itemID + "|");
-
-        body.append("101=" + purchaseAmount + "|");
-
-        body.append("102=" + purchasePrice + "|");
-
-        body.append("103=" + marketID + "|");
 
         String header = constructHeader(body.toString(), "3"); //Reject = "3"
 

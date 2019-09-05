@@ -99,9 +99,16 @@ public class MarketFunctions {
 
 
     public static String brokerPurchaseRejected(String value) {
-        String[] parts = value.split("-");
-        String brokerID = parts[5];
-        String ret = "5" + "-" + brokerID;
+        String[] message = value.split("\\|");
+        String brokerID = "";
+
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("554=")) {
+                brokerID = message[i].substring(4);
+            }
+        }
+
+        String ret = Market.fixProtocol.PurchaseMessageFail(brokerID);
         return ret;
     }
 
