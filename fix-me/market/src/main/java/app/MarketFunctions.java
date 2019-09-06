@@ -204,11 +204,9 @@ public class MarketFunctions {
             }
         }
 
-        String ret = Market.fixProtocol.MarketQueryReturn(, brokerID);
-
-        String ret = "7" + "-" + MarketAccount.marketRouteID  + "-" + brokerID +
-        "-" + MarketAccount.silver + "-" + MarketAccount.gold + "-" + MarketAccount.platinum +
-        "-" + MarketAccount.fuel + "-" + MarketAccount.bitcoin + "-" + MarketAccount.capital;
+        String ret = Market.fixProtocol.MarketQueryReturn(brokerID, MarketAccount.marketRouteID, 
+                        MarketAccount.silver, MarketAccount.gold, MarketAccount.platinum, 
+                        MarketAccount.fuel, MarketAccount.bitcoin, MarketAccount.capital);
         return ret;
     }
     

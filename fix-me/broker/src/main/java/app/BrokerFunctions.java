@@ -112,14 +112,26 @@ public class BrokerFunctions {
             "\n[5]Bitcoin  : " + BrokerAccount.accountBitcoin + "\n[-]Capital  :" + BrokerAccount.capital);
     }
     public static void brokerReceiveDataMarket(String value) {
-        String[] parts = value.split("-");
-        int marketID = Integer.parseInt(parts[1]);
-        int marketSilver = Integer.parseInt(parts[3]);
-        int marketGold = Integer.parseInt(parts[4]);
-        int marketPlatinum = Integer.parseInt(parts[5]);
-        int marketFuel = Integer.parseInt(parts[6]);
-        int marketBitCoin = Integer.parseInt(parts[7]);
-        int marketCapital = Integer.parseInt(parts[8]);
+        String[] message = value.split("\\|");
+        String itemList = null;
+        int marketID = 0;
+        
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("103=")) {
+                marketID = Integer.parseInt(message[i].substring(4));
+            }
+            if (message[i].startsWith("104=")) {
+                itemList = message[i].substring(4);
+            }
+        }
+
+        message = itemList.split(",");
+        int marketSilver = Integer.parseInt(message[0]);
+        int marketGold = Integer.parseInt(message[1]);
+        int marketPlatinum = Integer.parseInt(message[2]);
+        int marketFuel = Integer.parseInt(message[3]);
+        int marketBitCoin = Integer.parseInt(message[4]);
+        int marketCapital = Integer.parseInt(message[5]);
         System.out.println("__/Market [" + marketID + "]/__" + 
             "\n[1]Silver   : " + marketSilver + "\n[2]Gold     : " + marketGold + 
             "\n[3]Platinum : " + marketPlatinum + "\n[4]Fuel     : " + marketFuel + 

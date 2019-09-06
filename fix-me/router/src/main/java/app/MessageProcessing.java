@@ -82,6 +82,10 @@ public class MessageProcessing extends Thread {
                             output.println(echoString);
                         }
                     } else {
+                        // Return Message If All Fail
+                        // output = new PrintWriter(socket.getOutputStream(), true);
+                        // output.println(echoString);
+                        // 
                         throw new InvalidMsgTypeException("No valid type sent through");
                     }
                 } catch (InvalidMsgTypeException mte) {
@@ -144,16 +148,6 @@ public class MessageProcessing extends Thread {
                         output = new PrintWriter(brokerPort.getOutputStream(), true);
                         output.println("Market Find  Error");
                     }
-                }
-                //-List Market Goods Data Return
-                else if (echoStringParts[0].equals("7")) {
-                    Socket marketPort = Server.mapBroker.get(echoStringParts[2]);
-                    output = new PrintWriter(marketPort.getOutputStream(), true);
-                    output.println(echoString);
-                }
-                else {
-                    output = new PrintWriter(socket.getOutputStream(), true);
-                    output.println(echoString);
                 }
             }
             */

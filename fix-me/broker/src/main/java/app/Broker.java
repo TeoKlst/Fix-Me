@@ -87,6 +87,7 @@ class Broker {
                     BrokerFunctions.brokerGetDataBroker();
                     dOut.println(echoString);
                 }
+                // Not allowed to query market 0
                 else if (echoString.equals("listmg") || echoString.equals("list market goods")) {
                     System.out.println("Choose Market ID to view (its) goods:");
                     String marketID = scanner.nextLine().toLowerCase();
@@ -112,7 +113,7 @@ class Broker {
                     }
                     else if (responseType.equals("3"))
                         System.out.println("Transaction Failed");
-                    else if (responseType.equals("6"))
+                    else if (responseType.equals("7"))
                         BrokerFunctions.brokerReceiveDataMarket(response);
                     else
                         System.out.println(response);

@@ -222,7 +222,8 @@ public class FixProtocol {
         return message;
     }
 
-    public String           MarketQueryReturn(String marketID, String brokerRouteID) {
+    public String           MarketQueryReturn(String brokerRouteID, int marketID, int silver, int gold,
+                                            int platinum, int fuel, int bitcoin, int capital){
         StringBuilder body = new StringBuilder();
 
         body.append("553=" + this.userID + "|");
@@ -231,7 +232,7 @@ public class FixProtocol {
 
         body.append("103=" + marketID + "|");
 
-        body.append("104=" + silver || gold || platinum || fuel || bitcoin || capital + "|");
+        body.append("104=" + silver + "," + gold + "," + platinum + "," + fuel + "," + bitcoin + "," + capital + "|");
 
         String header = constructHeader(body.toString(), "7"); //MarketQueryReturn = "6"
 
