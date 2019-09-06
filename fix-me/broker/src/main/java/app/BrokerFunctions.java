@@ -90,7 +90,7 @@ public class BrokerFunctions {
                 purchasePrice = Integer.parseInt(message[i].substring(4));
             }
         }
-        
+        // Test
         String[] parts = value.split("-");
         int marketID = Integer.parseInt(parts[1]);
         int itemID = Integer.parseInt(parts[2]);
