@@ -89,12 +89,10 @@ class Broker {
                 }
                 else if (echoString.equals("listmg") || echoString.equals("list market goods")) {
                     System.out.println("Choose Market ID to view (its) goods:");
-                    echoString = scanner.nextLine().toLowerCase();
-                    brokerMessageType = "6";
-                    sbMessage.append(brokerMessageType + "-");
-                    sbMessage.append(echoString + "-");
-                    sbMessage.append(BrokerAccount.brokerRouteID);
-                    dOut.println(sbMessage);
+                    String marketID = scanner.nextLine().toLowerCase();
+                    String brokerRouteID = Integer.toString(BrokerAccount.brokerRouteID);
+                    String fixMessage = fixProtocol.MarketQuery(marketID, brokerRouteID);
+                    dOut.println(fixMessage);
                 }
                 else {
                     dOut.println(echoString);

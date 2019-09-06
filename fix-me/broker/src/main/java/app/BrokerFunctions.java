@@ -90,12 +90,6 @@ public class BrokerFunctions {
                 purchasePrice = Integer.parseInt(message[i].substring(4));
             }
         }
-        // Test
-        String[] parts = value.split("-");
-        int marketID = Integer.parseInt(parts[1]);
-        int itemID = Integer.parseInt(parts[2]);
-        int purchaseAmount = Integer.parseInt(parts[3]);
-        int purchasePrice = Integer.parseInt(parts[4]);
         
         if (itemID == 1)
             BrokerAccount.accountSilver -= purchaseAmount;

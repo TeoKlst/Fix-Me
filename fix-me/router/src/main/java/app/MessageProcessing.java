@@ -67,16 +67,16 @@ public class MessageProcessing extends Thread {
                     if (type.equals("A") || type.equals("5") || type.equals("0")) {
                         //Message for router
                         System.out.println("Message for Router");
-                    } else if (type.equals("1") || type.equals("2") || type.equals("3") || type.equals("AK") || type.equals("D")) {
+                    } else if (type.equals("1") || type.equals("2") || type.equals("3") || type.equals("AK") || type.equals("D") || type.equals("6") || type.equals("7")) {
                         //Send through message to broker
-                        if (type.equals("AK") || type.equals("3")) {
+                        if (type.equals("AK") || type.equals("3") || type.equals("7")) {
                             Socket brokerPort = Server.mapBroker.get(fixProtocol.getRouteID(echoString));
                             output = new PrintWriter(brokerPort.getOutputStream(), true);
                             output.println(echoString);
                         }
                         //Send through message to market
                         // Get market route id
-                        if (type.equals("D") || type.equals("1") || type.equals("2")) {
+                        if (type.equals("D") || type.equals("1") || type.equals("2") || type.equals("6")) {
                             Socket marketPort = Server.mapMarket.get(fixProtocol.getMarketRouteID(echoString));
                             output = new PrintWriter(marketPort.getOutputStream(), true);
                             output.println(echoString);

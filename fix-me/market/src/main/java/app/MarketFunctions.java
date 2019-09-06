@@ -195,8 +195,16 @@ public class MarketFunctions {
     }
 
     public static String marketQuery(String value) {
-        String[] parts = value.split("-");
-        int brokerID = Integer.parseInt(parts[2]);
+        String[] message = value.split("\\|");
+        String brokerID = "";
+
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("554=")) {
+                brokerID = message[i].substring(4);
+            }
+        }
+
+        String ret = Market.fixProtocol.MarketQueryReturn(, brokerID);
 
         String ret = "7" + "-" + MarketAccount.marketRouteID  + "-" + brokerID +
         "-" + MarketAccount.silver + "-" + MarketAccount.gold + "-" + MarketAccount.platinum +

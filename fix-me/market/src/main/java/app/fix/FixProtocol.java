@@ -191,36 +191,54 @@ public class FixProtocol {
         return message;
     }
 
-        // Sale Message Builder
-        public String           SaleMessageSuccess(String brokerRouteID, String confirmationType) {
-            StringBuilder body = new StringBuilder();
-    
-            body.append("553=" + this.userID + "|");
-    
-            body.append("554=" + brokerRouteID + "|");
-    
-            body.append("655=" + confirmationType + "|"); //confirmationType Purchase Success Type - 1
-    
-            String header = constructHeader(body.toString(), "AK"); //Confirmation = "AK"
-    
-            String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
-    
-            return message;
-        }
+    // Sale Message Builder
+    public String           SaleMessageSuccess(String brokerRouteID, String confirmationType) {
+        StringBuilder body = new StringBuilder();
 
-        public String           SaleMessageFail(String brokerRouteID) {
-            StringBuilder body = new StringBuilder();
-    
-            body.append("553=" + this.userID + "|");
-    
-            body.append("554=" + brokerRouteID + "|");
-    
-            String header = constructHeader(body.toString(), "3"); //Reject = "3"
-    
-            String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
-    
-            return message;
-        }
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|");
+
+        body.append("655=" + confirmationType + "|"); //confirmationType Purchase Success Type - 1
+
+        String header = constructHeader(body.toString(), "AK"); //Confirmation = "AK"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    public String           SaleMessageFail(String brokerRouteID) {
+        StringBuilder body = new StringBuilder();
+
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|");
+
+        String header = constructHeader(body.toString(), "3"); //Reject = "3"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    public String           MarketQueryReturn(String marketID, String brokerRouteID) {
+        StringBuilder body = new StringBuilder();
+
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|");
+
+        body.append("103=" + marketID + "|");
+
+        body.append("104=" + silver || gold || platinum || fuel || bitcoin || capital + "|");
+
+        String header = constructHeader(body.toString(), "7"); //MarketQueryReturn = "6"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
 
     //Encryption|UserID|
 	public String           logoutMessage() {

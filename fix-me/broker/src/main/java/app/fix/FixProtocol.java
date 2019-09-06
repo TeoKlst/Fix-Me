@@ -198,53 +198,72 @@ public class FixProtocol {
     }
 
 
-        // Purchase Message Builder
-        public String           PurchaseMessage(String marketID, String itemID, String purchaseAmount,
-                                                String purchasePrice, String brokerRouteID) {
-            StringBuilder body = new StringBuilder();
+    // Purchase Message Builder
+    public String           PurchaseMessage(String marketID, String itemID, String purchaseAmount,
+                                            String purchasePrice, String brokerRouteID) {
+        StringBuilder body = new StringBuilder();
 
-            body.append("553=" + this.userID + "|");
+        body.append("553=" + this.userID + "|");
 
-            body.append("554=" + brokerRouteID + "|");
+        body.append("554=" + brokerRouteID + "|");
 
-            body.append("100=" + itemID + "|");
+        body.append("100=" + itemID + "|");
 
-            body.append("101=" + purchaseAmount + "|");
+        body.append("101=" + purchaseAmount + "|");
 
-            body.append("102=" + purchasePrice + "|");
+        body.append("102=" + purchasePrice + "|");
 
-            body.append("103=" + marketID + "|");
+        body.append("103=" + marketID + "|");
 
-            String header = constructHeader(body.toString(), "1"); //Purchase = "1"
+        String header = constructHeader(body.toString(), "1"); //Purchase = "1"
 
-            String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 
-            return message;
-        }
+        return message;
+    }
     
-        // Sale Message Builder
-        public String           SaleMessage(String marketID, String itemID, String saleAmount,
-                                            String salePrice, String brokerRouteID) {
-            StringBuilder body = new StringBuilder();
+    // Sale Message Builder
+    public String           SaleMessage(String marketID, String itemID, String saleAmount,
+                                        String salePrice, String brokerRouteID) {
+        StringBuilder body = new StringBuilder();
 
-            body.append("553=" + this.userID + "|");
+        body.append("553=" + this.userID + "|");
 
-            body.append("554=" + brokerRouteID + "|");
+        body.append("554=" + brokerRouteID + "|");
 
-            body.append("100=" + itemID + "|");
+        body.append("100=" + itemID + "|");
 
-            body.append("101=" + saleAmount + "|");
+        body.append("101=" + saleAmount + "|");
 
-            body.append("102=" + salePrice + "|");
+        body.append("102=" + salePrice + "|");
 
-            body.append("103=" + marketID + "|");
+        body.append("103=" + marketID + "|");
 
-            String header = constructHeader(body.toString(), "2"); //Sale = "2"
+        String header = constructHeader(body.toString(), "2"); //Sale = "2"
 
-            String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 
-            return message;
-        }
+        return message;
+    }
+
+    // Protocol Version|length|Message Type|Message Sequence Number|Date|Encryption|UserID|Checksum|
+    // 8=FIX4.4|9=len|35=0|34=seqNum|34=yyyyMMddHH:mm:ss|98=0|553=userID|10=00x|
+    // MarketQuery Message Builder
+    public String           MarketQuery(String marketID, String brokerRouteID) {
+        StringBuilder body = new StringBuilder();
+
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|");
+
+        body.append("103=" + marketID + "|");
+
+        String header = constructHeader(body.toString(), "6"); //MarketQuery = "6"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
 
     //Encryption|UserID|
 	public String           logoutMessage() {
