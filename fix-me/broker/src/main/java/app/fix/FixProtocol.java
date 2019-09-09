@@ -179,43 +179,119 @@ public class FixProtocol {
             return msgType;
        }
 
-        // Purchase Message Builder
-        public String           PurchaseMessage(String marketID, String itemID, String purchaseAmount,
-                                                String purchasePrice, String brokerRouteID) {
-            StringBuilder body = new StringBuilder();
-
-            body.append("553=" + this.userID + "|");
-
-            body.append("554=" + brokerRouteID + "|");
-
-            body.append("100=" + itemID + "|");
-
-            body.append("101=" + purchaseAmount + "|");
-
-            body.append("102=" + purchasePrice + "|");
-
-            body.append("103=" + marketID + "|");
-
-            String header = constructHeader(body.toString(), "1"); //Purchase = "1"
-
-            String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
-
-            return message;
+        // Get Sale/Purchase success status
+        public String		    getTransactionState(String messageInput) throws InvalidMsgTypeException {
+        String msgType = null;
+        if (!messageInput.contains("|655=")) {
+            throw new InvalidMsgTypeException("Invalid Purchase/Sale State");
         }
-    
-        // Sale Message Builder
-        public String           SaleMessage(String marketID, String itemID, String purchaseAmount,
+        String[] message = messageInput.split("\\|");
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("655=")) {
+                msgType =message[i].substring(4);
+            }
+        }
+        if (msgType == null) {
+            throw new InvalidMsgTypeException("Invalid Message Type");
+        }
+        return msgType;
+    }
+
+
+    // Purchase Message Builder
+    public String           PurchaseMessage(String marketID, String itemID, String purchaseAmount,
                                             String purchasePrice, String brokerRouteID) {
-            StringBuilder body = new StringBuilder();
+        StringBuilder body = new StringBuilder();
 
-            // Append to body
+        body.append("553=" + this.userID + "|");
 
-            String header = constructHeader(body.toString(), "2"); //Sale = "2"
+        body.append("554=" + brokerRouteID + "|");
 
-            String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+        body.append("100=" + itemID + "|");
 
-            return message;
-        }
+        body.append("101=" + purchaseAmount + "|");
+
+        body.append("102=" + purchasePrice + "|");
+
+        body.append("103=" + marketID + "|");
+
+        String header = constructHeader(body.toString(), "1"); //Purchase = "1"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+    
+    // Sale Message Builder
+    public String           SaleMessage(String marketID, String itemID, String saleAmount,
+                                        String salePrice, String brokerRouteID) {
+        StringBuilder body = new StringBuilder();
+
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|");
+
+        body.append("100=" + itemID + "|");
+
+        body.append("101=" + saleAmount + "|");
+
+        body.append("102=" + salePrice + "|");
+
+        body.append("103=" + marketID + "|");
+
+        String header = constructHeader(body.toString(), "2"); //Sale = "2"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    // Default No Type Message Builder
+    public String           DefaultNoType(int brokerRouteID) {
+        StringBuilder body = new StringBuilder();
+
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|");
+
+        String header = constructHeader(body.toString(), "404"); //Default = "404"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    // ListMarkets Message Builder
+    public String           ListMarket(int brokerRouteID) {
+        StringBuilder body = new StringBuilder();
+
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|");
+
+        String header = constructHeader(body.toString(), "60"); //ListMarkets = "60"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    // MarketQuery Message Builder
+    public String           MarketQuery(String marketID, String brokerRouteID) {
+        StringBuilder body = new StringBuilder();
+
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|");
+
+        body.append("103=" + marketID + "|");
+
+        String header = constructHeader(body.toString(), "6"); //MarketQuery = "6"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
 
     //Encryption|UserID|
 	public String           logoutMessage() {
@@ -251,6 +327,8 @@ public class FixProtocol {
          * The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
          */
         body.append("553=" + this.userID + "|");
+
+        body.append("560=" + "1" + "|"); //HB Type = 1 Broker
 
         String header = constructHeader(body.toString(), "0"); //Heartbeat = "0"
 

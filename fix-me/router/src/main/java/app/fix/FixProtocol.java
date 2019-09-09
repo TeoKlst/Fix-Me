@@ -1,5 +1,6 @@
 package app.fix;
 
+import app.Server;
 import app.fix.exceptions.InvalidChecksumException;
 import app.fix.exceptions.InvalidMsgLengthException;
 import app.fix.exceptions.InvalidMsgTypeException;
@@ -8,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.TimeZone;
 
 public class FixProtocol {
@@ -238,6 +238,7 @@ public class FixProtocol {
    
            return message;
        }
+       
    
        //Encryption|UserID|Heartbeat|resetSeqNum
        public String           heartBeatMessage() {
@@ -260,6 +261,7 @@ public class FixProtocol {
    
            return message;
        }
+       
    
        //Encryption|UserID|RefSeqNum|sessionRejectReason|Text
        public String           RejectMessage(int refSeqNum, int sessionRejectReason, String text) {
@@ -596,4 +598,69 @@ public class FixProtocol {
    
            return message;
        }
+
+    //Encryption|UserID|Heartbeat|resetSeqNum|
+    
+    // ListMarkets Return Message Builder
+    public String           ListMarketReturn() {
+        StringBuilder body = new StringBuilder();
+
+        body.append("553=" + this.userID + "|");
+
+        body.append("600=" + Server.mapHBMarket.keySet() + "|");
+
+        String header = constructHeader(body.toString(), "60"); //ListMarkets = "60"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    // Error Non-Existent Market
+    public String           NullMarket() {
+        StringBuilder body = new StringBuilder();
+
+        body.append("553=" + this.userID + "|");
+
+        String header = constructHeader(body.toString(), "91"); //Non-Existent Market = "91"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    // Get Market Route ID
+    public String		    getMarketRouteID(String messageInput) throws InvalidMsgTypeException {
+        String msgRouteID = null;
+        if (!messageInput.contains("|103=")) {
+            throw new InvalidMsgTypeException("Invalid RouteID Market");
+        }
+        String[] message = messageInput.split("\\|");
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("103=")) {
+                msgRouteID =message[i].substring(4);
+            }
+        }
+        if (msgRouteID == null) {
+            throw new InvalidMsgTypeException("Invalid Message Type");
+        }
+        return msgRouteID;
+    }
+
+   public String		    getHBType(String messageInput) throws InvalidMsgTypeException {
+    String msgType = null;
+    if (!messageInput.contains("|560=")) {
+        throw new InvalidMsgTypeException("Invalid  Heart Beat");
+    }
+    String[] message = messageInput.split("\\|");
+    for (int i=0; i < message.length; i++) {
+        if (message[i].startsWith("560=")) {
+            msgType =message[i].substring(4);
+        }
+    }
+    if (msgType == null) {
+        throw new InvalidMsgTypeException("Invalid Heart Beat");
+    }
+    return msgType;
+}
 }

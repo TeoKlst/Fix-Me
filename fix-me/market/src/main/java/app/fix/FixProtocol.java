@@ -238,28 +238,6 @@ public class FixProtocol {
             return message;
         }
     
-        //Encryption|UserID|Heartbeat|resetSeqNum
-        public String           heartBeatMessage() {
-            StringBuilder body = new StringBuilder();
-    
-            /* 
-             * Define a message encryption scheme. Valid value is "0" = NONE+OTHER (encryption is not used)
-             */
-            body.append("98=0|");
-    
-            /*
-             * The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
-             */
-            body.append("553=" + this.userID + "|");
-    
-            String header = constructHeader(body.toString(), "0"); //Heartbeat = "0"
-    
-            String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
-    
-    
-            return message;
-        }
-    
         //Encryption|UserID|RefSeqNum|sessionRejectReason|Text
         public String           RejectMessage(int refSeqNum, int sessionRejectReason, String text) {
             StringBuilder body = new StringBuilder();
@@ -300,7 +278,7 @@ public class FixProtocol {
     
             return message;
         }
-    
+
        //Protocol Version|length|Message Type|Message Sequence Number|Date|
        public String            constructHeader(String bodyMessage, String type) {
             StringBuilder header = new StringBuilder();
@@ -486,7 +464,120 @@ public class FixProtocol {
             String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
     
             return message;
-        }
+
+        String header = constructHeader(body.toString(), "A"); //Logon = "A"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    // Purchase Message Builder
+    public String           PurchaseMessageSuccess(String brokerRouteID, String confirmationType) {
+        StringBuilder body = new StringBuilder();
+
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|");
+
+        body.append("655=" + confirmationType + "|"); //confirmationType Purchase Success Type - 1
+
+        String header = constructHeader(body.toString(), "AK"); //Confirmation = "AK"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    public String           PurchaseMessageFail(String brokerRouteID) {
+        StringBuilder body = new StringBuilder();
+
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|");
+
+        String header = constructHeader(body.toString(), "4"); //Reject = "4"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    // Sale Message Builder
+    public String           SaleMessageSuccess(String brokerRouteID, String confirmationType) {
+        StringBuilder body = new StringBuilder();
+
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|");
+
+        body.append("655=" + confirmationType + "|"); //confirmationType Purchase Success Type - 1
+
+        String header = constructHeader(body.toString(), "AK"); //Confirmation = "AK"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    public String           SaleMessageFail(String brokerRouteID) {
+        StringBuilder body = new StringBuilder();
+
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|");
+
+        String header = constructHeader(body.toString(), "4"); //Reject = "4"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    public String           MarketQueryReturn(String brokerRouteID, int marketID, int silver, int gold,
+                                            int platinum, int fuel, int bitcoin, int capital){
+        StringBuilder body = new StringBuilder();
+
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|");
+
+        body.append("103=" + marketID + "|");
+
+        body.append("104=" + silver + "," + gold + "," + platinum + "," + fuel + "," + bitcoin + "," + capital + "|");
+
+        String header = constructHeader(body.toString(), "7"); //MarketQueryReturn = "6"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    //Encryption|UserID|Heartbeat|resetSeqNum
+    public String           heartBeatMessage() {
+        StringBuilder body = new StringBuilder();
+
+        /* 
+         * Define a message encryption scheme. Valid value is "0" = NONE+OTHER (encryption is not used)
+         */
+        body.append("98=0|");
+
+        /*
+         * The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
+         */
+        body.append("553=" + this.userID + "|");
+
+        body.append("560=" + "2" + "|"); //HB Type = 2 Market
+
+        String header = constructHeader(body.toString(), "0"); //Heartbeat = "0"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+
+        return message;
+    }
+
+
     
         //list markets (ListStatus<N> -> Answer)
         //<Header MsgType=N>Encryption|Text<58>|Tail|
@@ -595,4 +686,48 @@ public class FixProtocol {
     
             return message;
         }
+
+
+    //Encryption|UserID|RefSeqNum|sessionRejectReason|Text
+    public String           RejectMessageNumFormat(int refSeqNum, int sessionRejectReason, String text, int brokerRouteID) {
+        StringBuilder body = new StringBuilder();
+
+        /* 
+            * Define a message encryption scheme. Valid value is "0" = NONE+OTHER (encryption is not used)
+            */
+        body.append("98=0|");
+
+        /*
+            * The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
+            */
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|");
+
+        /*
+            * Reference to the Message Sequence Number that was rejected
+            */
+        body.append("45=" + refSeqNum + "|");
+
+        /*
+            * Setting the sessionRejectionReason value, as well as adding text to explain further
+            */
+        if ((sessionRejectReason >= 0 && sessionRejectReason <= 17)) {
+            body.append("373=" + sessionRejectReason + "|");
+        } else if (sessionRejectReason == 99) {
+            body.append("373=" + sessionRejectReason + "|");
+        } else {
+            System.out.println("Invalid rejection value entered.");
+            return null;
+        }
+        if (text != null && !text.isEmpty()) {
+            body.append("58=" + text + "|");
+        }
+
+        String header = constructHeader(body.toString(), "3"); //Reject = "3"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
 }

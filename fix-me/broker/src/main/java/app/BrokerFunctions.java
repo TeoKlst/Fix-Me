@@ -23,34 +23,52 @@ public class BrokerFunctions {
         return amount;
     }
 
-    public static Boolean brokerPurchaseValidate(String value) {
+    public static Boolean brokerPurchaseValidate(String value, String marketID) {
         Boolean ret = true;
-
-        if (Integer.parseInt(value) > BrokerAccount.capital) {
+        
+        try {
+        if (Integer.parseInt(value) > BrokerAccount.capital)
+            ret = false;
+        if (marketID.equals("0"))
+            ret = false;
+        } catch (NumberFormatException e) {
             ret = false;
         }
         return ret;
     }
 
-    public static Boolean brokerSaleValidate(String value) {
+    public static Boolean brokerSaleValidate(String value, String itemID, String marketID) {
         Boolean ret = true;
-        String[] parts = value.split("-");
-        int itemID = Integer.parseInt(parts[2]);
-        int saleAmount = Integer.parseInt(parts[3]);
 
-        if (saleAmount > getBrokerItemAmount(itemID))
+        try {
+            if (Integer.parseInt(value) > getBrokerItemAmount(Integer.parseInt(itemID)))
+                ret = false;
+            if (marketID.equals("0"))
+                ret = false;
+        } catch (NumberFormatException e) {
             ret = false;
-
+        }
         return ret;
     }
 
     public static void brokerBuySuccess(String value) {
-        String[] parts = value.split("-");
-        int marketID = Integer.parseInt(parts[1]);
-        int itemID = Integer.parseInt(parts[2]);
-        int purchaseAmount = Integer.parseInt(parts[3]);
-        int purchasePrice = Integer.parseInt(parts[4]);
+        String[] message = value.split("\\|");
+        int itemID = 0;
+        int purchaseAmount = 0;
+        int purchasePrice = 0;
         
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("100=")) {
+                itemID = Integer.parseInt(message[i].substring(4));
+            }
+            if (message[i].startsWith("101=")) {
+                purchaseAmount = Integer.parseInt(message[i].substring(4));
+            }
+            if (message[i].startsWith("102=")) {
+                purchasePrice = Integer.parseInt(message[i].substring(4));
+            }
+        }
+
         if (itemID == 1)
             BrokerAccount.accountSilver += purchaseAmount;
         else if (itemID == 2)
@@ -66,11 +84,22 @@ public class BrokerFunctions {
     }
 
     public static void brokerSellSuccess(String value) {
-        String[] parts = value.split("-");
-        int marketID = Integer.parseInt(parts[1]);
-        int itemID = Integer.parseInt(parts[2]);
-        int purchaseAmount = Integer.parseInt(parts[3]);
-        int purchasePrice = Integer.parseInt(parts[4]);
+        String[] message = value.split("\\|");
+        int itemID = 0;
+        int purchaseAmount = 0;
+        int purchasePrice = 0;
+        
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("100=")) {
+                itemID = Integer.parseInt(message[i].substring(4));
+            }
+            if (message[i].startsWith("101=")) {
+                purchaseAmount = Integer.parseInt(message[i].substring(4));
+            }
+            if (message[i].startsWith("102=")) {
+                purchasePrice = Integer.parseInt(message[i].substring(4));
+            }
+        }
         
         if (itemID == 1)
             BrokerAccount.accountSilver -= purchaseAmount;
@@ -92,18 +121,43 @@ public class BrokerFunctions {
             "\n[3]Platinum : " + BrokerAccount.accountPlatinum + "\n[4]Fuel     : " + BrokerAccount.accountFuel + 
             "\n[5]Bitcoin  : " + BrokerAccount.accountBitcoin + "\n[-]Capital  :" + BrokerAccount.capital);
     }
+
     public static void brokerReceiveDataMarket(String value) {
-        String[] parts = value.split("-");
-        int marketID = Integer.parseInt(parts[1]);
-        int marketSilver = Integer.parseInt(parts[3]);
-        int marketGold = Integer.parseInt(parts[4]);
-        int marketPlatinum = Integer.parseInt(parts[5]);
-        int marketFuel = Integer.parseInt(parts[6]);
-        int marketBitCoin = Integer.parseInt(parts[7]);
-        int marketCapital = Integer.parseInt(parts[8]);
+        String[] message = value.split("\\|");
+        String itemList = null;
+        int marketID = 0;
+        
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("103=")) {
+                marketID = Integer.parseInt(message[i].substring(4));
+            }
+            if (message[i].startsWith("104=")) {
+                itemList = message[i].substring(4);
+            }
+        }
+
+        message = itemList.split(",");
+        int marketSilver = Integer.parseInt(message[0]);
+        int marketGold = Integer.parseInt(message[1]);
+        int marketPlatinum = Integer.parseInt(message[2]);
+        int marketFuel = Integer.parseInt(message[3]);
+        int marketBitCoin = Integer.parseInt(message[4]);
+        int marketCapital = Integer.parseInt(message[5]);
         System.out.println("__/Market [" + marketID + "]/__" + 
             "\n[1]Silver   : " + marketSilver + "\n[2]Gold     : " + marketGold + 
             "\n[3]Platinum : " + marketPlatinum + "\n[4]Fuel     : " + marketFuel + 
             "\n[5]Bitcoin  : " + marketBitCoin + "\n[-]Capital  :" + marketCapital);
+    }
+
+    public static void getMarketList(String value) {
+        String[] message = value.split("\\|");
+        String marketList = null;
+        
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("600=")) {
+                marketList =message[i].substring(4);
+            }
+        }
+        System.out.println(marketList);
     }
 }
