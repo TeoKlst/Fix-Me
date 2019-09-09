@@ -464,12 +464,6 @@ public class FixProtocol {
             String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
     
             return message;
-
-        String header = constructHeader(body.toString(), "A"); //Logon = "A"
-
-        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
-
-        return message;
     }
 
     // Purchase Message Builder
