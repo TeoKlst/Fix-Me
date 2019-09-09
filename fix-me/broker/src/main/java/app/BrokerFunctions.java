@@ -23,21 +23,31 @@ public class BrokerFunctions {
         return amount;
     }
 
-    public static Boolean brokerPurchaseValidate(String value) {
+    public static Boolean brokerPurchaseValidate(String value, String marketID) {
         Boolean ret = true;
-
-        if (Integer.parseInt(value) > BrokerAccount.capital) {
+        
+        try {
+        if (Integer.parseInt(value) > BrokerAccount.capital)
+            ret = false;
+        if (marketID.equals("0"))
+            ret = false;
+        } catch (NumberFormatException e) {
             ret = false;
         }
         return ret;
     }
 
-    public static Boolean brokerSaleValidate(String value, String itemID) {
+    public static Boolean brokerSaleValidate(String value, String itemID, String marketID) {
         Boolean ret = true;
 
-        if (Integer.parseInt(value) > getBrokerItemAmount(Integer.parseInt(itemID)))
+        try {
+            if (Integer.parseInt(value) > getBrokerItemAmount(Integer.parseInt(itemID)))
+                ret = false;
+            if (marketID.equals("0"))
+                ret = false;
+        } catch (NumberFormatException e) {
             ret = false;
-
+        }
         return ret;
     }
 
@@ -111,6 +121,7 @@ public class BrokerFunctions {
             "\n[3]Platinum : " + BrokerAccount.accountPlatinum + "\n[4]Fuel     : " + BrokerAccount.accountFuel + 
             "\n[5]Bitcoin  : " + BrokerAccount.accountBitcoin + "\n[-]Capital  :" + BrokerAccount.capital);
     }
+
     public static void brokerReceiveDataMarket(String value) {
         String[] message = value.split("\\|");
         String itemList = null;
@@ -136,5 +147,17 @@ public class BrokerFunctions {
             "\n[1]Silver   : " + marketSilver + "\n[2]Gold     : " + marketGold + 
             "\n[3]Platinum : " + marketPlatinum + "\n[4]Fuel     : " + marketFuel + 
             "\n[5]Bitcoin  : " + marketBitCoin + "\n[-]Capital  :" + marketCapital);
+    }
+
+    public static void getMarketList(String value) {
+        String[] message = value.split("\\|");
+        String marketList = null;
+        
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("600=")) {
+                marketList =message[i].substring(4);
+            }
+        }
+        System.out.println(marketList);
     }
 }

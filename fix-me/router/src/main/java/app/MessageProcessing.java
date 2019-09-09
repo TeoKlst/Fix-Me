@@ -52,7 +52,6 @@ public class MessageProcessing extends Thread {
                 */
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-
                 String rejectMessage = fixProtocol.receiveMessage(echoString);
                 if (rejectMessage != null) {
                     //Send rejectMessage
@@ -62,30 +61,48 @@ public class MessageProcessing extends Thread {
                     return;
                 }
                 try {
-                    // TODO Deny user to send to messages to HB readers => "0"
                     String type = fixProtocol.getMsgType(echoString);
                     if (type.equals("A") || type.equals("5") || type.equals("0")) {
                         //Message for router
+                        if (fixProtocol.getHBType(echoString) == "1") {
+                            Socket brokerPort = Server.mapBroker.get("0");
+                            output = new PrintWriter(brokerPort.getOutputStream(), true);
+                            output.println(echoString);
+                        }
+                        if (fixProtocol.getHBType(echoString) == "2") {
+                            Socket marketPort = Server.mapMarket.get("0");
+                            output = new PrintWriter(marketPort.getOutputStream(), true);
+                            output.println(echoString);
+                        }
                         System.out.println("Message for Router");
-                    } else if (type.equals("1") || type.equals("2") || type.equals("3") || type.equals("AK") || type.equals("D") || type.equals("6") || type.equals("7")) {
+                    } 
+                    else if (type.equals("1") || type.equals("2") || type.equals("3") || type.equals("AK") || type.equals("D")
+                            || type.equals("6") || type.equals("7") || type.equals("60") || type.equals("4")) {
                         //Send through message to broker
+                        if (type.equals("60")) {
+                            Socket brokerPort = Server.mapBroker.get(fixProtocol.getRouteID(echoString));
+                            output = new PrintWriter(brokerPort.getOutputStream(), true);
+                            output.println(fixProtocol.ListMarketReturn());
+                        }
                         if (type.equals("AK") || type.equals("3") || type.equals("7")) {
                             Socket brokerPort = Server.mapBroker.get(fixProtocol.getRouteID(echoString));
                             output = new PrintWriter(brokerPort.getOutputStream(), true);
                             output.println(echoString);
                         }
                         //Send through message to market
-                        // Get market route id
                         if (type.equals("D") || type.equals("1") || type.equals("2") || type.equals("6")) {
                             Socket marketPort = Server.mapMarket.get(fixProtocol.getMarketRouteID(echoString));
-                            output = new PrintWriter(marketPort.getOutputStream(), true);
-                            output.println(echoString);
+                            if (marketPort == null) {
+                                Socket brokerPort = Server.mapBroker.get(fixProtocol.getRouteID(echoString));
+                                output = new PrintWriter(brokerPort.getOutputStream(), true);
+                                output.println(fixProtocol.NullMarket());
+                            }
+                            else {
+                                output = new PrintWriter(marketPort.getOutputStream(), true);
+                                output.println(echoString);
+                            }
                         }
                     } else {
-                        // Return Message If All Fail
-                        // output = new PrintWriter(socket.getOutputStream(), true);
-                        // output.println(echoString);
-                        // 
                         throw new InvalidMsgTypeException("No valid type sent through");
                     }
                 } catch (InvalidMsgTypeException mte) {
@@ -108,50 +125,7 @@ public class MessageProcessing extends Thread {
                     output.println("Reject message: " + rejectMessage);
                 }
             }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-                /*
-                //-List Markets
-                else if (echoStringParts[0].equals("3")) {
-                    Socket brokerPort = Server.mapBroker.get(echoStringParts[1]);
-                    output = new PrintWriter(brokerPort.getOutputStream(), true);
-                    output.println("Available Market ID's => " + (Server.mapHBMarket.keySet()));
-                }
-                //-Purchase || Sale Executed
-                else if (echoStringParts[0].equals("4")) {
-                    Socket marketPort = Server.mapBroker.get(echoStringParts[1]);
-                    output = new PrintWriter(marketPort.getOutputStream(), true);
-                    output.println(echoString);
-                }
-                //-Purchase || Sale Rejected
-                else if (echoStringParts[0].equals("5")) {
-                    Socket brokerPort = Server.mapBroker.get(echoStringParts[1]);
-                    output = new PrintWriter(brokerPort.getOutputStream(), true);
-                    output.println(echoString);
-                }
-                //-List Market Goods Query
-                else if (echoStringParts[0].equals("6")) {
-                    Socket marketPort = Server.mapMarket.get(echoStringParts[1]);
-                    if (marketPort != null) {
-                        if(echoStringParts[1].equals("0")) {
-                            Socket brokerPort = Server.mapMarket.get(echoStringParts[2]);
-                            output = new PrintWriter(brokerPort.getOutputStream(), true);
-                            output.println("Market Find  Error");
-                        }
-                        else {
-                            output = new PrintWriter(marketPort.getOutputStream(), true);
-                            output.println(echoString);
-                        }
-                    }
-                    else {
-                        Socket brokerPort = Server.mapMarket.get(echoStringParts[2]);
-                        output = new PrintWriter(brokerPort.getOutputStream(), true);
-                        output.println("Market Find  Error");
-                    }
-                }
-            }
-            */
-            
+/////////////////////////////////////////////////////////////////////////////////////////////////////////            
         } catch(IOException | InvalidMsgTypeException e) {
             System.out.println("Oops: " + e.getMessage());
         } finally {

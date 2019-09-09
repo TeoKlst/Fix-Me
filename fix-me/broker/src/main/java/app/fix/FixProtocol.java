@@ -246,8 +246,36 @@ public class FixProtocol {
         return message;
     }
 
-    // Protocol Version|length|Message Type|Message Sequence Number|Date|Encryption|UserID|Checksum|
-    // 8=FIX4.4|9=len|35=0|34=seqNum|34=yyyyMMddHH:mm:ss|98=0|553=userID|10=00x|
+    // Default No Type Message Builder
+    public String           DefaultNoType(int brokerRouteID) {
+        StringBuilder body = new StringBuilder();
+
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|");
+
+        String header = constructHeader(body.toString(), "404"); //Default = "404"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    // ListMarkets Message Builder
+    public String           ListMarket(int brokerRouteID) {
+        StringBuilder body = new StringBuilder();
+
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|");
+
+        String header = constructHeader(body.toString(), "60"); //ListMarkets = "60"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
     // MarketQuery Message Builder
     public String           MarketQuery(String marketID, String brokerRouteID) {
         StringBuilder body = new StringBuilder();
@@ -299,6 +327,8 @@ public class FixProtocol {
          * The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
          */
         body.append("553=" + this.userID + "|");
+
+        body.append("560=" + "1" + "|"); //HB Type = 1 Broker
 
         String header = constructHeader(body.toString(), "0"); //Heartbeat = "0"
 

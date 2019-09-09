@@ -36,8 +36,7 @@ class Broker {
             "You are Broker[" + BrokerAccount.brokerRouteID + "]" + " ServiceID => " + BrokerAccount.brokerServiceID);
 
             do {
-                StringBuilder sbMessage = new StringBuilder();
-                String brokerMessageType = "0";
+                String fixMessage = null;
 
                 System.out.println("Buy, Sell, List Markets or Display your goods:");
                 echoString = scanner.nextLine().toLowerCase();
@@ -52,13 +51,14 @@ class Broker {
                     System.out.println("Choose purchase Price:");
                     String purchasePrice = scanner.nextLine().toLowerCase();
                     String brokerRouteID = Integer.toString(BrokerAccount.brokerRouteID);
-                    String fixMessage = fixProtocol.PurchaseMessage(marketID, itemID, purchaseAmount, purchasePrice, brokerRouteID);
-                    if (BrokerFunctions.brokerPurchaseValidate(purchasePrice)) {
+                    fixMessage = fixProtocol.PurchaseMessage(marketID, itemID, purchaseAmount, purchasePrice, brokerRouteID);
+                    if (BrokerFunctions.brokerPurchaseValidate(purchasePrice, marketID)) {
                         dOut.println(fixMessage);
                     }
-                    else
-                        // TODO Change to send proper fix message to be returned to same broker with purchase amount exceeding
-                        dOut.println("Purchase: Account amount error");
+                    else {
+                        echoString = "error_1";
+                        System.out.println("ERROR: account purchase input");
+                    }
                 }
                 else if (echoString.equals("sell")) {
                     System.out.println("Choose Market ID:");
@@ -70,53 +70,59 @@ class Broker {
                     System.out.println("Choose sale Price:");
                     String salePrice = scanner.nextLine().toLowerCase();
                     String brokerRouteID = Integer.toString(BrokerAccount.brokerRouteID);
-                    String fixMessage = fixProtocol.SaleMessage(marketID, itemID, saleAmount, salePrice, brokerRouteID);
-                    if (BrokerFunctions.brokerSaleValidate(saleAmount, itemID)) {
+                    fixMessage = fixProtocol.SaleMessage(marketID, itemID, saleAmount, salePrice, brokerRouteID);
+                    if (BrokerFunctions.brokerSaleValidate(saleAmount, itemID, marketID)) {
                         dOut.println(fixMessage);
                     }
-                    else
-                        dOut.println("Sale: Account amount error");
+                    else {
+                        echoString = "error_2";
+                        System.out.println("ERROR: account sale input");
+                    }
                 }
                 else if (echoString.equals("listm")) {
-                    brokerMessageType = "3";
-                    sbMessage.append(brokerMessageType + "-");
-                    sbMessage.append(BrokerAccount.brokerRouteID);
-                    dOut.println(sbMessage);
+                    fixMessage = fixProtocol.ListMarket(BrokerAccount.brokerRouteID);
+                    dOut.println(fixMessage);
                 }
                 else if (echoString.equals("listg") || echoString.equals("list goods")) {
                     BrokerFunctions.brokerGetDataBroker();
-                    dOut.println(echoString);
                 }
                 // Not allowed to query market 0
                 else if (echoString.equals("listmg") || echoString.equals("list market goods")) {
                     System.out.println("Choose Market ID to view (its) goods:");
                     String marketID = scanner.nextLine().toLowerCase();
                     String brokerRouteID = Integer.toString(BrokerAccount.brokerRouteID);
-                    String fixMessage = fixProtocol.MarketQuery(marketID, brokerRouteID);
+                    fixMessage = fixProtocol.MarketQuery(marketID, brokerRouteID);
                     dOut.println(fixMessage);
                 }
                 else {
-                    dOut.println(echoString);
+                    dOut.println(fixProtocol.DefaultNoType(BrokerAccount.brokerRouteID));
                 }
                 if (!echoString.equals("exit")) {
-                    response = dIn.readLine();
-                    String responseType = fixProtocol.getMsgType(response);
-                    if (responseType.equals("AK")) {
-                        if (fixProtocol.getTransactionState(response).equals("1")) {
-                            BrokerFunctions.brokerBuySuccess(sbMessage.toString());
-                            System.out.println("Purchase Successful");
+                    if (!echoString.equals("listg") && !echoString.equals("list goods")
+                        && !echoString.equals("error_1") && !echoString.equals("error_2")) {
+                        response = dIn.readLine();
+                        String responseType = fixProtocol.getMsgType(response);
+                        if (responseType.equals("AK")) {
+                            if (fixProtocol.getTransactionState(response).equals("1")) {
+                                BrokerFunctions.brokerBuySuccess(fixMessage);
+                                System.out.println("Purchase Successful");
+                            }
+                            if (fixProtocol.getTransactionState(response).equals("2")) {
+                                BrokerFunctions.brokerSellSuccess(fixMessage);
+                                System.out.println("Sale Successful");
+                            }
                         }
-                        if (fixProtocol.getTransactionState(response).equals("2")) {
-                            BrokerFunctions.brokerSellSuccess(sbMessage.toString());
-                            System.out.println("Sale Successful");
-                        }
+                        else if (responseType.equals("4"))
+                            System.out.println("Transaction Failed");
+                        else if (responseType.equals("7"))
+                            BrokerFunctions.brokerReceiveDataMarket(response);
+                        else if (responseType.equals("91"))
+                            System.out.println("ERROR: Market does not exist!");
+                        else if (responseType.equals("60"))
+                            BrokerFunctions.getMarketList(response);
+                        else
+                            System.out.println(response);
                     }
-                    else if (responseType.equals("3"))
-                        System.out.println("Transaction Failed");
-                    else if (responseType.equals("7"))
-                        BrokerFunctions.brokerReceiveDataMarket(response);
-                    else
-                        System.out.println(response);
                 }
             } while (!echoString.equals("exit"));
 

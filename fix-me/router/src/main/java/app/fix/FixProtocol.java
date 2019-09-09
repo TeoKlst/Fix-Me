@@ -1,5 +1,6 @@
 package app.fix;
 
+import app.Server;
 import app.fix.exceptions.InvalidChecksumException;
 import app.fix.exceptions.InvalidMsgLengthException;
 import app.fix.exceptions.InvalidMsgTypeException;
@@ -155,6 +156,34 @@ public class FixProtocol {
        
 
         String header = constructHeader(body.toString(), "A"); //Logon = "A"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    // ListMarkets Return Message Builder
+    public String           ListMarketReturn() {
+        StringBuilder body = new StringBuilder();
+
+        body.append("553=" + this.userID + "|");
+
+        body.append("600=" + Server.mapHBMarket.keySet() + "|");
+
+        String header = constructHeader(body.toString(), "60"); //ListMarkets = "60"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    // Error Non-Existent Market
+    public String           NullMarket() {
+        StringBuilder body = new StringBuilder();
+
+        body.append("553=" + this.userID + "|");
+
+        String header = constructHeader(body.toString(), "91"); //Non-Existent Market = "91"
 
         String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 
@@ -394,6 +423,23 @@ public class FixProtocol {
 	   }
     	return msgType;
    }
+
+   public String		    getHBType(String messageInput) throws InvalidMsgTypeException {
+    String msgType = null;
+    if (!messageInput.contains("|560=")) {
+        throw new InvalidMsgTypeException("Invalid  Heart Beat");
+    }
+    String[] message = messageInput.split("\\|");
+    for (int i=0; i < message.length; i++) {
+       if (message[i].startsWith("560=")) {
+           msgType =message[i].substring(4);
+       }
+   }
+   if (msgType == null) {
+       throw new InvalidMsgTypeException("Invalid Heart Beat");
+   }
+    return msgType;
+}
    
    
    

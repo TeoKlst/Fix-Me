@@ -32,29 +32,39 @@ public class MarketFunctions {
         String[] message = value.split("\\|");
         int itemID = 0;
         int purchaseAmount = 0;
+        int brokerRouteID = 0;
         // TODO Check if market has enough money to send to broker
         int purchasePrice = 0;
 
-        for (int i=0; i < message.length; i++) {
-            if (message[i].startsWith("100=")) {
-                itemID = Integer.parseInt(message[i].substring(4));
+        try {
+            for (int i=0; i < message.length; i++) {
+                if (message[i].startsWith("100=")) {
+                    itemID = Integer.parseInt(message[i].substring(4));
+                }
+                if (message[i].startsWith("101=")) {
+                    purchaseAmount = Integer.parseInt(message[i].substring(4));
+                }
+                if (message[i].startsWith("102=")) {
+                    purchasePrice = Integer.parseInt(message[i].substring(4));
+                }
+                if (message[i].startsWith("554=")) {
+                    brokerRouteID = Integer.parseInt(message[i].substring(4));
+                }
             }
-            if (message[i].startsWith("101=")) {
-                purchaseAmount = Integer.parseInt(message[i].substring(4));
-            }
-            if (message[i].startsWith("102=")) {
-                purchasePrice = Integer.parseInt(message[i].substring(4));
-            }
+            if (itemID > 5 || itemID < 0)
+                checkPass = false;
+            else if (purchaseAmount > getMarketItemAmount(itemID) || purchaseAmount < 0)
+                checkPass = false;
+            if (checkPass)
+                return ret = brokerPurchaseExecuted(value);
+            else
+                return ret = brokerPurchaseRejected(value);
+        } catch (NumberFormatException e) {
+            String rejectMessage = Market.fixProtocol.receiveMessage(value);
+            rejectMessage = Market.fixProtocol.RejectMessageNumFormat(-1, 11, "Invalid Numeric Input Type", brokerRouteID);
+            ret = rejectMessage;
         }
-
-        if (itemID > 5 || itemID < 0)
-            checkPass = false;
-        else if (purchaseAmount > getMarketItemAmount(itemID) || purchaseAmount < 0)
-            checkPass = false;
-        if (checkPass)
-            return ret = brokerPurchaseExecuted(value);
-        else
-            return ret = brokerPurchaseRejected(value);
+        return ret;
     }
 
     public static String brokerPurchaseExecuted(String value) {
@@ -119,26 +129,37 @@ public class MarketFunctions {
         String[] message = value.split("\\|");
         int itemID = 0;
         int salePrice = 0;
+        int brokerRouteID = 0;
 
-        for (int i=0; i < message.length; i++) {
-            if (message[i].startsWith("100=")) {
-                itemID = Integer.parseInt(message[i].substring(4));
+        try {
+            for (int i=0; i < message.length; i++) {
+                if (message[i].startsWith("100=")) {
+                    itemID = Integer.parseInt(message[i].substring(4));
+                }
+                if (message[i].startsWith("102=")) {
+                    salePrice = Integer.parseInt(message[i].substring(4));
+                }
+                if (message[i].startsWith("554=")) {
+                    brokerRouteID = Integer.parseInt(message[i].substring(4));
+                }
             }
-            if (message[i].startsWith("102=")) {
-                salePrice = Integer.parseInt(message[i].substring(4));
-            }
+
+            int marketCapital = MarketAccount.capital;
+
+            if (salePrice > marketCapital)
+                checkPass = false;
+            else if (itemID > 5 || itemID < 0)
+                checkPass = false;
+            if (checkPass)
+                return ret = brokerSaleExecuted(value);
+            else
+                return ret = brokerSaleRejected(value);
+        } catch (NumberFormatException e) {
+            String rejectMessage = Market.fixProtocol.receiveMessage(value);
+            rejectMessage = Market.fixProtocol.RejectMessageNumFormat(-1, 11, "Invalid Numeric Input Type", brokerRouteID);
+            ret = rejectMessage;
         }
-
-        int marketCapital = MarketAccount.capital;
-
-        if (salePrice > marketCapital)
-            checkPass = false;
-        else if (itemID > 5 || itemID < 0)
-            checkPass = false;
-        if (checkPass)
-            return ret = brokerSaleExecuted(value);
-        else
-            return ret = brokerSaleRejected(value);
+        return ret;
     }
 
     public static String  brokerSaleExecuted(String value) {
