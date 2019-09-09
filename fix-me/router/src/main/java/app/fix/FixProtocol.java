@@ -171,7 +171,7 @@ public class FixProtocol {
                String[] message = messageInput.split("\\|");
                for (int i=0; i < message.length; i++) {
                   if (message[i].startsWith("554=")) {
-                      msgType =message[i].substring(3);
+                      msgType =message[i].substring(4);
                   }
               }
               if (msgType == null) {
