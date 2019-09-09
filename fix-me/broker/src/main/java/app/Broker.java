@@ -93,6 +93,9 @@ class Broker {
                     String brokerRouteID = Integer.toString(BrokerAccount.brokerRouteID);
                     fixMessage = fixProtocol.MarketQuery(marketID, brokerRouteID);
                     dOut.println(fixMessage);
+                } else if (echoString.equals("logon")) {
+                    fixMessage = fixProtocol.logonMessage(120);
+                    dOut.println(fixMessage);
                 }
                 else {
                     dOut.println(fixProtocol.DefaultNoType(BrokerAccount.brokerRouteID));
