@@ -263,7 +263,7 @@ public class FixProtocol {
     }
 
     //Encryption|UserID|Heartbeat|resetSeqNum
-    public String           heartBeatMessage() {
+    public String           heartBeatMessage(int marketRouteID) {
         StringBuilder body = new StringBuilder();
 
         /* 
@@ -275,6 +275,8 @@ public class FixProtocol {
          * The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
          */
         body.append("553=" + this.userID + "|");
+
+        body.append("554=" + marketRouteID + "|");
 
         body.append("560=" + "2" + "|"); //HB Type = 2 Market
 

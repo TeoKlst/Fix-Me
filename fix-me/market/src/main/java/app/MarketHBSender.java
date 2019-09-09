@@ -18,7 +18,7 @@ public class MarketHBSender extends Thread {
 
             while (true) {
                 Thread.sleep(3000);
-                dOut.println("HBM" + "-" + MarketAccount.marketRouteID);
+                dOut.println(Market.fixProtocol.heartBeatMessage(MarketAccount.marketRouteID));
                 }
         } catch (IOException e) {
             System.out.println("Oops, MarketHeartBeat Send Error: " + e.getMessage());
