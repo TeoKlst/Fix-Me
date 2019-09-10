@@ -1,5 +1,7 @@
 package app;
 
+import app.fix.FixProtocol;
+
 public class MarketFunctions {
 
     public static void assignRouteServiceID(String value) {
@@ -27,28 +29,66 @@ public class MarketFunctions {
         Boolean checkPass = true;
         String ret;
 
-        String[] parts = value.split("-");
-        int marketID = Integer.parseInt(parts[1]);
-        int itemID = Integer.parseInt(parts[2]);
-        int purchaseAmount = Integer.parseInt(parts[3]);
-        int purchasePrice = Integer.parseInt(parts[4]);
+        String[] message = value.split("\\|");
+        int itemID = 0;
+        int purchaseAmount = 0;
+        int brokerRouteID = 0;
+        // TODO Check if market has enough money to send to broker
+        int purchasePrice = 0;
 
-        if (itemID > 5 || itemID < 0)
-            checkPass = false;
-        else if (purchaseAmount > getMarketItemAmount(itemID) || purchaseAmount < 0)
-            checkPass = false;
-        if (checkPass)
-            return ret = brokerPurchaseExecuted(value);
-        else
-            return ret = brokerPurchaseRejected(value);
+        try {
+            for (int i=0; i < message.length; i++) {
+                if (message[i].startsWith("100=")) {
+                    itemID = Integer.parseInt(message[i].substring(4));
+                }
+                if (message[i].startsWith("101=")) {
+                    purchaseAmount = Integer.parseInt(message[i].substring(4));
+                }
+                if (message[i].startsWith("102=")) {
+                    purchasePrice = Integer.parseInt(message[i].substring(4));
+                }
+                if (message[i].startsWith("554=")) {
+                    brokerRouteID = Integer.parseInt(message[i].substring(4));
+                }
+            }
+            if (itemID > 5 || itemID < 0)
+                checkPass = false;
+            else if (purchaseAmount > getMarketItemAmount(itemID) || purchaseAmount < 0)
+                checkPass = false;
+            if (checkPass)
+                return ret = brokerPurchaseExecuted(value);
+            else
+                return ret = brokerPurchaseRejected(value);
+        } catch (NumberFormatException e) {
+            String rejectMessage = Market.fixProtocol.receiveMessage(value);
+            rejectMessage = Market.fixProtocol.RejectMessageNumFormat(-1, 11, "Invalid Numeric Input Type", brokerRouteID);
+            ret = rejectMessage;
+        }
+        return ret;
     }
 
     public static String brokerPurchaseExecuted(String value) {
-        String[] parts = value.split("-");
-        int itemID = Integer.parseInt(parts[2]);
-        int purchaseAmount = Integer.parseInt(parts[3]);
-        int purchasePrice = Integer.parseInt(parts[4]);
-        String brokerID = parts[5];
+
+        String[] message = value.split("\\|");
+        int itemID = 0;
+        int purchaseAmount = 0;
+        int purchasePrice = 0;
+        String brokerID = "";
+
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("100=")) {
+                itemID = Integer.parseInt(message[i].substring(4));
+            }
+            if (message[i].startsWith("101=")) {
+                purchaseAmount = Integer.parseInt(message[i].substring(4));
+            }
+            if (message[i].startsWith("102=")) {
+                purchasePrice = Integer.parseInt(message[i].substring(4));
+            }
+            if (message[i].startsWith("554=")) {
+                brokerID = message[i].substring(4);
+            }
+        }
 
         if (itemID == 1)
             MarketAccount.silver -= purchaseAmount;
@@ -63,15 +103,22 @@ public class MarketFunctions {
 
         MarketAccount.capital += purchasePrice;
 
-        String ret = "4" + "-" + brokerID + "-" + "1";
+        String ret = Market.fixProtocol.PurchaseMessageSuccess(brokerID, "1");
         return ret;
     }
 
 
     public static String brokerPurchaseRejected(String value) {
-        String[] parts = value.split("-");
-        String brokerID = parts[5];
-        String ret = "5" + "-" + brokerID;
+        String[] message = value.split("\\|");
+        String brokerID = "";
+
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("554=")) {
+                brokerID = message[i].substring(4);
+            }
+        }
+
+        String ret = Market.fixProtocol.PurchaseMessageFail(brokerID);
         return ret;
     }
 
@@ -79,61 +126,108 @@ public class MarketFunctions {
         Boolean checkPass = true;
         String ret;
 
-        String[] parts = value.split("-");
-        int marketID = Integer.parseInt(parts[1]);
-        int itemID = Integer.parseInt(parts[2]);
-        int sellAmount = Integer.parseInt(parts[3]);
-        int sellPrice = Integer.parseInt(parts[4]);
-        int marketCapital = MarketAccount.capital;
+        String[] message = value.split("\\|");
+        int itemID = 0;
+        int salePrice = 0;
+        int brokerRouteID = 0;
 
-        if (sellPrice > marketCapital)
-            checkPass = false;
-        else if (itemID > 5 || itemID < 0)
-            checkPass = false;
-        if (checkPass)
-            return ret = brokerSaleExecuted(value);
-        else
-            return ret = brokerSaleRejected(value);
+        try {
+            for (int i=0; i < message.length; i++) {
+                if (message[i].startsWith("100=")) {
+                    itemID = Integer.parseInt(message[i].substring(4));
+                }
+                if (message[i].startsWith("102=")) {
+                    salePrice = Integer.parseInt(message[i].substring(4));
+                }
+                if (message[i].startsWith("554=")) {
+                    brokerRouteID = Integer.parseInt(message[i].substring(4));
+                }
+            }
+
+            int marketCapital = MarketAccount.capital;
+
+            if (salePrice > marketCapital)
+                checkPass = false;
+            else if (itemID > 5 || itemID < 0)
+                checkPass = false;
+            if (checkPass)
+                return ret = brokerSaleExecuted(value);
+            else
+                return ret = brokerSaleRejected(value);
+        } catch (NumberFormatException e) {
+            String rejectMessage = Market.fixProtocol.receiveMessage(value);
+            rejectMessage = Market.fixProtocol.RejectMessageNumFormat(-1, 11, "Invalid Numeric Input Type", brokerRouteID);
+            ret = rejectMessage;
+        }
+        return ret;
     }
 
     public static String  brokerSaleExecuted(String value) {
-        String[] parts = value.split("-");
-        int itemID = Integer.parseInt(parts[2]);
-        int sellAmount = Integer.parseInt(parts[3]);
-        int sellPrice = Integer.parseInt(parts[4]);
-        String brokerID = parts[5];
+        String[] message = value.split("\\|");
+        int itemID = 0;
+        int saleAmount = 0;
+        int salePrice = 0;
+        String brokerID = "";
+
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("100=")) {
+                itemID = Integer.parseInt(message[i].substring(4));
+            }
+            if (message[i].startsWith("101=")) {
+                saleAmount = Integer.parseInt(message[i].substring(4));
+            }
+            if (message[i].startsWith("102=")) {
+                salePrice = Integer.parseInt(message[i].substring(4));
+            }
+            if (message[i].startsWith("554=")) {
+                brokerID = message[i].substring(4);
+            }
+        }
 
         if (itemID == 1)
-            MarketAccount.silver += sellAmount;
+            MarketAccount.silver += saleAmount;
         else if (itemID == 2)
-            MarketAccount.gold += sellAmount;
+            MarketAccount.gold += saleAmount;
         else if (itemID == 3)
-            MarketAccount.platinum += sellAmount;
+            MarketAccount.platinum += saleAmount;
         else if (itemID == 4)
-            MarketAccount.fuel += sellAmount;
+            MarketAccount.fuel += saleAmount;
         else if (itemID == 5)
-            MarketAccount.bitcoin += sellAmount;
+            MarketAccount.bitcoin += saleAmount;
 
-        MarketAccount.capital -= sellPrice;
+        MarketAccount.capital -= salePrice;
         
-        String ret = "4" + "-" + brokerID + "-" + "2";
+        String ret = Market.fixProtocol.SaleMessageSuccess(brokerID, "2");
         return ret;
     }
 
     public static String brokerSaleRejected(String value) {
-        String[] parts = value.split("-");
-        String brokerID = parts[5];
-        String ret = "5" + "-" + brokerID;
+        String[] message = value.split("\\|");
+        String brokerID = "";
+
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("554=")) {
+                brokerID = message[i].substring(4);
+            }
+        }
+
+        String ret = Market.fixProtocol.SaleMessageFail(brokerID);
         return ret;
     }
 
     public static String marketQuery(String value) {
-        String[] parts = value.split("-");
-        int brokerID = Integer.parseInt(parts[2]);
+        String[] message = value.split("\\|");
+        String brokerID = "";
 
-        String ret = "7" + "-" + MarketAccount.marketRouteID  + "-" + brokerID +
-        "-" + MarketAccount.silver + "-" + MarketAccount.gold + "-" + MarketAccount.platinum +
-        "-" + MarketAccount.fuel + "-" + MarketAccount.bitcoin + "-" + MarketAccount.capital;
+        for (int i=0; i < message.length; i++) {
+            if (message[i].startsWith("554=")) {
+                brokerID = message[i].substring(4);
+            }
+        }
+
+        String ret = Market.fixProtocol.MarketQueryReturn(brokerID, MarketAccount.marketRouteID, 
+                        MarketAccount.silver, MarketAccount.gold, MarketAccount.platinum, 
+                        MarketAccount.fuel, MarketAccount.bitcoin, MarketAccount.capital);
         return ret;
     }
     
