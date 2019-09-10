@@ -10,7 +10,7 @@ import java.net.Socket;
 import java.util.Scanner;
 
 class Broker {
-    private static FixProtocol fixProtocol;
+    public static FixProtocol fixProtocol;
 
     public static void main(String[] args) throws Exception {
         try (Socket socket = new Socket("127.0.0.1", 5000)) {
@@ -19,8 +19,8 @@ class Broker {
             fixProtocol = new FixProtocol(Integer.toString(BrokerAccount.brokerServiceID));
 
             //-Starts Broker HeartBeat
-            // BrokerHBSender brokerHBSender = new BrokerHBSender(socket);
-            // brokerHBSender.start();
+            BrokerHBSender brokerHBSender = new BrokerHBSender(socket);
+            brokerHBSender.start();
 
             BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter dOut = new PrintWriter(socket.getOutputStream(), true);

@@ -18,7 +18,7 @@ public class BrokerHBSender extends Thread {
 
             while (true) {
                 Thread.sleep(3000);
-                dOut.println("HBB" + "-" + BrokerAccount.brokerRouteID);
+                dOut.println(Broker.fixProtocol.heartBeatMessage(BrokerAccount.brokerRouteID));
                 }
         } catch (IOException e) {
             System.out.println("Oops, BrokerHeartBeat Send Error: " + e.getMessage());
