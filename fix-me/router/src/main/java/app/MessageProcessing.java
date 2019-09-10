@@ -52,9 +52,35 @@ public class MessageProcessing extends Thread {
             while (true) {
                 String echoString = input.readLine();
                 try {
-                    String sql = "INSERT INTO fixmessages (Message) " +
-                                "VALUES ('" + echoString + "')";
-                    stmt.executeUpdate(sql);
+                    String type = fixProtocol.getMsgType(echoString);
+                    String userId = fixProtocol.getUserID(echoString);
+                    String sequenceNum = fixProtocol.getSequenceNum(echoString)
+                    switch(type){
+                        case "0":   //heartbeat
+                        case "5":   //logout
+                        case "A":   //logon
+                        case "404": //error
+                            String sql = "INSERT INTO fixmessages (Message, Response) " +
+                                        "VALUES ('" + echoString + "', 'NRR')";
+                            stmt.executeUpdate(sql);
+                            break;
+                        case "3":   //reject
+                        case "4":   //sale/purchase failure
+                        case "7":   //list market goods
+                        case "AK":  //sale - purchase success
+                        case "N":   //list markets
+                        case "W":   //markets data response
+                        case "Y":   //markets data reject
+                            String sql = "UPDATE fixmessages " +
+                                        "SET Response = " + echoString + " " +
+                                        "WHERE Message LIKE '%|34=" + userID + "%' AND Message LIKE '%|553=" + sequenceNum + "%'"
+                            stmt.executeUpdate(sql);
+                            break;
+                        default:
+                            String sql = "INSERT INTO fixmessages (Message) " +
+                                        "VALUES ('" + echoString + "')";
+                            stmt.executeUpdate(sql);
+                    }
                 } catch(Exception e) {
                     e.printStackTrace();
                 }
