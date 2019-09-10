@@ -83,6 +83,8 @@ public class MessageProcessing extends Thread {
                 */
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
+                output.println("Received message: " + echoString);
+
                 String rejectMessage = fixProtocol.receiveMessage(echoString);
                 if (rejectMessage != null) {
                     //Send rejectMessage
@@ -94,18 +96,19 @@ public class MessageProcessing extends Thread {
                 try {
                     String type = fixProtocol.getMsgType(echoString);
                     if (type.equals("A") || type.equals("5") || type.equals("0")) {
+                        output.println("Message for Router");
                         //Message for router
-                        if (fixProtocol.getHBType(echoString) == "1") {
+                        if (fixProtocol.getHBType(echoString).equals("1")) {
                             Socket brokerPort = Server.mapBroker.get("0");
                             output = new PrintWriter(brokerPort.getOutputStream(), true);
                             output.println(echoString);
                         }
-                        if (fixProtocol.getHBType(echoString) == "2") {
+                        String test = fixProtocol.getHBType(echoString);
+                        if (fixProtocol.getHBType(echoString).equals("2")) {
                             Socket marketPort = Server.mapMarket.get("0");
                             output = new PrintWriter(marketPort.getOutputStream(), true);
                             output.println(echoString);
                         }
-                        System.out.println("Message for Router");
                     } 
                     else if (type.equals("1") || type.equals("2") || type.equals("3") || type.equals("AK") || type.equals("D")
                             || type.equals("6") || type.equals("7") || type.equals("60") || type.equals("4")) {

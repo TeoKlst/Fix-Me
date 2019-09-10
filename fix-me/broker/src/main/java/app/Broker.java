@@ -1,7 +1,6 @@
 package app;
 
 import app.fix.FixProtocol;
-import app.fix.exceptions.InvalidMsgTypeException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -92,6 +91,9 @@ class Broker {
                     String marketID = scanner.nextLine().toLowerCase();
                     String brokerRouteID = Integer.toString(BrokerAccount.brokerRouteID);
                     fixMessage = fixProtocol.MarketQuery(marketID, brokerRouteID);
+                    dOut.println(fixMessage);
+                } else if (echoString.equals("logon")) {
+                    fixMessage = fixProtocol.logonMessage(120);
                     dOut.println(fixMessage);
                 }
                 else {
