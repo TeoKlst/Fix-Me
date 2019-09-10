@@ -30,6 +30,7 @@ public class HBScannerBroker extends Thread {
                 String[] echoStringParts = echoString.split("-");
                 if (echoStringParts[0].equals("HBB")) {
                     Server.mapHBBroker.put(echoStringParts[1], seconds);
+                    System.out.println("HBBroker Map=>" + Server.mapHBBroker);
                 }
             }
         } catch(IOException e) {

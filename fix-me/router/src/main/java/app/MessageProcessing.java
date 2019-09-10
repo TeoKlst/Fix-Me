@@ -67,18 +67,16 @@ public class MessageProcessing extends Thread {
                     if (type.equals("A") || type.equals("5") || type.equals("0")) {
                         output.println("Message for Router");
                         //Message for router
-                        if (type.equals("0")) {
-                            //Heartbeat Message
-                            if (fixProtocol.getHBType(echoString) == "1") {
-                                Socket brokerPort = Server.mapBroker.get("0");
-                                output = new PrintWriter(brokerPort.getOutputStream(), true);
-                                output.println(echoString);
-                            }
-                            if (fixProtocol.getHBType(echoString) == "2") {
-                                Socket marketPort = Server.mapMarket.get("0");
-                                output = new PrintWriter(marketPort.getOutputStream(), true);
-                                output.println(echoString);
-                            }
+                        if (fixProtocol.getHBType(echoString).equals("1")) {
+                            Socket brokerPort = Server.mapBroker.get("0");
+                            output = new PrintWriter(brokerPort.getOutputStream(), true);
+                            output.println(echoString);
+                        }
+                        String test = fixProtocol.getHBType(echoString);
+                        if (fixProtocol.getHBType(echoString).equals("2")) {
+                            Socket marketPort = Server.mapMarket.get("0");
+                            output = new PrintWriter(marketPort.getOutputStream(), true);
+                            output.println(echoString);
                         }
                     } 
                     else if (type.equals("1") || type.equals("2") || type.equals("3") || type.equals("AK") || type.equals("D")
