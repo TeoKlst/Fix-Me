@@ -465,7 +465,8 @@ public class FixProtocol {
    }
 
    public String		    getMsgType(String messageInput) throws InvalidMsgTypeException {
-		String msgType = null;
+        String msgType = null;
+        System.out.println(messageInput);
 		if (!messageInput.contains("|35=")) {
 			throw new InvalidMsgTypeException("Invalid Message Type");
 		}
@@ -480,56 +481,4 @@ public class FixProtocol {
 	   }
     	return msgType;
    }
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-    //Encryption|Heartbeat|resetSeqNum|UserID|              INCORRECT DO NOT USE
-//    public String       orderMessage(HashMap<String, String> object) {
-//        // https://www.onixs.biz/fix-dictionary/4.4/msgType_D_68.html
-//        StringBuilder body = new StringBuilder();
-//
-//        //Message encryption scheme. "0" = NONE+OTHER (encryption is not used)
-//        body.append("98=0|");
-//
-//        //Heartbeat interval in seconds.
-//        if (object.containsKey("heartbeat")) {
-//            body.append("108=" + object.get("heartbeat") + "|");
-//        } else {
-//            body.append("108=" + "120" + "|");
-//        }
-//
-//        /*
-//         * Each FIX message has a unique sequence number (MsgSecNum (34) tag) - https://kb.b2bits.com/display/B2BITS/Sequence+number+handling
-//         * Sequence numbers are initialized at the start of the FIX session starting at 1 (one) and increment through the session
-//         *
-//         * All sides of FIX session should have sequence numbers reset.
-//         * Valid value is "Y" = Yes (reset)
-//         */
-//        if (object.containsKey("resetSeqNum") && object.get("resetSeqNum").equals("true")) {
-//            body.append("141=Y|");
-//            this.msgSeqNum = 0;
-//        } else {
-//            body.append("141=N|");
-//        }
-//
-//        /*
-//         * The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
-//         */
-//        body.append("553=" + this.userID + "|");
-//
-//        String header = constructHeader(body.toString(), "A"); //Logon = "A"
-//
-//        String message = header + body.toString() + checksumGenerator(header + body.toString()) + "|";
-//
-//        System.out.println("Message : " + message);
-//
-//        return message;
-//    }
 }

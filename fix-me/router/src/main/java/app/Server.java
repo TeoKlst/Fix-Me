@@ -98,7 +98,6 @@ public class Server {
     class MarketSocket implements Runnable {
         private ServerSocket socketM;
 
-
 	    MarketSocket(ServerSocket sM) { socketM = sM; }
 
         public void run() {
@@ -143,7 +142,6 @@ public class Server {
     
     public static void main(String[] args)
     {
-
         int portA = 5000;
         int portB = 5001;
 

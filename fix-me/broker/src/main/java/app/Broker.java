@@ -100,6 +100,7 @@ class Broker {
                     if (!echoString.equals("listg") && !echoString.equals("list goods")
                         && !echoString.equals("error_1") && !echoString.equals("error_2")) {
                         response = dIn.readLine();
+                        Thread.sleep(1000);
                         String responseType = fixProtocol.getMsgType(response);
                         if (responseType.equals("AK")) {
                             if (fixProtocol.getTransactionState(response).equals("1")) {
