@@ -537,8 +537,8 @@ public class FixProtocol {
            // //Text
            // body.append("58=" + marketsList + "|");
    
-           String header = constructHeader(body.toString(), "N"); //List status request (list markets) - Single = "M"
-   
+           String header = constructHeader(body.toString(), "V"); //Market Data Request - Single = "V"
+              
            String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
    
            return message;

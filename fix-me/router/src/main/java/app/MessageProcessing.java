@@ -52,20 +52,22 @@ public class MessageProcessing extends Thread {
                 */
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-                output.println("Received message: " + echoString);
+                if (!fixProtocol.getMsgType(echoString).equals("0"))  {
+                    System.out.println("Received message: " + echoString);
+                }
 
                 String rejectMessage = fixProtocol.receiveMessage(echoString);
                 if (rejectMessage != null) {
                     //Send rejectMessage
                     Socket brokerPort = Server.mapBroker.get(fixProtocol.getRouteID(echoString));
                     output = new PrintWriter(brokerPort.getOutputStream(), true);
-                    output.println("Reject message: " + rejectMessage);
+                    System.out.println("Reject message: " + rejectMessage);
                     return;
                 }
                 try {
                     String type = fixProtocol.getMsgType(echoString);
                     if (type.equals("A") || type.equals("5") || type.equals("0")) {
-                        output.println("Message for Router");
+                        // output.println("Message for Router");
                         //Message for router
                         if (fixProtocol.getHBType(echoString).equals("1")) {
                             Socket brokerPort = Server.mapBroker.get("0");
@@ -125,7 +127,7 @@ public class MessageProcessing extends Thread {
                     //Send reject message
                     Socket brokerPort = Server.mapBroker.get(fixProtocol.getRouteID(echoString));
                     output = new PrintWriter(brokerPort.getOutputStream(), true);
-                    output.println("Reject message: " + rejectMessage);
+                    System.out.println("Reject message: " + rejectMessage);
                 }
             }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////            

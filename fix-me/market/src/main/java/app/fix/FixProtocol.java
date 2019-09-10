@@ -363,21 +363,22 @@ public class FixProtocol {
        }
     
        public String		    getMsgType(String messageInput) throws InvalidMsgTypeException {
+            // System.out.println("Message contains |35=: " + messageInput.contains("|35="));
             String msgType = null;
-            if (!messageInput.contains("|35=")) {
+            if (messageInput == null || !messageInput.contains("|35=")) {
                 throw new InvalidMsgTypeException("Invalid Message Type");
             }
             String[] message = messageInput.split("\\|");
             for (int i=0; i < message.length; i++) {
-               if (message[i].startsWith("35=")) {
-                   msgType =message[i].substring(3);
-               }
-           }
-           if (msgType == null) {
-               throw new InvalidMsgTypeException("Invalid Message Type");
-           }
+            if (message[i].startsWith("35=")) {
+                msgType =message[i].substring(3);
+            }
+        }
+        if (msgType == null) {
+            throw new InvalidMsgTypeException("Invalid Message Type");
+        }
             return msgType;
-       }
+    }
        
        public String       buyOrderMessage(String marketID, String itemID, String purchaseAmount,
                                                     String purchasePrice, String brokerRouteID) {
@@ -621,7 +622,7 @@ public class FixProtocol {
             // //Text
             // body.append("58=" + marketsList + "|");
     
-            String header = constructHeader(body.toString(), "N"); //List status request (list markets) - Single = "M"
+            String header = constructHeader(body.toString(), "V"); //Market Data Request - Single = "V"
     
             String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
     
