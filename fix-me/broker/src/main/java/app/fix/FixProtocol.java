@@ -466,7 +466,6 @@ public class FixProtocol {
 
    public String		    getMsgType(String messageInput) throws InvalidMsgTypeException {
         String msgType = null;
-        System.out.println(messageInput);
 		if (!messageInput.contains("|35=")) {
 			throw new InvalidMsgTypeException("Invalid Message Type");
 		}

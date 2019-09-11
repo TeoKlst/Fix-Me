@@ -1,7 +1,6 @@
 package app;
 
 import app.fix.FixProtocol;
-import app.fix.exceptions.InvalidMsgTypeException;
 
 import java.io.PrintWriter;
 import java.io.IOException;
