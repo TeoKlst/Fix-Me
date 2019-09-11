@@ -15,10 +15,8 @@ class Broker {
     public static void main(String[] args) throws Exception {
         try (Socket socket = new Socket("127.0.0.1", 5000)) {
 
-            // Initialize protocol
             fixProtocol = new FixProtocol(Integer.toString(BrokerAccount.brokerServiceID));
 
-            //-Starts Broker HeartBeat
             BrokerHBSender brokerHBSender = new BrokerHBSender(socket);
             brokerHBSender.start();
 
@@ -126,7 +124,7 @@ class Broker {
                 }
             } while (!echoString.equals("exit"));
 
-            // brokerHBSender.interrupt();
+            brokerHBSender.interrupt();
             scanner.close();
             System.out.println("Connection Closed");
 

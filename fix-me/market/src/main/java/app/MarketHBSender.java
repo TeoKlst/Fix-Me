@@ -24,7 +24,6 @@ public class MarketHBSender extends Thread {
             System.out.println("Oops, MarketHeartBeat Send Error: " + e.getMessage());
         } catch (InterruptedException te) {
             System.out.println("Market HeartBeat Stopped");
-            // System.out.println("Oops, BrokerHeartBeat ThreadSleep Error: " + te.getMessage());
         } finally {
             try {
                 socket.close();

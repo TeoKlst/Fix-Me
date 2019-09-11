@@ -49,7 +49,7 @@ class Market {
                 dOut.println(response);   
             } while (!echoString.equals("exit"));
 
-            // marketHBSender.interrupt();
+            marketHBSender.interrupt();
 
         } catch(IOException e) {
             System.out.println("Market Error: " + e.getMessage());
