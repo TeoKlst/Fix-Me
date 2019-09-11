@@ -40,7 +40,7 @@ public class FixProtocol {
 		// only got here if we didn't return false
 		return true;
     }
-    
+
     public String           checksumGenerator(String messageInput) {
         //Replace | with the ascii value of 1 (a non-printable character) to ensure the correct byte size
         String message = messageInput.replace('|', '\u0001');
@@ -59,7 +59,7 @@ public class FixProtocol {
 
         return checksumStr;
     }
-    
+
     public boolean          checksumValidator(String input) throws InvalidChecksumException {
         // Reference: https://gigi.nullneuron.net/gigilabs/calculating-the-checksum-of-a-fix-message/
         //Separates the checksum from the message
@@ -71,7 +71,7 @@ public class FixProtocol {
         }
         //Add the pipe back to the first string to end the input
         values[0] += '|';
-        
+
         String checksumStr = checksumGenerator(values[0]);
 
         if (!checksumStr.equals(values[1].substring(0,3))) {
@@ -116,7 +116,7 @@ public class FixProtocol {
     public String           logonMessage(int heartbeat) {
         StringBuilder body = new StringBuilder();
 
-        /* 
+        /*
          * Define a message encryption scheme. Valid value is "0" = NONE+OTHER (encryption is not used)
          */
         body.append("98=0|");
@@ -130,10 +130,10 @@ public class FixProtocol {
          * Heartbeat interval in seconds.
          * The Heartbeat monitors the status of the communication link and identifies when the last of a string of messages was not received.
          * When either end of the FIX connection has not sent any data for HeartBtInt seconds, it will transmit a Heartbeat message.
-         * 
+         *
          * Value is set in the 'config.properties' file (client side) as 'SERVER.POLLING.INTERVAL'
          * 30 seconds is default interval value. If HeartBtInt is set to 0 no heartbeat message is required.
-         * 
+         *
          */
         if (heartbeat > 0) {
             body.append("108=" + heartbeat + "|");
@@ -144,14 +144,14 @@ public class FixProtocol {
         /*
          * Each FIX message has a unique sequence number (MsgSecNum (34) tag) - https://kb.b2bits.com/display/B2BITS/Sequence+number+handling
          * Sequence numbers are initialized at the start of the FIX session starting at 1 (one) and increment through the session
-         * 
+         *
          * All sides of FIX session should have sequence numbers reset.
          * Valid value is "Y" = Yes (reset)
-         * 
+         *
          */
         body.append("141=Y|");
         this.msgSeqNum = 0;
-       
+
 
         String header = constructHeader(body.toString(), "A"); //Logon = "A"
 
@@ -221,7 +221,7 @@ public class FixProtocol {
 
         return message;
     }
-    
+
     // Sale Message Builder
     public String           SaleMessage(String marketID, String itemID, String saleAmount,
                                         String salePrice, String brokerRouteID) {
@@ -297,7 +297,7 @@ public class FixProtocol {
 	public String           logoutMessage() {
         StringBuilder body = new StringBuilder();
 
-        /* 
+        /*
          * Define a message encryption scheme. Valid value is "0" = NONE+OTHER (encryption is not used)
          */
         body.append("98=0|");
@@ -318,7 +318,7 @@ public class FixProtocol {
     public String           heartBeatMessage(int brokerRouteID) {
         StringBuilder body = new StringBuilder();
 
-        /* 
+        /*
          * Define a message encryption scheme. Valid value is "0" = NONE+OTHER (encryption is not used)
          */
         body.append("98=0|");
@@ -344,7 +344,7 @@ public class FixProtocol {
     public String           RejectMessage(int refSeqNum, int sessionRejectReason, String text) {
         StringBuilder body = new StringBuilder();
 
-        /* 
+        /*
          * Define a message encryption scheme. Valid value is "0" = NONE+OTHER (encryption is not used)
          */
         body.append("98=0|");
@@ -410,7 +410,7 @@ public class FixProtocol {
 
         return header.toString();
     }
-   
+
    public int               validateMessage(String fixMessage) {
     	try {
             checksumValidator(fixMessage);
@@ -480,4 +480,199 @@ public class FixProtocol {
 	   }
     	return msgType;
    }
+
+   public String       buyOrderMessage(String marketID, String itemID, String purchaseAmount,
+                                                String purchasePrice, String brokerRouteID) {
+        StringBuilder body = new StringBuilder();
+
+        //Encryption
+        body.append("98=0|");
+
+        //UserID
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|"); //Need to remove this one somehow, only one ID
+
+        //Side <54> = 1 to buy
+        body.append("54=1|");
+
+        //Instrument -> Product<460> -> Type of product
+        body.append("100=" + itemID + "|"); //To fix
+
+        body.append("101=" + purchaseAmount + "|"); //Quantity<53>
+
+        body.append("44=" + purchasePrice + "|"); //Price<44>
+
+        body.append("49=" + marketID + "|");//SenderCompID <49>
+
+        String header = constructHeader(body.toString(), "D"); //New Order - Single = "D"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+   }
+
+    // Sale Message Builder
+    public String           sellOrderMessage(String marketID, String itemID, String purchaseAmount,
+                String purchasePrice, String brokerRouteID) {
+
+        // itemID, Sell_Price, Sell_Amount, MarketID.
+        StringBuilder body = new StringBuilder();
+
+         //Encryption
+         body.append("98=0|");
+
+         //UserID
+         body.append("553=" + this.userID + "|");
+
+         body.append("554=" + brokerRouteID + "|"); //Need to remove this one somehow, only one ID
+
+         //Side <54> = 2 to sell
+         body.append("54=2|");
+
+         //Instrument -> Product<460> -> Type of product
+         body.append("100=" + itemID + "|"); //To fix
+
+         body.append("101=" + purchaseAmount + "|"); //Quantity<53>
+
+         body.append("44=" + purchasePrice + "|"); //Price<44>
+
+         body.append("49=" + marketID + "|");//SenderCompID <49>
+
+        String header = constructHeader(body.toString(), "D"); //New Order - Single = "D"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    //List Markets (List status request)
+    //<Header MsgType=M>|Encryption|UserID|<TAIL>
+    //ListID<66>?
+    public String           listMarketsRequest(String brokerRouteID) {
+        // itemID, Sell_Price, Sell_Amount, MarketID.
+        StringBuilder body = new StringBuilder();
+
+        //Encryption
+        body.append("98=0|");
+
+        //UserID
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|"); //Need to remove this one somehow, only one ID
+
+        String header = constructHeader(body.toString(), "M"); //List status request (list markets) - Single = "M"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    //list markets (ListStatus<N> -> Answer)
+    //<Header MsgType=N>Encryption|Text<58>|Tail|
+    //ListID<66>?
+    public String           listMarketsResponse(String marketsList) {
+        // itemID, Sell_Price, Sell_Amount, MarketID.
+        StringBuilder body = new StringBuilder();
+
+        //Encryption
+        body.append("98=0|");
+
+        //Text
+        body.append("58=" + marketsList + "|");
+
+        String header = constructHeader(body.toString(), "N"); //List status request (list markets) - Single = "M"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    //list market goods
+    //Market Data Request (From broker)
+    // https://www.btobits.com/fixopaedia/fixdic44/message_Market_Data_Request_V_.html
+    // <Header MsgTyp=Y>|Encryption|UserID|MDReqID<262>|SenderCompId<49>|Tail
+    // MDReqID -> unique request ID
+    //Could have instrument? Not sure how
+    public String           marketsDataRequest(String brokerRouteID, String marketDataReqID, String marketID) {
+        // itemID, Sell_Price, Sell_Amount, MarketID.
+        StringBuilder body = new StringBuilder();
+
+        //Encryption
+        body.append("98=0|");
+
+        //UserID
+        body.append("553=" + this.userID + "|");
+
+        body.append("554=" + brokerRouteID + "|"); //Need to remove this one somehow, only one ID
+
+        //MarketDataReq ID
+        body.append("262=" + marketDataReqID + "|");
+
+        //MarketID
+        body.append("49=" + marketID + "|");//SenderCompID <49>
+        // //Text
+        // body.append("58=" + marketsList + "|");
+
+        String header = constructHeader(body.toString(), "N"); //List status request (list markets) - Single = "M"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    //Market Data Request Snapshot/Full Refresh (FromMarket)
+    // https://www.btobits.com/fixopaedia/fixdic44/message_Market_Data_Snapshot_Full_Refresh_W_.html
+    // <Header MsgTyp=W>|Encryption|UserID|MDReqID<262>|Text<58>|SenderCompID|Tail
+    public String           marketsDataResponse(String brokerID, String marketDataReqID, String marketData) {
+
+        // itemID, Sell_Price, Sell_Amount, MarketID.
+        StringBuilder body = new StringBuilder();
+
+         //Encryption
+         body.append("98=0|");
+
+         //UserID (who the market is sending to)
+         body.append("553=" + brokerID + "|");
+
+         //MarketDataReq ID
+        body.append("262=" + marketDataReqID + "|");
+
+        //Text
+        body.append("58=" + marketData + "|");
+
+        body.append("49=" + this.userID + "|");//SenderCompID <49>
+
+        String header = constructHeader(body.toString(), "W"); //Market Data Request Snapshot/Full Refresh = "W"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
+
+    //Market Data Request Reject (From Market)
+    // https://www.btobits.com/fixopaedia/fixdic44/message_Market_Data_Request_Reject_Y_.html
+    // <Header MsgTyp=Y>|UserID|MDReqID<262>|SenderCompID|Tail
+    public String           marketsDataReject(String brokerID, String marketDataReqID, String marketData) {
+
+        // itemID, Sell_Price, Sell_Amount, MarketID.
+        StringBuilder body = new StringBuilder();
+
+         //Encryption
+         body.append("98=0|");
+
+         //UserID (who the market is sending to)
+         body.append("553=" + brokerID + "|");
+
+         //MarketDataReq ID
+        body.append("262=" + marketDataReqID + "|");
+
+        body.append("49=" + this.userID + "|");//SenderCompID <49>
+
+        String header = constructHeader(body.toString(), "Y"); //Market Data Request Snapshot/Full Refresh = "Y"
+
+        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+        return message;
+    }
 }
