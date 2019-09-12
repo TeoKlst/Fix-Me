@@ -73,7 +73,11 @@ public class FixProtocol {
 				if (msgSqnNum < 1) {
 					msgSqnNum = 1;
 				}
-				rejectMessage = RejectMessage(msgSqnNum, 99, "InvalidCheckSum");
+				try {
+					rejectMessage = RejectMessage(msgSqnNum, 99, getMsgSeqNum(messageInput),"InvalidCheckSum");
+				} catch (InvalidMsgTypeException e) {
+					e.printStackTrace();
+				}
 			} else if (ret == -2) {
 				int msgSqnNum = -1;																								//Reject through the msgLength - first get the msgSequence number
 				String[] message = messageInput.split("\\|");
@@ -85,7 +89,11 @@ public class FixProtocol {
 				if (msgSqnNum < 1) {
 					msgSqnNum = 1;
 				}
-				rejectMessage = RejectMessage(msgSqnNum, 99, "InvalidMsgLength");
+				try {
+					rejectMessage = RejectMessage(msgSqnNum, 99, getMsgSeqNum(messageInput),"InvalidMsgLength");
+				} catch (InvalidMsgTypeException e) {
+					e.printStackTrace();
+				}
 			} else if (ret == 1) {
 				return null;																									//Message valid
 			}
@@ -170,7 +178,7 @@ public class FixProtocol {
 
 			message.append("35=" + type + "|");																					//Message type. Always unencrypted, must be the third field in message.
 
-			// this.msgSeqNum++;																									//Message Sequence Number. Starts at 1
+			// this.msgSeqNum++;																								//Message Sequence Number. Starts at 1
 			// message.append("34=" + this.msgSeqNum + "|");
 			message.append("34=" + msgSeqNumber + "|");
 
@@ -209,7 +217,7 @@ public class FixProtocol {
 		   this.msgSeqNum = 0;																									//Sequence numbers are initialized at the start of the FIX session starting at 1 (one) and increment through the session
 		  
 		   this.msgSeqNum++;																									//Message Sequence Number. Starts at 1
-		   String header = constructHeader(body.toString(), "A", this.msgSeqNum); 																//Logon = "A"
+		   String header = constructHeader(body.toString(), "A", this.msgSeqNum); 												//Logon = "A"
    
 		   String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
    
@@ -226,7 +234,7 @@ public class FixProtocol {
 			body.append("553=" + this.userID + "|");																			//The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
 
 			this.msgSeqNum++;																									//Message Sequence Number. Starts at 1
-			String header = constructHeader(body.toString(), "5", this.msgSeqNum); 																//Logout = "5"
+			String header = constructHeader(body.toString(), "5", this.msgSeqNum); 												//Logout = "5"
 
 			String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 
@@ -243,7 +251,7 @@ public class FixProtocol {
 			body.append("553=" + this.userID + "|");																			//The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
 
 			this.msgSeqNum++;
-			String header = constructHeader(body.toString(), "0", this.msgSeqNum); 																//Heartbeat = "0"
+			String header = constructHeader(body.toString(), "0", this.msgSeqNum); 												//Heartbeat = "0"
 
 			String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 
@@ -262,7 +270,7 @@ public class FixProtocol {
 			body.append("560=" + "2" + "|"); 																					//HB Type = 2 Market
 	
 			this.msgSeqNum++;
-			String header = constructHeader(body.toString(), "0", this.msgSeqNum); 																//Heartbeat = "0"
+			String header = constructHeader(body.toString(), "0", this.msgSeqNum); 												//Heartbeat = "0"
 	
 			String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 
@@ -291,7 +299,7 @@ public class FixProtocol {
 			body.append("49=" + marketID + "|");																				//SenderCompID <49>
 
 			this.msgSeqNum++;
-			String header = constructHeader(body.toString(), "D", this.msgSeqNum); 																//New Order - Single = "D"
+			String header = constructHeader(body.toString(), "D", this.msgSeqNum); 												//New Order - Single = "D"
 
 			String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 
@@ -331,7 +339,7 @@ public class FixProtocol {
 	
 			body.append("655=" + confirmationType + "|"); 																		//confirmationType Purchase Success Type - 1
 	
-			String header = constructHeader(body.toString(), "AK", refSeqNum); 															//Confirmation = "AK"
+			String header = constructHeader(body.toString(), "AK", refSeqNum); 													//Confirmation = "AK"
 	
 			String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 	
@@ -345,7 +353,7 @@ public class FixProtocol {
 	
 			body.append("554=" + brokerRouteID + "|");
 	
-			String header = constructHeader(body.toString(), "4", refSeqNum); 																//Reject = "4"
+			String header = constructHeader(body.toString(), "4", refSeqNum); 													//Reject = "4"
 	
 			String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 	
@@ -357,31 +365,31 @@ public class FixProtocol {
 		public String			sellOrderMessage(String marketID, String itemID, String purchaseAmount,
 													String purchasePrice, String brokerRouteID) {
 
-		StringBuilder body = new StringBuilder();
+			StringBuilder body = new StringBuilder();
 
-		body.append("98=0|");																									//Encryption
+			body.append("98=0|");																									//Encryption
 
-		body.append("553=" + this.userID + "|");																				//UserID
+			body.append("553=" + this.userID + "|");																				//UserID
 
-		body.append("554=" + brokerRouteID + "|"); 																				//Need to remove this one somehow, only one ID
+			body.append("554=" + brokerRouteID + "|"); 																				//Need to remove this one somehow, only one ID
 
-		body.append("54=2|");																									//Side <54> = 2 to sell
+			body.append("54=2|");																									//Side <54> = 2 to sell
 
-		body.append("100=" + itemID + "|"); 																					//Instrument -> Product<460> -> Type of product
+			body.append("100=" + itemID + "|"); 																					//Instrument -> Product<460> -> Type of product
 
-		body.append("101=" + purchaseAmount + "|"); 																			//Quantity<53>
+			body.append("101=" + purchaseAmount + "|"); 																			//Quantity<53>
 
-		body.append("44=" + purchasePrice + "|"); 																				//Price<44>
+			body.append("44=" + purchasePrice + "|"); 																				//Price<44>
 
-		body.append("49=" + marketID + "|");																					//SenderCompID <49>
+			body.append("49=" + marketID + "|");																					//SenderCompID <49>
 
-		this.msgSeqNum++;
-		String header = constructHeader(body.toString(), "D", this.msgSeqNum); 																	//New Order - Single = "D"
+			this.msgSeqNum++;
+			String header = constructHeader(body.toString(), "D", this.msgSeqNum); 													//New Order - Single = "D"
 
-		String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+			String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 
-		return message;
-	}
+			return message;
+		}
 
 		public String			SaleMessage(String marketID, String itemID, String purchaseAmount,
 			String purchasePrice, String brokerRouteID) {
@@ -499,7 +507,7 @@ public class FixProtocol {
 			String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 
 			return message;
-	}
+		}
 	
 		public String			marketsDataResponse(String brokerID, int refSeqNum, String marketDataReqID, String marketData) {
 			// <Header MsgTyp=W>|Encryption|UserID|MDReqID<262>|Text<58>|SenderCompID|Tail										Market Data Request Snapshot/Full Refresh (FromMarket)   https://www.btobits.com/fixopaedia/fixdic44/message_Market_Data_Snapshot_Full_Refresh_W_.html
@@ -708,32 +716,32 @@ public class FixProtocol {
 			}
 			String[] message = messageInput.split("\\|");
 			for (int i=0; i < message.length; i++) {
-			if (message[i].startsWith("554=")) {
-				msgType =message[i].substring(4);
+				if (message[i].startsWith("554=")) {
+					msgType =message[i].substring(4);
+				}
 			}
-		}
-		if (msgType == null) {
-			throw new InvalidMsgTypeException("Invalid Message Type");
-		}
+			if (msgType == null || !isNumeric(msgType) || !isInteger(msgType)) {
+				throw new InvalidMsgTypeException("Invalid Message Type");
+			}
 			return msgType;
 		}
 
 		public int			getMsgSeqNum(String messageInput) throws InvalidMsgTypeException {
-		// 	String msgType = null;
-		// 	if (!messageInput.contains("|554=")) {
-		// 		// TODO To be able to distinguish if message is required to check for broker or market routeID and give appropriate error return
-		// 		throw new InvalidMsgTypeException("Invalid RouteID (Broker/Market) Type");
-		// 	}
-		// 	String[] message = messageInput.split("\\|");
-		// 	for (int i=0; i < message.length; i++) {
-		// 	if (message[i].startsWith("554=")) {
-		// 		msgType =message[i].substring(4);
-		// 	}
-		// }
-		// if (msgType == null) {
-		// 	throw new InvalidMsgTypeException("Invalid Message Type");
-		// }
-		// 	return msgType;
+			String msgSeqNum = null;
+			if (!messageInput.contains("|34=")) {
+				// TODO To be able to distinguish if message is required to check for broker or market routeID and give appropriate error return
+				throw new InvalidMsgTypeException("Invalid Message Sequence Number");
+			}
+			String[] message = messageInput.split("\\|");
+			for (int i=0; i < message.length; i++) {
+				if (message[i].startsWith("34=")) {
+					msgSeqNum =message[i].substring(3);
+				}
+			}
+			if (msgSeqNum == null || !isNumeric(msgSeqNum) || !isInteger(msgSeqNum)) {
+				throw new InvalidMsgTypeException("Invalid Message Sequence Number");
+			}
+			return Integer.parseInt(msgSeqNum);
 		}
 
 }
