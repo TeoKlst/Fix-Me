@@ -684,47 +684,4 @@ public class FixProtocol {
             return message;
         }
 
-
-    //Encryption|UserID|RefSeqNum|sessionRejectReason|Text
-    public String           RejectMessageNumFormat(int refSeqNum, int sessionRejectReason, String text, int brokerRouteID) {
-        StringBuilder body = new StringBuilder();
-
-        /* 
-            * Define a message encryption scheme. Valid value is "0" = NONE+OTHER (encryption is not used)
-            */
-        body.append("98=0|");
-
-        /*
-            * The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
-            */
-        body.append("553=" + this.userID + "|");
-
-        body.append("554=" + brokerRouteID + "|");
-
-        /*
-            * Reference to the Message Sequence Number that was rejected
-            */
-        body.append("45=" + refSeqNum + "|");
-
-        /*
-            * Setting the sessionRejectionReason value, as well as adding text to explain further
-            */
-        if ((sessionRejectReason >= 0 && sessionRejectReason <= 17)) {
-            body.append("373=" + sessionRejectReason + "|");
-        } else if (sessionRejectReason == 99) {
-            body.append("373=" + sessionRejectReason + "|");
-        } else {
-            System.out.println("Invalid rejection value entered.");
-            return null;
-        }
-        if (text != null && !text.isEmpty()) {
-            body.append("58=" + text + "|");
-        }
-
-        String header = constructHeader(body.toString(), "3"); //Reject = "3"
-
-        String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
-
-        return message;
-    }
 }
