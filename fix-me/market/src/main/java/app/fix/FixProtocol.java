@@ -370,15 +370,15 @@ public class FixProtocol {
             }
             String[] message = messageInput.split("\\|");
             for (int i=0; i < message.length; i++) {
-            if (message[i].startsWith("35=")) {
-                msgType =message[i].substring(3);
+                if (message[i].startsWith("35=")) {
+                    msgType =message[i].substring(3);
+                }
             }
+            if (msgType == null) {
+                throw new InvalidMsgTypeException("Invalid Message Type");
+            }
+                return msgType;
         }
-        if (msgType == null) {
-            throw new InvalidMsgTypeException("Invalid Message Type");
-        }
-            return msgType;
-    }
        
        public String       buyOrderMessage(String marketID, String itemID, String purchaseAmount,
                                                     String purchasePrice, String brokerRouteID) {
