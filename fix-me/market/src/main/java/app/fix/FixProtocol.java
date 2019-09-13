@@ -537,13 +537,11 @@ public class FixProtocol {
 			
 			body.append("553=" + brokerID + "|");																				//UserID (who the market is sending to)
 			
-			// body.append("45=" + refSeqNum + "|");																			//Reference to the Message Sequence Number that was rejected
-
 			body.append("262=" + marketDataReqID + "|");																		//MarketDataReq ID
 
 			body.append("49=" + this.userID + "|");																				//SenderCompID <49>
 
-			String header = constructHeader(body.toString(), "Y", refSeqNum); 													//Market Data Request Snapshot/Full Refresh = "Y"
+			String header = constructHeader(body.toString(), "Y", refSeqNum); 													//Market Data Request Snapshot/Full Refresh = "Y"				//Reference to the Message Sequence Number that was rejected
 
 			String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 
