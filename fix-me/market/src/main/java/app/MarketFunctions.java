@@ -33,8 +33,6 @@ public class MarketFunctions {
         int itemID = 0;
         int purchaseAmount = 0;
         int brokerRouteID = 0;
-        // TODO Check if market has enough money to send to broker
-        int purchasePrice = 0;
 
         try {
             for (int i=0; i < message.length; i++) {
@@ -43,9 +41,6 @@ public class MarketFunctions {
                 }
                 if (message[i].startsWith("101=")) {
                     purchaseAmount = Integer.parseInt(message[i].substring(4));
-                }
-                if (message[i].startsWith("102=")) {
-                    purchasePrice = Integer.parseInt(message[i].substring(4));
                 }
                 if (message[i].startsWith("554=")) {
                     brokerRouteID = Integer.parseInt(message[i].substring(4));

@@ -58,7 +58,6 @@ public class MessageProcessing extends Thread {
                             output = new PrintWriter(brokerPort.getOutputStream(), true);
                             output.println(echoString);
                         }
-                        String test = fixProtocol.getHBType(echoString);
                         if (fixProtocol.getHBType(echoString).equals("2")) {
                             Socket marketPort = Server.mapMarket.get("0");
                             output = new PrintWriter(marketPort.getOutputStream(), true);
@@ -77,7 +76,8 @@ public class MessageProcessing extends Thread {
                                 e.printStackTrace();
                             }
                         }
-                        if (type.equals("AK") || type.equals("3") || type.equals("7")) {
+                        if (type.equals("AK") || type.equals("3") || type.equals("7") || type.equals("4")) {
+                            // TODO Fix Null get(fixProtocol.getRouteID(echoString)
                             Socket brokerPort = Server.mapBroker.get(fixProtocol.getRouteID(echoString));
                             output = new PrintWriter(brokerPort.getOutputStream(), true);
                             output.println(echoString);

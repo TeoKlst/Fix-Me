@@ -35,7 +35,7 @@ class Market {
                 echoString = dIn.readLine();
 
                 System.out.println(echoString);
-
+                // Thread.sleep(500);
                 msgType = fixProtocol.getMsgType(echoString);
 
                 if (msgType.equals("1"))
