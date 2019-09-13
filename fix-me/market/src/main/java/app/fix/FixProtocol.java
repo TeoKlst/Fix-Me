@@ -646,6 +646,7 @@ public class FixProtocol {
 
 	//Getters
 		public String			getMsgType(String messageInput) throws InvalidMsgTypeException {
+			System.out.println("GetmsgType: " + messageInput);
 			String msgType = null;
 			if (messageInput == null || !messageInput.contains("|35=")) {
 				throw new InvalidMsgTypeException("Invalid Message Type");
@@ -714,7 +715,7 @@ public class FixProtocol {
 			return msgType;
 		}
 
-		public int			getMsgSeqNum(String messageInput) throws InvalidMsgTypeException {
+		public int				getMsgSeqNum(String messageInput) throws InvalidMsgTypeException {
 			String msgSeqNum = null;
 			if (!messageInput.contains("|34=")) {
 				// TODO To be able to distinguish if message is required to check for broker or market routeID and give appropriate error return
