@@ -1,7 +1,6 @@
 package app;
 
 import app.fix.FixProtocol;
-import app.fix.exceptions.InvalidMsgTypeException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,8 +14,8 @@ class Market {
     public static void main(String[] args) throws Exception {
         try (Socket socket = new Socket("127.0.0.1", 5001)) {
             //-Starts Market HeartBeat
-            // MarketHBSender marketHBSender = new MarketHBSender(socket);
-            // marketHBSender.start();
+            MarketHBSender marketHBSender = new MarketHBSender(socket);
+            marketHBSender.start();
 
             BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter dOut = new PrintWriter(socket.getOutputStream(), true);
@@ -50,7 +49,7 @@ class Market {
                 dOut.println(response);   
             } while (!echoString.equals("exit"));
 
-            // marketHBSender.interrupt();
+            marketHBSender.interrupt();
 
         } catch(IOException e) {
             System.out.println("Market Error: " + e.getMessage());
