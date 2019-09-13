@@ -195,32 +195,32 @@ public class FixProtocol {
 
 	//Session Related Message Generation
 		public String			logonMessage(int heartbeat) {
-		   //Encryption|UserID|Heartbeat|resetSeqNum|
+			//Encryption|UserID|Heartbeat|resetSeqNum|
 
-		   StringBuilder body = new StringBuilder();
-   
-		   body.append("98=0|");																								//Define a message encryption scheme. Valid value is "0" = NONE+OTHER (encryption is not used)
-   
-		   body.append("553=" + this.userID + "|");																				//The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
-   
-		   
-		   if (heartbeat > 0) {																									//Heartbeat interval in seconds.
-			   body.append("108=" + heartbeat + "|");
-		   } else {
-			   body.append("108=" + "120" + "|");
-		   }
+			StringBuilder body = new StringBuilder();
 
-		   //TODO
-		   //To be taken out
-		   body.append("141=Y|");																								//Each FIX message has a unique sequence number (MsgSeqNum (34) tag) - https://kb.b2bits.com/display/B2BITS/Sequence+number+handling
-		   this.msgSeqNum = 0;																									//Sequence numbers are initialized at the start of the FIX session starting at 1 (one) and increment through the session
-		  
-		   this.msgSeqNum++;																									//Message Sequence Number. Starts at 1
-		   String header = constructHeader(body.toString(), "A", this.msgSeqNum); 												//Logon = "A"
-   
-		   String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
-   
-		   return message;
+			body.append("98=0|");																								//Define a message encryption scheme. Valid value is "0" = NONE+OTHER (encryption is not used)
+
+			body.append("553=" + this.userID + "|");																			//The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
+
+			
+			if (heartbeat > 0) {																								//Heartbeat interval in seconds.
+				body.append("108=" + heartbeat + "|");
+			} else {
+				body.append("108=" + "120" + "|");
+			}
+
+			//TODO
+			//To be taken out
+			body.append("141=Y|");																								//Each FIX message has a unique sequence number (MsgSeqNum (34) tag) - https://kb.b2bits.com/display/B2BITS/Sequence+number+handling
+			this.msgSeqNum = 0;																									//Sequence numbers are initialized at the start of the FIX session starting at 1 (one) and increment through the session
+			
+			this.msgSeqNum++;																									//Message Sequence Number. Starts at 1
+			String header = constructHeader(body.toString(), "A", this.msgSeqNum); 												//Logon = "A"
+
+			String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
+
+			return message;
 	   }
 
 		public String			logoutMessage() {
@@ -488,7 +488,7 @@ public class FixProtocol {
 			body.append("554=" + brokerRouteID + "|");
 
 			this.msgSeqNum++;
-			String header = constructHeader(body.toString(), "60", this.msgSeqNum); //ListMarkets = "60"
+			String header = constructHeader(body.toString(), "60", this.msgSeqNum);												//ListMarkets = "60"
 
 			String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 
@@ -529,7 +529,7 @@ public class FixProtocol {
 			body.append("103=" + marketID + "|");
 
 			this.msgSeqNum++;
-			String header = constructHeader(body.toString(), "6", this.msgSeqNum); //MarketQuery = "6"
+			String header = constructHeader(body.toString(), "6", this.msgSeqNum); 												//MarketQuery = "6"
 
 			String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 
@@ -590,13 +590,11 @@ public class FixProtocol {
 
 			body.append("554=" + brokerRouteID + "|");
 			
-			// body.append("45=" + refSeqNum + "|");																			//Reference to the Message Sequence Number that was rejected
-
 			body.append("103=" + marketID + "|");
 
 			body.append("104=" + silver + "," + gold + "," + platinum + "," + fuel + "," + bitcoin + "," + capital + "|");
 
-			String header = constructHeader(body.toString(), "7", refSeqNum); 													//MarketQueryReturn = "6"
+			String header = constructHeader(body.toString(), "7", refSeqNum); 													//MarketQueryReturn = "6"   //Reference to the Message Sequence Number that was rejected
 
 			String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 
@@ -611,11 +609,8 @@ public class FixProtocol {
 
 			body.append("98=0|");																								//Define a message encryption scheme. Valid value is "0" = NONE+OTHER (encryption is not used)
 
-			// body.append("553=" + this.userID + "|");																			//The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
 			body.append("553=" + brokerRouteID + "|");																			//The numeric User ID. - User is linked to SenderCompID (#49) value (the user's organisation)
 			
-			// body.append("45=" + refSeqNum + "|");																			//Reference to the Message Sequence Number that was rejected
-
 			if ((sessionRejectReason >= 0 && sessionRejectReason <= 17)) {														//Setting the sessionRejectionReason value, as well as adding text to explain further
 				body.append("373=" + sessionRejectReason + "|");
 			} else if (sessionRejectReason == 99) {
@@ -639,10 +634,7 @@ public class FixProtocol {
 			// Error Non-Existent Market
 			StringBuilder body = new StringBuilder();
 	
-			// body.append("553=" + this.userID + "|");
 			body.append("553=" + brokerRouteID + "|");
-
-			// body.append("45=" + refSeqNum + "|");	
 
 			String header = constructHeader(body.toString(), "91", refSeqNum); 													//Non-Existent Market = "91"
 	
@@ -662,9 +654,7 @@ public class FixProtocol {
 
 			body.append("554=" + brokerRouteID + "|");
 
-			// body.append("45=" + refSeqNum + "|");																			//Reference to the Message Sequence Number that was rejected
-			
-			if ((sessionRejectReason >= 0 && sessionRejectReason <= 17)) {														//Setting the sessionRejectionReason value, as well as adding text to explain further
+			if ((sessionRejectReason >= 0 && sessionRejectReason <= 17)) {														//Setting the sessionRejectionReason value, as well as adding text to explain further			//Reference to the Message Sequence Number that was rejected
 				body.append("373=" + sessionRejectReason + "|");
 			} else if (sessionRejectReason == 99) {
 				body.append("373=" + sessionRejectReason + "|");
@@ -691,7 +681,7 @@ public class FixProtocol {
 			body.append("554=" + brokerRouteID + "|");
 	
 			this.msgSeqNum++;
-			String header = constructHeader(body.toString(), "404", this.msgSeqNum); //Default = "404"
+			String header = constructHeader(body.toString(), "404", this.msgSeqNum); 											//Default = "404"
 	
 			String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 	
