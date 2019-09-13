@@ -24,7 +24,6 @@ public class BrokerHBSender extends Thread {
             System.out.println("Oops, BrokerHeartBeat Send Error: " + e.getMessage());
         } catch (InterruptedException te) {
             System.out.println("Broker HeartBeat Stopped");
-            // System.out.println("Oops, BrokerHeartBeat ThreadSleep Error: " + te.getMessage());
         } finally {
             try {
                 socket.close();

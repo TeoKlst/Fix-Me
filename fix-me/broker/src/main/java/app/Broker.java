@@ -15,10 +15,8 @@ class Broker {
     public static void main(String[] args) throws Exception {
         try (Socket socket = new Socket("127.0.0.1", 5000)) {
 
-            // Initialize protocol
             fixProtocol = new FixProtocol(Integer.toString(BrokerAccount.brokerServiceID));
 
-            //-Starts Broker HeartBeat
             BrokerHBSender brokerHBSender = new BrokerHBSender(socket);
             brokerHBSender.start();
 
@@ -103,6 +101,7 @@ class Broker {
                     if (!echoString.equals("listg") && !echoString.equals("list goods")
                         && !echoString.equals("error_1") && !echoString.equals("error_2")) {
                         response = dIn.readLine();
+                        Thread.sleep(1000);
                         String responseType = fixProtocol.getMsgType(response);
                         if (responseType.equals("AK")) {
                             if (fixProtocol.getTransactionState(response).equals("1")) {
@@ -128,7 +127,7 @@ class Broker {
                 }
             } while (!echoString.equals("exit"));
 
-            // brokerHBSender.interrupt();
+            brokerHBSender.interrupt();
             scanner.close();
             System.out.println("Connection Closed");
 

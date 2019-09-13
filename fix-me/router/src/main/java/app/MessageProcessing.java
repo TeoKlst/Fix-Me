@@ -16,7 +16,6 @@ public class MessageProcessing extends Thread {
         this.socket = socket;
     }
 
-    // ERROR
     private static FixProtocol fixProtocol = new FixProtocol(Integer.toString(1));
 
     @Override
@@ -28,7 +27,6 @@ public class MessageProcessing extends Thread {
             while (true) {
                 String echoString = input.readLine();
                 if (echoString == null) {
-                //- ⬆ echoString == null Break; Helps Prevent null pointer exception when Broker or Market close unexpectedly
                     break;
                 }
 
@@ -36,22 +34,8 @@ public class MessageProcessing extends Thread {
                     break;
                 }
 
-                /*
-                //Transfers HB to broker server
-                else if (echoStringParts[0].equals("HBB")) {
-                    Socket hbPort = Server.mapBroker.get("0");
-                    output = new PrintWriter(hbPort.getOutputStream(), true);
-                    output.println(echoString);
-                }
-                //Transfers HB to market server
-                else if (echoStringParts[0].equals("HBM")) {
-                    Socket mbPort = Server.mapMarket.get("0");
-                    output = new PrintWriter(mbPort.getOutputStream(), true);
-                    output.println(echoString);
-                }
-                */
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
+                //TODO
+                //Delete or mute
                 if (!fixProtocol.getMsgType(echoString).equals("0"))  {
                     System.out.println("Received message: " + echoString);
                 }
@@ -142,8 +126,7 @@ public class MessageProcessing extends Thread {
                     output = new PrintWriter(brokerPort.getOutputStream(), true);
                     System.out.println("Reject message: " + rejectMessage);
                 }
-            }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////            
+            }         
         } catch(IOException | InvalidMsgTypeException e) {
             System.out.println("Oops: " + e.getMessage());
         } finally {
