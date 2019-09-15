@@ -1,8 +1,9 @@
-package test.app; 
+package test;
 
-import org.junit.Test; 
+import junit.framework.TestCase;
+import org.junit.Test;
 import org.junit.Before; 
-import org.junit.After; 
+import org.junit.After;
 
 /** 
 * Broker Tester. 
@@ -11,7 +12,7 @@ import org.junit.After;
 * @since <pre>Sep 11, 2019</pre> 
 * @version 1.0 
 */ 
-public class BrokerTest { 
+public class BrokerTest extends TestCase {
 
 @Before
 public void before() throws Exception { 
@@ -27,7 +28,8 @@ public void after() throws Exception {
 * 
 */ 
 @Test
-public void testMain() throws Exception { 
+public void testMain() throws Exception {
+
 //TODO: Test goes here... 
 } 
 

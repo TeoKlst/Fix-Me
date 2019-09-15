@@ -17,8 +17,8 @@
   </dependencies>
   <modules>
     <module>broker</module>
-    <module>router</module>
-    <module>market</module>
+<!--    <module>router</module>-->
+<!--    <module>market</module>-->
   </modules>
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
