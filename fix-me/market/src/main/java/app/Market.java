@@ -34,19 +34,18 @@ class Market {
                 msgType = null;
                 echoString = dIn.readLine();
 
-                System.out.println(echoString);
-                // Thread.sleep(500);
-                msgType = fixProtocol.getMsgType(echoString);
-
-                if (msgType.equals("1"))
-                    response = MarketFunctions.brokerPurchaseCheck(echoString);
-                else if (msgType.equals("2"))
-                    response = MarketFunctions.brokerSaleCheck(echoString);
-                else if (msgType.equals("6"))
-                    response = MarketFunctions.marketQuery(echoString);
-                else
-                    response = "Market Command Error";
-                dOut.println(response);   
+                if (!echoString.equals(null)) {
+                    msgType = fixProtocol.getMsgType(echoString);
+                    if (msgType.equals("1"))
+                        response = MarketFunctions.brokerPurchaseCheck(echoString);
+                    else if (msgType.equals("2"))
+                        response = MarketFunctions.brokerSaleCheck(echoString);
+                    else if (msgType.equals("6"))
+                        response = MarketFunctions.marketQuery(echoString);
+                    else
+                        response = "Market Command Error";
+                    dOut.println(response);
+                }
             } while (!echoString.equals("exit"));
 
             marketHBSender.interrupt();

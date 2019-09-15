@@ -35,7 +35,9 @@ class Broker {
             do {
                 String fixMessage = null;
 
+                // socket.setSoTimeout(1000);
                 System.out.println("Buy, Sell, List Markets or Display your goods:");
+                // Thread.sleep(1000);
                 echoString = scanner.nextLine().toLowerCase();
 
                 if (echoString.equals("buy")) {
@@ -101,30 +103,34 @@ class Broker {
                     if (!echoString.equals("listg") && !echoString.equals("list goods")
                         && !echoString.equals("error_1") && !echoString.equals("error_2")) {
                         response = dIn.readLine();
+
                         // TODO Fix Null Response
-                        if (response == null) {}
+                        if (!response.equals(null)) {
                         // Thread.sleep(1000);
-                        String responseType = fixProtocol.getMsgType(response);
-                        if (responseType.equals("AK")) {
-                            if (fixProtocol.getTransactionState(response).equals("1")) {
-                                BrokerFunctions.brokerBuySuccess(fixMessage);
-                                System.out.println("Purchase Successful");
+                            String responseType = fixProtocol.getMsgType(response);
+                            if (responseType.equals("AK")) {
+                                if (fixProtocol.getTransactionState(response).equals("1")) {
+                                    BrokerFunctions.brokerBuySuccess(fixMessage);
+                                    System.out.println("Purchase Successful");
+                                }
+                                if (fixProtocol.getTransactionState(response).equals("2")) {
+                                    BrokerFunctions.brokerSellSuccess(fixMessage);
+                                    System.out.println("Sale Successful");
+                                }
                             }
-                            if (fixProtocol.getTransactionState(response).equals("2")) {
-                                BrokerFunctions.brokerSellSuccess(fixMessage);
-                                System.out.println("Sale Successful");
+                            else if (responseType.equals("4"))
+                                System.out.println("Transaction Failed");
+                            else if (responseType.equals("7"))
+                                BrokerFunctions.brokerReceiveDataMarket(response);
+                            else if (responseType.equals("91"))
+                                System.out.println("ERROR: Market does not exist!");
+                            else if (responseType.equals("60"))
+                                BrokerFunctions.getMarketList(response);
+                            else
+                                System.out.println(response);
                             }
-                        }
-                        else if (responseType.equals("4"))
-                            System.out.println("Transaction Failed");
-                        else if (responseType.equals("7"))
-                            BrokerFunctions.brokerReceiveDataMarket(response);
-                        else if (responseType.equals("91"))
-                            System.out.println("ERROR: Market does not exist!");
-                        else if (responseType.equals("60"))
-                            BrokerFunctions.getMarketList(response);
                         else
-                            System.out.println(response);
+                            System.out.println("Server ERROR => \"Null\"");
                     }
                 }
             } while (!echoString.equals("exit"));
@@ -138,3 +144,11 @@ class Broker {
         }
     }
 }
+/*
+    Message sent == null
+    Broker Receives message
+    message.gettype gets null and breaks!
+    Broker Disconnects
+    Message sent before cant find broker .getBrokerRouteID
+    Fails & Crashes
+*/
