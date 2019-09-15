@@ -19,17 +19,28 @@ public class HBScannerBroker extends Thread {
 
             HBTimeOutBroker hbTimeOutBroker = new HBTimeOutBroker();
             hbTimeOutBroker.start();
-
+            String marketRouteID = null;
+            String hBType = null;
             while (true) {
-                String echoString = dIn.readLine();
+                String dINString = dIn.readLine();
                 Calendar cal = Calendar.getInstance();
                 int seconds = cal.get(Calendar.SECOND);
-                if (echoString == null) {
+                if (dINString == null) {
                     break;
                 }
-                String[] echoStringParts = echoString.split("-");
-                if (echoStringParts[0].equals("HBB")) {
-                    Server.mapHBBroker.put(echoStringParts[1], seconds);
+
+                String[] message = dINString.split("\\|");
+                
+                for (int i=0; i < message.length; i++) {
+                    if (message[i].startsWith("554=")) {
+                        marketRouteID = message[i].substring(4);
+                    }
+                    if (message[i].startsWith("560=")) {
+                        hBType = message[i].substring(4);
+                    }
+                }
+                if ("1".equals(hBType)) {
+                    Server.mapHBBroker.put(marketRouteID, seconds);
                 }
             }
         } catch(IOException e) {

@@ -1,13 +1,13 @@
 package app;
 
+import app.fix.FixProtocol;
+import app.fix.exceptions.InvalidMsgTypeException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-
-import app.fix.FixProtocol;
-import app.fix.exceptions.InvalidMsgTypeException;
 
 public class MessageProcessing extends Thread {
     private Socket socket;
@@ -16,7 +16,6 @@ public class MessageProcessing extends Thread {
         this.socket = socket;
     }
 
-    // ERROR
     private static FixProtocol fixProtocol = new FixProtocol(Integer.toString(1));
 
     @Override
@@ -28,7 +27,6 @@ public class MessageProcessing extends Thread {
             while (true) {
                 String echoString = input.readLine();
                 if (echoString == null) {
-                //- ⬆ echoString == null Break; Helps Prevent null pointer exception when Broker or Market close unexpectedly
                     break;
                 }
 
@@ -36,45 +34,36 @@ public class MessageProcessing extends Thread {
                     break;
                 }
 
-                /*
-                //Transfers HB to broker server
-                else if (echoStringParts[0].equals("HBB")) {
-                    Socket hbPort = Server.mapBroker.get("0");
-                    output = new PrintWriter(hbPort.getOutputStream(), true);
-                    output.println(echoString);
+                //TODO
+                //Delete or mute
+                if (!fixProtocol.getMsgType(echoString).equals("0"))  {
+                    System.out.println("Received message: " + echoString);
                 }
-                //Transfers HB to market server
-                else if (echoStringParts[0].equals("HBM")) {
-                    Socket mbPort = Server.mapMarket.get("0");
-                    output = new PrintWriter(mbPort.getOutputStream(), true);
-                    output.println(echoString);
-                }
-                */
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
                 String rejectMessage = fixProtocol.receiveMessage(echoString);
                 if (rejectMessage != null) {
                     //Send rejectMessage
                     Socket brokerPort = Server.mapBroker.get(fixProtocol.getRouteID(echoString));
                     output = new PrintWriter(brokerPort.getOutputStream(), true);
-                    output.println("Reject message: " + rejectMessage);
+                    System.out.println("Reject message: " + rejectMessage);
                     return;
                 }
                 try {
                     String type = fixProtocol.getMsgType(echoString);
                     if (type.equals("A") || type.equals("5") || type.equals("0")) {
+                        // output.println("Message for Router");
                         //Message for router
-                        if (fixProtocol.getHBType(echoString) == "1") {
+                        if (fixProtocol.getHBType(echoString).equals("1")) {
                             Socket brokerPort = Server.mapBroker.get("0");
                             output = new PrintWriter(brokerPort.getOutputStream(), true);
                             output.println(echoString);
                         }
-                        if (fixProtocol.getHBType(echoString) == "2") {
+                        String test = fixProtocol.getHBType(echoString);
+                        if (fixProtocol.getHBType(echoString).equals("2")) {
                             Socket marketPort = Server.mapMarket.get("0");
                             output = new PrintWriter(marketPort.getOutputStream(), true);
                             output.println(echoString);
                         }
-                        System.out.println("Message for Router");
                     } 
                     else if (type.equals("1") || type.equals("2") || type.equals("3") || type.equals("AK") || type.equals("D")
                             || type.equals("6") || type.equals("7") || type.equals("60") || type.equals("4")) {
@@ -82,7 +71,11 @@ public class MessageProcessing extends Thread {
                         if (type.equals("60")) {
                             Socket brokerPort = Server.mapBroker.get(fixProtocol.getRouteID(echoString));
                             output = new PrintWriter(brokerPort.getOutputStream(), true);
-                            output.println(fixProtocol.ListMarketReturn());
+                            try {
+                                output.println(fixProtocol.ListMarketReturn(fixProtocol.getMsgSeqNum(echoString)));
+                            } catch (InvalidMsgTypeException e) {
+                                e.printStackTrace();
+                            }
                         }
                         if (type.equals("AK") || type.equals("3") || type.equals("7")) {
                             Socket brokerPort = Server.mapBroker.get(fixProtocol.getRouteID(echoString));
@@ -95,7 +88,11 @@ public class MessageProcessing extends Thread {
                             if (marketPort == null) {
                                 Socket brokerPort = Server.mapBroker.get(fixProtocol.getRouteID(echoString));
                                 output = new PrintWriter(brokerPort.getOutputStream(), true);
-                                output.println(fixProtocol.NullMarket());
+								try {
+									output.println(fixProtocol.NullMarket(fixProtocol.getMsgSeqNum(echoString), Integer.parseInt(fixProtocol.getRouteID(echoString))));
+								} catch (InvalidMsgTypeException e) {
+									e.printStackTrace();
+								}
                             }
                             else {
                                 output = new PrintWriter(marketPort.getOutputStream(), true);
@@ -118,14 +115,18 @@ public class MessageProcessing extends Thread {
                     if (msgSqnNum < 1) {
                         msgSqnNum = 1;
                     }
-                    rejectMessage = fixProtocol.RejectMessage(msgSqnNum, 11, "InvalidMsgType");
+                    try {
+						rejectMessage = fixProtocol.RejectMessage(msgSqnNum, 11,fixProtocol.getMsgSeqNum(echoString), "InvalidMsgType");
+					} catch (InvalidMsgTypeException e) {
+                    	e.printStackTrace();
+					}
+
                     //Send reject message
                     Socket brokerPort = Server.mapBroker.get(fixProtocol.getRouteID(echoString));
                     output = new PrintWriter(brokerPort.getOutputStream(), true);
-                    output.println("Reject message: " + rejectMessage);
+                    System.out.println("Reject message: " + rejectMessage);
                 }
-            }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////            
+            }         
         } catch(IOException | InvalidMsgTypeException e) {
             System.out.println("Oops: " + e.getMessage());
         } finally {

@@ -18,13 +18,12 @@ public class BrokerHBSender extends Thread {
 
             while (true) {
                 Thread.sleep(3000);
-                dOut.println("HBB" + "-" + BrokerAccount.brokerRouteID);
+                dOut.println(Broker.fixProtocol.heartBeatMessage(BrokerAccount.brokerRouteID));
                 }
         } catch (IOException e) {
             System.out.println("Oops, BrokerHeartBeat Send Error: " + e.getMessage());
         } catch (InterruptedException te) {
             System.out.println("Broker HeartBeat Stopped");
-            // System.out.println("Oops, BrokerHeartBeat ThreadSleep Error: " + te.getMessage());
         } finally {
             try {
                 socket.close();

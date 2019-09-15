@@ -1,7 +1,6 @@
 package app;
 
 import app.fix.FixProtocol;
-import app.fix.exceptions.InvalidMsgTypeException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,50 +9,51 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 class Market {
-    public static FixProtocol      fixProtocol;
+	public static FixProtocol      fixProtocol;
 
-    public static void main(String[] args) throws Exception {
-        try (Socket socket = new Socket("127.0.0.1", 5001)) {
-            //-Starts Market HeartBeat
-            // MarketHBSender marketHBSender = new MarketHBSender(socket);
-            // marketHBSender.start();
+	public static void main(String[] args) throws Exception {
+		try (Socket socket = new Socket("127.0.0.1", 5001)) {
+			//-Starts Market HeartBeat
+			MarketHBSender marketHBSender = new MarketHBSender(socket);
+			marketHBSender.start();
 
-            BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter dOut = new PrintWriter(socket.getOutputStream(), true);
-            
-            String echoString;
-            String msgType;
-            String response;
+			BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			PrintWriter dOut = new PrintWriter(socket.getOutputStream(), true);
+			
+			String echoString;
+			String msgType;
+			String response;
 
-            String savedServerResponse = dIn.readLine();
-            MarketFunctions.assignRouteServiceID(savedServerResponse);
-            System.out.println("--Market Connected--\n" + 
-            "Market[" + MarketAccount.marketRouteID + "]" + " ServiceID => " + MarketAccount.marketServiceID);
-            fixProtocol = new FixProtocol("" + MarketAccount.marketServiceID);
-            do {
-                response = null;
-                msgType = null;
-                echoString = dIn.readLine();
+			String savedServerResponse = dIn.readLine();
+			MarketFunctions.assignRouteServiceID(savedServerResponse);
+			System.out.println("--Market Connected--\n" + 
+			"Market[" + MarketAccount.marketRouteID + "]" + " ServiceID => " + MarketAccount.marketServiceID);
+			fixProtocol = new FixProtocol("" + MarketAccount.marketServiceID);
+			do {
+				response = null;
+				msgType = null;
+				echoString = dIn.readLine();
 
-                System.out.println(echoString);
+				System.out.println("Test");
+				System.out.println(echoString);
 
-                msgType = fixProtocol.getMsgType(echoString);
+				msgType = fixProtocol.getMsgType(echoString);
 
-                if (msgType.equals("1"))
-                    response = MarketFunctions.brokerPurchaseCheck(echoString);
-                else if (msgType.equals("2"))
-                    response = MarketFunctions.brokerSaleCheck(echoString);
-                else if (msgType.equals("6"))
-                    response = MarketFunctions.marketQuery(echoString);
-                else
-                    response = "Market Command Error";
-                dOut.println(response);   
-            } while (!echoString.equals("exit"));
+				if (msgType.equals("1"))
+					response = MarketFunctions.brokerPurchaseCheck(echoString);
+				else if (msgType.equals("2"))
+					response = MarketFunctions.brokerSaleCheck(echoString);
+				else if (msgType.equals("6"))
+					response = MarketFunctions.marketQuery(echoString);
+				else
+					response = "Market Command Error";
+				dOut.println(response);   
+			} while (!echoString.equals("exit"));
 
-            // marketHBSender.interrupt();
+			marketHBSender.interrupt();
 
-        } catch(IOException e) {
-            System.out.println("Market Error: " + e.getMessage());
-        }
-    }
+		} catch(IOException e) {
+			System.out.println("Market Error: " + e.getMessage());
+		}
+	}
 }

@@ -1,7 +1,6 @@
 package app;
 
 import app.fix.FixProtocol;
-import app.fix.exceptions.InvalidMsgTypeException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,17 +10,15 @@ import java.net.Socket;
 import java.util.Scanner;
 
 class Broker {
-    private static FixProtocol fixProtocol;
+    public static FixProtocol fixProtocol;
 
     public static void main(String[] args) throws Exception {
         try (Socket socket = new Socket("127.0.0.1", 5000)) {
 
-            // Initialize protocol
             fixProtocol = new FixProtocol(Integer.toString(BrokerAccount.brokerServiceID));
 
-            //-Starts Broker HeartBeat
-            // BrokerHBSender brokerHBSender = new BrokerHBSender(socket);
-            // brokerHBSender.start();
+            BrokerHBSender brokerHBSender = new BrokerHBSender(socket);
+            brokerHBSender.start();
 
             BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter dOut = new PrintWriter(socket.getOutputStream(), true);
@@ -93,6 +90,9 @@ class Broker {
                     String brokerRouteID = Integer.toString(BrokerAccount.brokerRouteID);
                     fixMessage = fixProtocol.MarketQuery(marketID, brokerRouteID);
                     dOut.println(fixMessage);
+                } else if (echoString.equals("logon")) {
+                    fixMessage = fixProtocol.logonMessage(120);
+                    dOut.println(fixMessage);
                 }
                 else {
                     dOut.println(fixProtocol.DefaultNoType(BrokerAccount.brokerRouteID));
@@ -101,6 +101,7 @@ class Broker {
                     if (!echoString.equals("listg") && !echoString.equals("list goods")
                         && !echoString.equals("error_1") && !echoString.equals("error_2")) {
                         response = dIn.readLine();
+                        Thread.sleep(1000);
                         String responseType = fixProtocol.getMsgType(response);
                         if (responseType.equals("AK")) {
                             if (fixProtocol.getTransactionState(response).equals("1")) {
@@ -126,7 +127,7 @@ class Broker {
                 }
             } while (!echoString.equals("exit"));
 
-            // brokerHBSender.interrupt();
+            brokerHBSender.interrupt();
             scanner.close();
             System.out.println("Connection Closed");
 
