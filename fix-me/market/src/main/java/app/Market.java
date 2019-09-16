@@ -34,7 +34,7 @@ class Market {
                 msgType = null;
                 echoString = dIn.readLine();
 
-                if (!echoString.equals(null)) {
+                if (echoString != null) {
                     msgType = fixProtocol.getMsgType(echoString);
                     if (msgType.equals("1"))
                         response = MarketFunctions.brokerPurchaseCheck(echoString);
