@@ -136,6 +136,8 @@ class Broker {
                                 }
                                 else {
                                     System.out.println("Server ERROR => \"Null\"");
+                                    // MessageProcessing messageProcessing = new MessageProcessing(socket);
+                                    // messageProcessing.start();
                                 }
                         }
                     }

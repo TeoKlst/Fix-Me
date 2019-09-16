@@ -26,7 +26,7 @@ public class MessageProcessing extends Thread {
 
             while (true) {
                 String echoString = input.readLine();
-                if (echoString == null) {
+                if (echoString.equals(null)) {
                     break;
                 }
 
