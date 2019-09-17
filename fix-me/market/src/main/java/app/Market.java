@@ -10,12 +10,13 @@ import java.net.Socket;
 
 class Market {
     public static FixProtocol      fixProtocol;
+    private static MarketHBSender marketHBSender;
 
     public static void main(String[] args) throws Exception {
         try (Socket socket = new Socket("127.0.0.1", 5001)) {
 
             //-Starts Market HeartBeat
-            MarketHBSender marketHBSender = new MarketHBSender(socket);
+            marketHBSender = new MarketHBSender(socket);
             marketHBSender.start();
 
             BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -35,8 +36,8 @@ class Market {
                 msgType = null;
                 echoString = dIn.readLine();
                 
-                Thread.sleep(1000);
-
+                // Thread.sleep(1000);
+                System.out.println(echoString);
                 if (echoString != null) {
                     msgType = fixProtocol.getMsgType(echoString);
                     if (msgType.equals("1"))
@@ -53,8 +54,9 @@ class Market {
 
             marketHBSender.interrupt();
 
-        } catch(IOException e) {
+        } catch(IOException | NullPointerException e) {
             System.out.println("Market Error: " + e.getMessage());
+            marketHBSender.interrupt();
         }
     }
 }
