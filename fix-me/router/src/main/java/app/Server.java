@@ -123,7 +123,7 @@ public class Server {
                     int serviceID = LinkCounter.generateServiceID();
                     String routeID = LinkCounter.getMarketRouteID(socket);
                     mapMarket.put(routeID, socket);
-                    System.out.println("Market[" + (LinkCounter.brokerCount == 0 ? "heartbeat" : LinkCounter.brokerCount) + "] connected");
+                    System.out.println("Market[" + (LinkCounter.marketCount == 0 ? "heartbeat" : LinkCounter.marketCount) + "] connected");
                     System.out.println("Saved Markets => " + mapMarket);
 
                     //-Send message to market

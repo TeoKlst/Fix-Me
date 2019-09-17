@@ -135,7 +135,24 @@ class Broker {
                                         System.out.println(response);
                                 }
                                 else {
-                                    System.out.println("Server_ERROR: \"Null_Message\"");
+                                    System.out.println("Server_ERROR: \"Session_Error\"");
+                                    System.out.println("-Create- new Session or -Close- old Session");
+                                    echoString = scanner.nextLine().toLowerCase();
+                                    while (!"create".equals(echoString) || !"close".equals(echoString)) {
+                                        System.out.println("-Create- new Session or -Close- old Session");
+                                        echoString = scanner.nextLine().toLowerCase();
+                                        if ("create".equals(echoString)) {
+                                            System.out.println("creating new. . .");
+                                            Broker.main(args);
+                                        }
+                                        else {
+                                            System.out.println("closing . . .");
+                                            brokerHBSender.interrupt();
+                                            scanner.close();
+                                            System.out.println("Connection Closed");
+                                            break;
+                                        }
+                                    }
                                 }
                         }
                     }

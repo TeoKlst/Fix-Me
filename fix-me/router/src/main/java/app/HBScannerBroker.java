@@ -19,7 +19,7 @@ public class HBScannerBroker extends Thread {
 
             HBTimeOutBroker hbTimeOutBroker = new HBTimeOutBroker();
             hbTimeOutBroker.start();
-            String marketRouteID = null;
+            String brokerRouteID = null;
             String hBType = null;
             while (true) {
                 String dINString = dIn.readLine();
@@ -33,15 +33,17 @@ public class HBScannerBroker extends Thread {
                 
                 for (int i=0; i < message.length; i++) {
                     if (message[i].startsWith("554=")) {
-                        marketRouteID = message[i].substring(4);
+                        brokerRouteID = message[i].substring(4);
                     }
                     if (message[i].startsWith("560=")) {
                         hBType = message[i].substring(4);
                     }
                 }
                 if ("1".equals(hBType)) {
-                    Server.mapHBBroker.put(marketRouteID, seconds);
+                    Server.mapHBBroker.put(brokerRouteID, seconds);
                 }
+                System.out.println("\nHB Broker =>" + Server.mapHBBroker.keySet());
+                System.out.println("AL Broker =>" + Server.mapBroker.keySet());
             }
         } catch(IOException e) {
             System.out.println("Oops: " + e.getMessage());
