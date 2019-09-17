@@ -478,7 +478,7 @@ public class FixProtocol {
 	
 			body.append("600=" + Server.mapHBMarket.keySet() + "|");
 	
-			String header = constructHeader(body.toString(), "60", refSeqNum); 													//ListMarkets = "60"
+			String header = constructHeader(body.toString(), "N", refSeqNum); 													//ListMarkets = "60"
 	
 			String message = header + body.toString() + "10=" + checksumGenerator(header + body.toString()) + "|";
 	
@@ -677,7 +677,7 @@ public class FixProtocol {
 			String[] message = messageInput.split("\\|");
 			for (int i=0; i < message.length; i++) {
 				if (message[i].startsWith("553=")) {
-					UserID =message[i].substring(3);
+					UserID =message[i].substring(4);
 				}
 			}
 			if (UserID == null) {

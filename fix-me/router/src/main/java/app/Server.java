@@ -18,7 +18,7 @@ public class Server {
 
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-	static final String DB_URL = "jdbc:mysql://localhost:3306/fixme";
+	static final String DB_URL = "jdbc:mysql://localhost:3306/";
 
 	//  Database credentials
 	static final String USER = "java";
@@ -47,12 +47,16 @@ public class Server {
 			Class.forName(JDBC_DRIVER);
 			System.out.println("Connecting to Database...");
 			conn = DriverManager.getConnection(DB_URL, USER, PASS);
-			System.out.println("Creating Table...");
 			stmt = conn.createStatement();
-			String sql = "DROP TABLE IF EXISTS fixmessages;";
+			String sql = "DROP DATABASE IF EXISTS fixme";
+			stmt.executeUpdate(sql);
+			sql = "CREATE DATABASE fixme";
+			stmt.executeUpdate(sql);
+			System.out.println("Creating Table...");
+			sql = "DROP TABLE IF EXISTS fixme.fixmessages;";
 			stmt.executeUpdate(sql);
 			sql = 
-			"CREATE TABLE fixmessages " +
+			"CREATE TABLE fixme.fixmessages " +
 			"(" +
 				"ID INT NOT NULL AUTO_INCREMENT, " +
 				"Message VARCHAR(120) NOT NULL, " +
