@@ -699,7 +699,6 @@ public class FixProtocol {
 		public String			getRouteID(String messageInput) throws InvalidMsgTypeException {
 			String msgType = null;
 			if (!messageInput.contains("|554=")) {
-				// TODO To be able to distinguish if message is required to check for broker or market routeID and give appropriate error return
 				throw new InvalidMsgTypeException("Invalid RouteID (Broker/Market) Type");
 			}
 			String[] message = messageInput.split("\\|");
@@ -717,7 +716,6 @@ public class FixProtocol {
 		public int			getMsgSeqNum(String messageInput) throws InvalidMsgTypeException {
 			String msgSeqNum = null;
 			if (!messageInput.contains("|34=")) {
-				// TODO To be able to distinguish if message is required to check for broker or market routeID and give appropriate error return
 				throw new InvalidMsgTypeException("Invalid Message Sequence Number");
 			}
 			String[] message = messageInput.split("\\|");

@@ -34,12 +34,6 @@ public class MessageProcessing extends Thread {
                     break;
                 }
 
-                //TODO
-                //Delete or mute
-                if (!fixProtocol.getMsgType(echoString).equals("0"))  {
-                    System.out.println("Received message: " + echoString);
-                }
-
                 String rejectMessage = fixProtocol.receiveMessage(echoString);
                 if (rejectMessage != null) {
                     //Send rejectMessage
@@ -51,8 +45,7 @@ public class MessageProcessing extends Thread {
                 try {
                     String type = fixProtocol.getMsgType(echoString);
                     if (type.equals("A") || type.equals("5") || type.equals("0")) {
-                        // output.println("Message for Router");
-                        //Message for router
+                        //Send through message to heartBeatScanners
                         if (fixProtocol.getHBType(echoString).equals("1")) {
                             Socket brokerPort = Server.mapBroker.get("0");
                             output = new PrintWriter(brokerPort.getOutputStream(), true);
@@ -77,7 +70,6 @@ public class MessageProcessing extends Thread {
                             }
                         }
                         if (type.equals("AK") || type.equals("3") || type.equals("7") || type.equals("4")) {
-                            // TODO Fix Null get(fixProtocol.getRouteID(echoString)
                             Socket brokerPort = Server.mapBroker.get(fixProtocol.getRouteID(echoString));
                             output = new PrintWriter(brokerPort.getOutputStream(), true);
                             output.println(echoString);

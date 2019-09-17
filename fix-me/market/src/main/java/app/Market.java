@@ -13,6 +13,7 @@ class Market {
 
     public static void main(String[] args) throws Exception {
         try (Socket socket = new Socket("127.0.0.1", 5001)) {
+
             //-Starts Market HeartBeat
             MarketHBSender marketHBSender = new MarketHBSender(socket);
             marketHBSender.start();
@@ -33,6 +34,8 @@ class Market {
                 response = null;
                 msgType = null;
                 echoString = dIn.readLine();
+                
+                Thread.sleep(1000);
 
                 if (echoString != null) {
                     msgType = fixProtocol.getMsgType(echoString);
@@ -46,7 +49,7 @@ class Market {
                         response = "Market Command Error";
                     dOut.println(response);
                 }
-            } while (!echoString.equals("exit"));
+            } while (!"exit".equals(echoString));
 
             marketHBSender.interrupt();
 

@@ -36,9 +36,7 @@ class Broker {
                 Boolean cmdValidator = false;
                 String fixMessage = null;
 
-                // socket.setSoTimeout(1000);
                 System.out.println("Buy, Sell, List Markets or Display your goods:");
-                // Thread.sleep(1000);
                 echoString = scanner.nextLine().toLowerCase();
 
                 if (echoString.equals("buy")) {
@@ -90,7 +88,6 @@ class Broker {
                     BrokerFunctions.brokerGetDataBroker();
                     cmdValidator = true;
                 }
-                // Not allowed to query market 0
                 else if (echoString.equals("listmg") || echoString.equals("list market goods")) {
                     System.out.println("Choose Market ID to view (its) goods:");
                     String marketID = scanner.nextLine().toLowerCase();
@@ -111,6 +108,9 @@ class Broker {
                         && !echoString.equals("error_1") && !echoString.equals("error_2")) {
                             if (cmdValidator) {
                                 response = dIn.readLine();
+
+                                Thread.sleep(1000);
+
                                 if (response != null) {
                                     String responseType = fixProtocol.getMsgType(response);
                                     if (responseType.equals("AK")) {
@@ -135,14 +135,12 @@ class Broker {
                                         System.out.println(response);
                                 }
                                 else {
-                                    System.out.println("Server ERROR => \"Null\"");
-                                    // MessageProcessing messageProcessing = new MessageProcessing(socket);
-                                    // messageProcessing.start();
+                                    System.out.println("Server_ERROR: \"Null_Message\"");
                                 }
                         }
                     }
                 }
-            } while (!echoString.equals("exit"));
+            } while (!"exit".equals(echoString));
 
             brokerHBSender.interrupt();
             scanner.close();
@@ -153,11 +151,3 @@ class Broker {
         }
     }
 }
-/*
-    Message sent == null
-    Broker Receives message
-    message.gettype gets null and breaks!
-    Broker Disconnects
-    Message sent before cant find broker .getBrokerRouteID
-    Fails & Crashes
-*/
