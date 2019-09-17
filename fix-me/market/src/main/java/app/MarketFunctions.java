@@ -33,8 +33,6 @@ public class MarketFunctions {
         int itemID = 0;
         int purchaseAmount = 0;
         int brokerRouteID = 0;
-        // TODO Check if market has enough money to send to broker
-        int purchasePrice = 0;
 
         try {
             for (int i=0; i < message.length; i++) {
@@ -43,9 +41,6 @@ public class MarketFunctions {
                 }
                 if (message[i].startsWith("101=")) {
                     purchaseAmount = Integer.parseInt(message[i].substring(4));
-                }
-                if (message[i].startsWith("102=")) {
-                    purchasePrice = Integer.parseInt(message[i].substring(4));
                 }
                 if (message[i].startsWith("554=")) {
                     brokerRouteID = Integer.parseInt(message[i].substring(4));
@@ -70,10 +65,11 @@ public class MarketFunctions {
     public static String brokerPurchaseExecuted(String value) {
 
         String[] message = value.split("\\|");
-        int itemID = 0;
-        int purchaseAmount = 0;
-        int purchasePrice = 0;
-        String brokerID = "";
+        int     itemID = 0;
+        int     purchaseAmount = 0;
+        int     purchasePrice = 0;
+        String  brokerID = "";
+        int     msgSeqNum = 0;
 
         for (int i=0; i < message.length; i++) {
             if (message[i].startsWith("100=")) {
@@ -87,6 +83,9 @@ public class MarketFunctions {
             }
             if (message[i].startsWith("554=")) {
                 brokerID = message[i].substring(4);
+            }
+            if (message[i].startsWith("34=")) {
+                msgSeqNum = Integer.parseInt(message[i].substring(3));
             }
         }
 
@@ -103,7 +102,7 @@ public class MarketFunctions {
 
         MarketAccount.capital += purchasePrice;
 
-        String ret = Market.fixProtocol.PurchaseMessageSuccess(brokerID, "1");
+        String ret = Market.fixProtocol.PurchaseMessageSuccess(brokerID, msgSeqNum, "1");
         return ret;
     }
 
@@ -111,14 +110,18 @@ public class MarketFunctions {
     public static String brokerPurchaseRejected(String value) {
         String[] message = value.split("\\|");
         String brokerID = "";
+        int     msgSeqNum = 0;
 
         for (int i=0; i < message.length; i++) {
             if (message[i].startsWith("554=")) {
                 brokerID = message[i].substring(4);
             }
+            if (message[i].startsWith("34=")) {
+                msgSeqNum = Integer.parseInt(message[i].substring(3));
+            }
         }
 
-        String ret = Market.fixProtocol.PurchaseMessageFail(brokerID);
+        String ret = Market.fixProtocol.PurchaseMessageFail(brokerID, msgSeqNum);
         return ret;
     }
 
@@ -168,6 +171,7 @@ public class MarketFunctions {
         int saleAmount = 0;
         int salePrice = 0;
         String brokerID = "";
+        int msgSeqNum = 0;
 
         for (int i=0; i < message.length; i++) {
             if (message[i].startsWith("100=")) {
@@ -181,6 +185,9 @@ public class MarketFunctions {
             }
             if (message[i].startsWith("554=")) {
                 brokerID = message[i].substring(4);
+            }
+            if (message[i].startsWith("34=")) {
+                msgSeqNum = Integer.parseInt(message[i].substring(3));
             }
         }
 
@@ -197,35 +204,43 @@ public class MarketFunctions {
 
         MarketAccount.capital -= salePrice;
         
-        String ret = Market.fixProtocol.SaleMessageSuccess(brokerID, "2");
+        String ret = Market.fixProtocol.SaleMessageSuccess(brokerID, msgSeqNum, "2");
         return ret;
     }
 
     public static String brokerSaleRejected(String value) {
         String[] message = value.split("\\|");
         String brokerID = "";
+        int msgSeqNum = 0;
 
         for (int i=0; i < message.length; i++) {
             if (message[i].startsWith("554=")) {
                 brokerID = message[i].substring(4);
             }
+            if (message[i].startsWith("34=")) {
+                msgSeqNum = Integer.parseInt(message[i].substring(3));
+            }
         }
 
-        String ret = Market.fixProtocol.SaleMessageFail(brokerID);
+        String ret = Market.fixProtocol.SaleMessageFail(brokerID, msgSeqNum);
         return ret;
     }
 
     public static String marketQuery(String value) {
         String[] message = value.split("\\|");
         String brokerID = "";
+        int msgSeqNum = 0;
 
         for (int i=0; i < message.length; i++) {
             if (message[i].startsWith("554=")) {
                 brokerID = message[i].substring(4);
             }
+            if (message[i].startsWith("34=")) {
+                msgSeqNum = Integer.parseInt(message[i].substring(3));
+            }
         }
 
-        String ret = Market.fixProtocol.MarketQueryReturn(brokerID, MarketAccount.marketRouteID, 
+        String ret = Market.fixProtocol.MarketQueryReturn(brokerID, msgSeqNum, MarketAccount.marketRouteID, 
                         MarketAccount.silver, MarketAccount.gold, MarketAccount.platinum, 
                         MarketAccount.fuel, MarketAccount.bitcoin, MarketAccount.capital);
         return ret;

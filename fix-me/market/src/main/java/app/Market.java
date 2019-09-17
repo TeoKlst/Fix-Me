@@ -13,6 +13,7 @@ class Market {
 
     public static void main(String[] args) throws Exception {
         try (Socket socket = new Socket("127.0.0.1", 5001)) {
+
             //-Starts Market HeartBeat
             MarketHBSender marketHBSender = new MarketHBSender(socket);
             marketHBSender.start();
@@ -33,23 +34,24 @@ class Market {
                 response = null;
                 msgType = null;
                 echoString = dIn.readLine();
+                
+                Thread.sleep(1000);
 
-                System.out.println(echoString);
+                if (echoString != null) {
+                    msgType = fixProtocol.getMsgType(echoString);
+                    if (msgType.equals("1"))
+                        response = MarketFunctions.brokerPurchaseCheck(echoString);
+                    else if (msgType.equals("2"))
+                        response = MarketFunctions.brokerSaleCheck(echoString);
+                    else if (msgType.equals("6"))
+                        response = MarketFunctions.marketQuery(echoString);
+                    else
+                        response = "Market Command Error";
+                    dOut.println(response);
+                }
+            } while (!"exit".equals(echoString));
 
-                msgType = fixProtocol.getMsgType(echoString);
-
-                if (msgType.equals("1"))
-                    response = MarketFunctions.brokerPurchaseCheck(echoString);
-                else if (msgType.equals("2"))
-                    response = MarketFunctions.brokerSaleCheck(echoString);
-                else if (msgType.equals("6"))
-                    response = MarketFunctions.marketQuery(echoString);
-                else
-                    response = "Market Command Error";
-                dOut.println(response);   
-            } while (!echoString.equals("exit"));
-
-            // marketHBSender.interrupt();
+            marketHBSender.interrupt();
 
         } catch(IOException e) {
             System.out.println("Market Error: " + e.getMessage());

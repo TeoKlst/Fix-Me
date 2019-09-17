@@ -20,6 +20,7 @@ public class HBScannerMarket extends Thread {
             HBTimeOutMarket hbTimeOutMarket = new HBTimeOutMarket();
             hbTimeOutMarket.start();
             String marketRouteID = null;
+            String hBType = null;
             while (true) {
                 String dINString = dIn.readLine();
                 Calendar cal = Calendar.getInstance();
@@ -34,9 +35,13 @@ public class HBScannerMarket extends Thread {
                     if (message[i].startsWith("554=")) {
                         marketRouteID = message[i].substring(4);
                     }
+                    if (message[i].startsWith("560=")) {
+                        hBType = message[i].substring(4);
+                    }
                 }
-                Server.mapHBMarket.put(marketRouteID, seconds);
-                System.out.println("HBMarket Map" + Server.mapHBMarket);
+                if ("2".equals(hBType)) {
+                    Server.mapHBMarket.put(marketRouteID, seconds);
+                }
             }
         } catch(IOException e) {
             System.out.println("Oops: " + e.getMessage());

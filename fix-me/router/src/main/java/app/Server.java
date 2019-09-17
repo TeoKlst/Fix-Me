@@ -1,7 +1,6 @@
 package app;
 
 import app.fix.FixProtocol;
-import app.fix.exceptions.InvalidMsgTypeException;
 
 import java.io.PrintWriter;
 import java.io.IOException;
@@ -127,7 +126,7 @@ public class Server {
                     int serviceID = LinkCounter.generateServiceID();
                     String routeID = LinkCounter.getBrokerRouteID(socket);
                     mapBroker.put(routeID, socket);
-                    System.out.println("Broker[" + LinkCounter.brokerCount + "] connected");
+                    System.out.println("Broker[" + (LinkCounter.brokerCount == 0 ? "heartbeat" : LinkCounter.brokerCount) + "] connected");
                     System.out.println("Saved Brokers => " + mapBroker);
 
                     //-Send message to broker
@@ -145,7 +144,6 @@ public class Server {
 
     class MarketSocket implements Runnable {
         private ServerSocket socketM;
-
 
 	    MarketSocket(ServerSocket sM) { socketM = sM; }
 
@@ -173,7 +171,7 @@ public class Server {
                     int serviceID = LinkCounter.generateServiceID();
                     String routeID = LinkCounter.getMarketRouteID(socket);
                     mapMarket.put(routeID, socket);
-                    System.out.println("Market[" + LinkCounter.marketCount + "] connected");
+                    System.out.println("Market[" + (LinkCounter.brokerCount == 0 ? "heartbeat" : LinkCounter.brokerCount) + "] connected");
                     System.out.println("Saved Markets => " + mapMarket);
 
                     //-Send message to market
@@ -191,7 +189,6 @@ public class Server {
     
     public static void main(String[] args)
     {
-
         int portA = 5000;
         int portB = 5001;
 
