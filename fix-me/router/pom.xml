@@ -8,6 +8,13 @@
   </parent>
   <artifactId>router</artifactId>
   <packaging>jar</packaging>
+  <dependencies>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.17</version>
+		</dependency>
+	</dependencies>
   <name>router</name>
 	<build>
 		<plugins>

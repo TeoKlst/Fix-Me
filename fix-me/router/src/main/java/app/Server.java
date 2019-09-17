@@ -8,9 +8,21 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class Server {
 	private static FixProtocol fixProtocol;
+
+	// JDBC driver name and database URL
+	static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+	static final String DB_URL = "jdbc:mysql://localhost:3306/fixme";
+
+	//  Database credentials
+	static final String USER = "java";
+	static final String PASS = "123";
 
     //-Broker Hash Map
     public static Map<String, Socket> mapBroker;
@@ -28,6 +40,42 @@ public class Server {
     public static Map<String, Integer> mapHBMarket;
 
     public Server(int portA, int portB) throws IOException {
+
+		Connection conn = null;
+		Statement stmt = null;
+		try{
+			Class.forName(JDBC_DRIVER);
+			System.out.println("Connecting to Database...");
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			System.out.println("Creating Table...");
+			stmt = conn.createStatement();
+			String sql = "DROP TABLE IF EXISTS fixmessages;";
+			stmt.executeUpdate(sql);
+			sql = 
+			"CREATE TABLE fixmessages " +
+			"(" +
+				"ID INT NOT NULL AUTO_INCREMENT, " +
+				"Message VARCHAR(120) NOT NULL, " +
+				"Response VARCHAR(120), " +
+				"PRIMARY KEY (ID)" +
+			")";
+			stmt.executeUpdate(sql);
+			System.out.println("Table created successfully...");
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			try{
+				if(stmt!=null)
+					stmt.close();
+			}catch(SQLException se){
+			}
+			try{
+				if(conn!=null)
+					conn.close();
+			}catch(SQLException se){
+				se.printStackTrace();
+			}
+		}
 
         mapBroker = new HashMap<String,Socket>();
         mapMarket = new HashMap<String,Socket>();
