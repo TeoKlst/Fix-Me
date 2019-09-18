@@ -24,8 +24,8 @@ public class HBTimeOutMarket extends Thread {
                 }
                 String parts[] = index.split(",");
                 while (i != parts.length) {
-                    Server.mapHBMarket.remove(parts[i]);
-                    Server.mapMarket.remove(parts[i]);
+                    // Server.mapHBMarket.remove(parts[i]);
+                    // Server.mapMarket.remove(parts[i]);
                     i++;
                 }
             }

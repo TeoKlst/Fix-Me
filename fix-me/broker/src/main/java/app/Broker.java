@@ -145,7 +145,7 @@ class Broker {
                                     if ("create".equals(echoString)) {
                                         System.out.println("creating new. . .");
                                         brokerHBSender.interrupt();
-                                        scanner.close();
+                                        // scanner.close();
                                         Broker.main(args);
                                     }
                                     else if ("close".equals(echoString)){

@@ -42,8 +42,8 @@ public class HBScannerBroker extends Thread {
                 if ("1".equals(hBType)) {
                     Server.mapHBBroker.put(brokerRouteID, seconds);
                 }
-                System.out.println("\nHB Broker =>" + Server.mapHBBroker.keySet());
-                System.out.println("AL Broker =>" + Server.mapBroker.keySet());
+                // System.out.println("\nHB Broker =>" + Server.mapHBBroker.keySet());
+                // System.out.println("AL Broker =>" + Server.mapBroker.keySet());
             }
         } catch(IOException e) {
             System.out.println("Oops: " + e.getMessage());
