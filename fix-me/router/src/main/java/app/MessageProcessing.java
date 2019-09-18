@@ -61,7 +61,6 @@ public class MessageProcessing extends Thread {
                     sql = "UPDATE fixmessages " +
                                 "SET Response = \"" + fixMessage + "\" " +
                                 "WHERE Message LIKE \"%|34=" + sequenceNum + "%\" AND Message LIKE \"%|554=" + userId + "%\"";
-                    System.out.println(sql);
                     stmt.executeUpdate(sql);
                     break;
                 default:
