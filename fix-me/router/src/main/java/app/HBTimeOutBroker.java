@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.ConcurrentModificationException;
 
 public class HBTimeOutBroker extends Thread {
+    
     @Override
     public void run() {
         try {
@@ -11,13 +12,13 @@ public class HBTimeOutBroker extends Thread {
                 Thread.sleep(5000);
                 Calendar cal = Calendar.getInstance();
                 int seconds = cal.get(Calendar.SECOND);
-                String index = "base";
+                String index = "";
                 int i = 0;
 
                 for (String key : Server.mapHBBroker.keySet()) {
                     int val = Server.mapHBBroker.get(key) < seconds ? seconds - Server.mapHBBroker.get(key) : Server.mapHBBroker.get(key) - seconds;
                     if (val > 5) {
-                        index = "," + key;
+                        index = key + ",";
                     }
                     else {}
                 }

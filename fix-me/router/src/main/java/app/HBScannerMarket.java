@@ -23,6 +23,7 @@ public class HBScannerMarket extends Thread {
             String hBType = null;
             while (true) {
                 String dINString = dIn.readLine();
+                Thread.sleep(250);
                 Calendar cal = Calendar.getInstance();
                 int seconds = cal.get(Calendar.SECOND);
                 if (dINString == null) {
@@ -44,6 +45,8 @@ public class HBScannerMarket extends Thread {
                 }
                 System.out.println("\nHB Market =>" + Server.mapHBMarket.keySet());
                 System.out.println("AL Market =>" + Server.mapMarket.keySet());
+                System.out.println("\nHB Broker =>" + Server.mapHBBroker.keySet());
+                System.out.println("AL Broker =>" + Server.mapBroker.keySet());
             }
         } catch(IOException e) {
             System.out.println("Oops: " + e.getMessage());

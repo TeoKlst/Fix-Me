@@ -23,6 +23,7 @@ public class HBScannerBroker extends Thread {
             String hBType = null;
             while (true) {
                 String dINString = dIn.readLine();
+                Thread.sleep(250);
                 Calendar cal = Calendar.getInstance();
                 int seconds = cal.get(Calendar.SECOND);
                 if (dINString == null) {

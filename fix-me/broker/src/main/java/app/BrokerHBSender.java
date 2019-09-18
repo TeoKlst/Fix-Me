@@ -17,7 +17,7 @@ public class BrokerHBSender extends Thread {
             PrintWriter dOut = new PrintWriter(socket.getOutputStream(), true);
 
             while (true) {
-                Thread.sleep(3000);
+                Thread.sleep(2000);
                 dOut.println(Broker.fixProtocol.heartBeatMessage(BrokerAccount.brokerRouteID));
                 }
         } catch (IOException e) {

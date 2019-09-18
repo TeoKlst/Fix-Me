@@ -11,13 +11,15 @@ import java.util.Scanner;
 
 class Broker {
     public static FixProtocol fixProtocol;
+    private static BrokerHBSender brokerHBSender;
+    private static Boolean exitCase;
 
     public static void main(String[] args) throws Exception {
         try (Socket socket = new Socket("127.0.0.1", 5000)) {
 
             fixProtocol = new FixProtocol(Integer.toString(BrokerAccount.brokerServiceID));
 
-            BrokerHBSender brokerHBSender = new BrokerHBSender(socket);
+            brokerHBSender = new BrokerHBSender(socket);
             brokerHBSender.start();
 
             BufferedReader dIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -33,6 +35,7 @@ class Broker {
             "You are Broker[" + BrokerAccount.brokerRouteID + "]" + " ServiceID => " + BrokerAccount.brokerServiceID);
 
             do {
+                exitCase = false;
                 Boolean cmdValidator = false;
                 String fixMessage = null;
 
@@ -144,16 +147,13 @@ class Broker {
                                     }
                                     if ("create".equals(echoString)) {
                                         System.out.println("creating new. . .");
-                                        brokerHBSender.interrupt();
-                                        // scanner.close();
+                                        exitCase = true;
+                                        echoString = "exit";
                                         Broker.main(args);
                                     }
                                     else if ("close".equals(echoString)){
                                         System.out.println("closing . . .");
-                                        brokerHBSender.interrupt();
-                                        scanner.close();
-                                        System.out.println("Connection Closed");
-                                        break;
+                                        echoString = "exit";
                                     }
                                 }
                         }
@@ -161,12 +161,16 @@ class Broker {
                 }
             } while (!"exit".equals(echoString));
 
+            if (exitCase) {}
+            else {
             brokerHBSender.interrupt();
             scanner.close();
             System.out.println("Connection Closed");
-
-        } catch(IOException e) {
+            }
+        } catch(IOException | NullPointerException e) {
             System.out.println("Broker Error: " + e.getMessage());
+            brokerHBSender.interrupt();
+            System.out.println("Broker [" + BrokerAccount.brokerRouteID + "] Closed");
         }
     }
 }

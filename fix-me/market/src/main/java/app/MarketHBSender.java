@@ -17,7 +17,7 @@ public class MarketHBSender extends Thread {
             PrintWriter dOut = new PrintWriter(socket.getOutputStream(), true);
 
             while (true) {
-                Thread.sleep(3000);
+                Thread.sleep(2000);
                 dOut.println(Market.fixProtocol.heartBeatMessage(MarketAccount.marketRouteID));
                 }
         } catch (IOException e) {
