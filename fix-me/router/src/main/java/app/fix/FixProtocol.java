@@ -669,6 +669,39 @@ public class FixProtocol {
 			}
 				return msgType;
 		}
+		public String		    getUserID(String messageInput) throws InvalidMsgTypeException {
+			String UserID = null;
+			if (!messageInput.contains("|553=")) {
+				throw new InvalidMsgTypeException("Invalid User ID");
+			}
+			String[] message = messageInput.split("\\|");
+			for (int i=0; i < message.length; i++) {
+				if (message[i].startsWith("553=")) {
+					UserID =message[i].substring(3);
+				}
+			}
+			if (UserID == null) {
+				throw new InvalidMsgTypeException("Invalid User ID");
+			}
+    		return UserID;
+		}
+
+		public String		    getSequenceNum(String messageInput) throws InvalidMsgTypeException {
+			String msn = null;
+			if (!messageInput.contains("|34=")) {
+				throw new InvalidMsgTypeException("Invalid Message Sequence Number");
+			}
+			String[] message = messageInput.split("\\|");
+			for (int i=0; i < message.length; i++) {
+				if (message[i].startsWith("34=")) {
+					msn =message[i].substring(3);
+				}
+			}
+			if (msn == null) {
+				throw new InvalidMsgTypeException("Invalid Message Sequence Number");
+			}
+    		return msn;
+		}
 
 		public String			getHBType(String messageInput) throws InvalidMsgTypeException {
 			String msgType = null;

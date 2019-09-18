@@ -8,8 +8,21 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class MessageProcessing extends Thread {
+
+	// JDBC driver name and database URL
+	static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+	static final String DB_URL = "jdbc:mysql://localhost:3306/fixme";
+
+	//  Database credentials
+	static final String USER = "java";
+	static final String PASS = "123";
+
     private Socket socket;
 
     public MessageProcessing(Socket socket) {
@@ -20,15 +33,61 @@ public class MessageProcessing extends Thread {
 
     @Override
     public void run() {
+
+		Connection conn = null;
+		Statement stmt = null;
+		try {
+			Class.forName(JDBC_DRIVER);
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			stmt = conn.createStatement();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+        
         try {
             BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
 
             while (true) {
                 String echoString = input.readLine();
+
                 if (echoString == null) {
                     System.out.println("---Disconnected---");
                     break;
+                }
+                
+                try {
+                    String type = fixProtocol.getMsgType(echoString);
+                    String userId = fixProtocol.getUserID(echoString);
+                    String sequenceNum = fixProtocol.getSequenceNum(echoString)
+                    switch(type){
+                        case "0":   //heartbeat
+                        case "5":   //logout
+                        case "A":   //logon
+                        case "404": //error
+                            String sql = "INSERT INTO fixmessages (Message, Response) " +
+                                        "VALUES ('" + echoString + "', 'NRR')";
+                            stmt.executeUpdate(sql);
+                            break;
+                        case "3":   //reject
+                        case "4":   //sale/purchase failure
+                        case "7":   //list market goods
+                        case "AK":  //sale - purchase success
+                        case "N":   //list markets
+                        case "W":   //markets data response
+                        case "Y":   //markets data reject
+                            String sql = "UPDATE fixmessages " +
+                                        "SET Response = " + echoString + " " +
+                                        "WHERE Message LIKE '%|34=" + userID + "%' AND Message LIKE '%|553=" + sequenceNum + "%'"
+                            stmt.executeUpdate(sql);
+                            break;
+                        default:
+                            String sql = "INSERT INTO fixmessages (Message) " +
+                                        "VALUES ('" + echoString + "')";
+                            stmt.executeUpdate(sql);
+                    }
+                } catch(Exception e) {
+                    e.printStackTrace();
                 }
 
                 if (echoString.equals("exit")) {
@@ -126,6 +185,17 @@ public class MessageProcessing extends Thread {
             try {
                 socket.close();
             } catch(IOException e) {}
+            try{
+				if(stmt!=null)
+					stmt.close();
+			}catch(SQLException se){
+			}
+			try{
+				if(conn!=null)
+					conn.close();
+			}catch(SQLException se){
+                se.printStackTrace();
+            }
         }
     }
 }
