@@ -129,7 +129,7 @@ class Broker {
                                         BrokerFunctions.brokerReceiveDataMarket(response);
                                     else if (responseType.equals("91"))
                                         System.out.println("ERROR: Market does not exist!");
-                                    else if (responseType.equals("60"))
+                                    else if (responseType.equals("N"))
                                         BrokerFunctions.getMarketList(response);
                                     else
                                         System.out.println(response);
