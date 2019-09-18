@@ -27,7 +27,7 @@ public class MessageProcessing extends Thread {
             while (true) {
                 String echoString = input.readLine();
                 if (echoString == null) {
-                    System.out.println("---Message Processor Null Break---");
+                    System.out.println("---Disconnected---");
                     break;
                 }
 
