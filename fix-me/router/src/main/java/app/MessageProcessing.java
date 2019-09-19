@@ -69,7 +69,10 @@ public class MessageProcessing extends Thread {
                     stmt.executeUpdate(sql);
             }
         } catch(Exception e) {
-            e.printStackTrace();
+            // System.out.println(fixMessage);
+            if (fixMessage != null) {
+                e.printStackTrace();
+            }
         }
     }
 

@@ -35,8 +35,8 @@ class Market {
                 
                 // Thread.sleep(1000);
                 
-                System.out.println(echoString);
                 if (echoString != null) {
+                    System.out.println(echoString);
                     msgType = fixProtocol.getMsgType(echoString);
                     if (msgType.equals("1"))
                         response = MarketFunctions.brokerPurchaseCheck(echoString);
@@ -49,6 +49,8 @@ class Market {
                     }
                     if (!"Market Cmd Error".equals(response))   
                         dOut.println(response);
+                } else if (echoString == null) {
+                    throw new NullPointerException("testing");
                 }
             } while (!"exit".equals(echoString));
 
