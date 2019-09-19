@@ -43,6 +43,10 @@ public class HBScannerMarket extends Thread {
                 if ("2".equals(hBType)) {
                     Server.mapHBMarket.put(marketRouteID, seconds);
                 }
+                // System.out.println("\nHB Market =>" +  Server.mapHBMarket.keySet());
+                // System.out.println("Map Market =>" +  Server.mapMarket.keySet());
+                // System.out.println("\nHB Broker =>" +  Server.mapHBBroker.keySet());
+                // System.out.println("Map Broker =>" +  Server.mapBroker.keySet());
             }
         } catch(IOException e) {
             System.out.println("Oops: " + e.getMessage());
