@@ -9,7 +9,7 @@ public class HBTimeOutBroker extends Thread {
     public void run() {
         try {
             while (true) {
-                Thread.sleep(5000);
+                Thread.sleep(10000);
                 Calendar cal = Calendar.getInstance();
                 int seconds = cal.get(Calendar.SECOND);
                 String index = "";
@@ -17,7 +17,7 @@ public class HBTimeOutBroker extends Thread {
 
                 for (String key : Server.mapHBBroker.keySet()) {
                     int val = Server.mapHBBroker.get(key) < seconds ? seconds - Server.mapHBBroker.get(key) : Server.mapHBBroker.get(key) - seconds;
-                    if (val > 5) {
+                    if (val > 10) {
                         index = key + ",";
                     }
                     else {}

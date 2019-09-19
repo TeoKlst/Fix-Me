@@ -89,7 +89,7 @@ public class MessageProcessing extends Thread {
 
             while (true) {
                 String echoString = input.readLine();
-                // UpdateDatabase(echoString);
+                UpdateDatabase(echoString);
 
                 if (echoString == null) {
                     break;

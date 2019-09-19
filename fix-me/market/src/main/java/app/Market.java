@@ -31,11 +31,10 @@ class Market {
             "Market[" + MarketAccount.marketRouteID + "]" + " ServiceID => " + MarketAccount.marketServiceID);
             fixProtocol = new FixProtocol("" + MarketAccount.marketServiceID);
             do {
-                // response = null;
-                // msgType = null;
                 echoString = dIn.readLine();
                 
                 // Thread.sleep(1000);
+                
                 System.out.println(echoString);
                 if (echoString != null) {
                     msgType = fixProtocol.getMsgType(echoString);
